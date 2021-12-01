@@ -1,0 +1,8 @@
+ovos-core~=0.0.2a1
+
+ovos-tts-plugin-mimic~=0.2.3
+ovos-tts-plugin-mimic2~=0.1.2
+ovos-tts-plugin-pico~=0.0.3
+git+https://github.com/NeonGeckoCom/neon-tts-plugin-larynx_server
+
+git+https://github.com/OpenVoiceOS/ovos-ocp-audio-plugin
