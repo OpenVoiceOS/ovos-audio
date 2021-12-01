@@ -35,5 +35,6 @@ setup(
     license='Apache-2.0',
     url='https://github.com/OpenVoiceOS/ovos-core',
     description='ovos-core metapackage for audio daemon',
+    include_package_data=True,
     install_requires=required('requirements.txt')
 )
