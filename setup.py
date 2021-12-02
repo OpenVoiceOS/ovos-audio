@@ -31,7 +31,7 @@ def required(requirements_file):
 
 setup(
     name='ovos-audio',
-    version="0.0.2a1",
+    version="0.0.2a2",
     license='Apache-2.0',
     url='https://github.com/OpenVoiceOS/ovos-core',
     description='ovos-core metapackage for audio daemon',

@@ -1,10 +1,8 @@
-ovos-core~=0.0.2a1
+ovos-core~=0.0.2a2
 
 ovos-tts-plugin-mimic~=0.2.3
 ovos-tts-plugin-mimic2~=0.1.2
 ovos-tts-plugin-pico~=0.0.3
 ovos-tts-plugin-google-tx~=0.0.2
 
-python-vlc~=1.1.2
-ovos_plugin_vlc~=0.0.1a3
-ovos-ocp-audio-plugin
+ovos_plugin_common_play~=0.0.1a6
