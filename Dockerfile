@@ -1,4 +1,4 @@
-FROM openvoiceos/core:latest
+FROM openvoiceos/core:dev
 
 RUN apt-get install -y portaudio19-dev libpulse-dev swig
 
