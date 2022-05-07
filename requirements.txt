@@ -1,1 +1,1 @@
-ovos-core[audio,tts]>=0.0.2a46
+ovos-core[audio,tts]>=0.0.2a47
