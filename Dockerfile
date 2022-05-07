@@ -10,10 +10,11 @@ RUN apt-get update && \
   apt-get clean && \
   useradd --no-log-init mycroft -m
 
-USER mycroft
-
 # the lines above are kept static so that docker layer is shared and cached among all containers
 RUN apt-get install -y portaudio19-dev libpulse-dev swig
+
+USER mycroft
+
 
 COPY . /tmp/ovos-audio
 RUN pip3 install /tmp/ovos-audio
