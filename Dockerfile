@@ -17,9 +17,6 @@ COPY . /tmp/ovos-audio
 RUN pip3 install /tmp/ovos-audio
 
 
-# TODO remove this, missing dependency in ovos-core
-RUN pip3 install python-dateutil ovos-utils==0.0.21a1
-
 USER mycroft
 
 ENTRYPOINT mycroft-audio
