@@ -1,2 +1,2 @@
-ovos-core[audio,tts]>=0.0.5a16
+ovos-core[audio,tts]>=0.0.6a11
 ovos_workshop~=0.0, >=0.0.7a4
