@@ -1,9 +1,9 @@
-ovos-utils~=0.0, >=0.0.29a2
+ovos-utils~=0.0, >=0.0.29
 ovos-config~=0.0,>=0.0.5
 ovos-plugin-manager~=0.0, >=0.0.20
 
 ovos_plugin_common_play~=0.0, >=0.0.3
-ovos-ocp-youtube-plugin
+# ovos-ocp-youtube-plugin
 ovos-ocp-m3u-plugin
 ovos-ocp-rss-plugin
 ovos-ocp-files-plugin
