@@ -1,4 +1,4 @@
-ovos-utils~=0.0, >=0.0.29a1
+ovos-utils~=0.0, >=0.0.29a2
 ovos-config~=0.0,>=0.0.5
 ovos-plugin-manager~=0.0, >=0.0.20
 
