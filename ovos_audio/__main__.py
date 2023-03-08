@@ -21,6 +21,7 @@ from ovos_audio.service import PlaybackService, on_ready, on_error, on_stopping
 def main(ready_hook=on_ready, error_hook=on_error, stopping_hook=on_stopping,
          watchdog=lambda: None):
     """Start the Audio Service and connect to the Message Bus"""
+    PIDLock.init()
     reset_sigint_handler()
     init_service_logger("audio")
     check_for_signal("isSpeaking")
