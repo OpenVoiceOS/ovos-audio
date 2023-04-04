@@ -10,6 +10,21 @@ under mycroft.conf
 
 ```javascript
 {
+
+  // Text to Speech parameters
+  // Override: REMOTE
+  "tts": {
+    "pulse_duck": false,
+    "module": "ovos-tts-plugin-mimic3-server",
+    "fallback_module": "ovos-tts-plugin-mimic",
+    "ovos-tts-plugin-mimic": {
+        "voice": "ap"
+    },
+    "ovos-tts-plugin-mimic3-server": {
+        "voice": "en_UK/apope_low"
+    }
+  },
+
   // File locations of sounds to play for system events
   "sounds": {
     "start_listening": "snd/start_listening.wav",
