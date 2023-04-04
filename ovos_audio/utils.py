@@ -44,8 +44,11 @@ def stop_speaking():
 
     TODO: Skills should only be able to stop speech they've initiated
     """
+    print(666, is_speaking())
     if is_speaking():
-        send('mycroft.audio.speech.stop')
+        from ovos_config import Configuration
+        bus_cfg = Configuration().get("websocket", {})
+        send('mycroft.audio.speech.stop', config=bus_cfg)
 
         # Block until stopped
         while check_for_signal("isSpeaking", -1):

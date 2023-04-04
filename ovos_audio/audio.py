@@ -34,7 +34,7 @@ class AudioService:
         to be played.
     """
 
-    def __init__(self, bus):
+    def __init__(self, bus, autoload=True):
         """
             Args:
                 bus: Mycroft messagebus
@@ -50,7 +50,8 @@ class AudioService:
         self.volume_is_low = False
 
         self._loaded = MonotonicEvent()
-        self.load_services()
+        if autoload:
+            self.load_services()
 
     def load_services(self):
         """Method for loading services.
@@ -112,6 +113,8 @@ class AudioService:
                     self._restore_volume_after_record)
 
         self._loaded.set()  # Report services loaded
+
+        return self.service
 
     def wait_for_load(self, timeout=3 * MINUTES):
         """Wait for services to be loaded.

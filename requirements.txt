@@ -2,6 +2,9 @@ ovos-utils~=0.0, >=0.0.29
 ovos-config~=0.0,>=0.0.5
 ovos-plugin-manager~=0.0, >=0.0.20
 
+ovos-tts-plugin-mimic3-server
+ovos-tts-plugin-mimic
+
 ovos_plugin_common_play~=0.0, >=0.0.3
 # ovos-ocp-youtube-plugin
 ovos-ocp-m3u-plugin
