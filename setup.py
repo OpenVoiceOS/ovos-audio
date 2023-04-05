@@ -13,7 +13,7 @@
 import os
 import os.path
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -62,6 +62,7 @@ setup(
     url="https://github.com/OpenVoiceOS/ovos-audio",
     description="ovos-core audio daemon client",
     include_package_data=True,
+    packages=find_packages(include=['ovos*']),
     install_requires=required("requirements.txt"),
     classifiers=[
         "Development Status :: 4 - Beta",
