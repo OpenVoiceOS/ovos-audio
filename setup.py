@@ -30,9 +30,6 @@ def required(requirements_file):
 
 
 
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
-
-
 def get_version():
     """ Find the version of ovos-core"""
     version = None
