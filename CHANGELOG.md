@@ -1,5 +1,9 @@
 # Changelog
 
+## [V0.0.2a8](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a8) (2023-04-05)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a7...V0.0.2a8)
+
 ## [V0.0.2a7](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a7) (2023-04-05)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a6...V0.0.2a7)
