@@ -1,6 +1,6 @@
 ovos-utils~=0.0, >=0.0.31a3
 ovos-bus-client~=0.0, >=0.0.3a4
-ovos-config~=0.0,>=0.0.7a2
+ovos-config~=0.0,>=0.0.8a2
 ovos-plugin-manager~=0.0, >=0.0.20
 
 ovos-tts-plugin-mimic3-server
