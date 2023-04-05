@@ -1,11 +1,12 @@
 ovos-utils~=0.0, >=0.0.31a3
 ovos-bus-client~=0.0, >=0.0.3a4
 ovos-config~=0.0,>=0.0.8a2
-ovos-plugin-manager~=0.0, >=0.0.20
+ovos-plugin-manager~=0.0, >=0.0.23a4
+
+ovos_plugin_common_play~=0.0, >=0.0.5a3
 
 ovos-tts-plugin-mimic3-server
 
-ovos_plugin_common_play~=0.0, >=0.0.3
 # ovos-ocp-youtube-plugin
 ovos-ocp-m3u-plugin
 ovos-ocp-rss-plugin
