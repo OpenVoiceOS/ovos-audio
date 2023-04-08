@@ -13,7 +13,7 @@
 from threading import Lock
 
 import time
-from mycroft_bus_client.message import Message
+from ovos_bus_client.message import Message
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend

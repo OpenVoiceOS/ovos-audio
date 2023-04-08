@@ -2,7 +2,7 @@ from os.path import exists, expanduser
 from threading import Thread, Lock
 
 import time
-from mycroft_bus_client import Message, MessageBusClient
+from ovos_bus_client import Message, MessageBusClient
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import get_audio_service_configs
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs

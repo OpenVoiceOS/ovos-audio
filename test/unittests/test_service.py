@@ -14,7 +14,7 @@ from os.path import dirname, join, abspath
 import unittest
 import unittest.mock as mock
 
-from mycroft_bus_client import Message
+from ovos_bus_client import Message
 from ovos_audio.audio import AudioService
 
 from .services.working import WorkingBackend

@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 import time
-from mycroft_bus_client.send_func import send
+from ovos_bus_client.send_func import send
 from ovos_utils.log import LOG
 from ovos_utils.signal import check_for_signal
 
