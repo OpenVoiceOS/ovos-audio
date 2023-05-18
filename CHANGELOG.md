@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a11...HEAD)
+
+**Merged pull requests:**
+
+- Optionally skip fallback TTS init [\#11](https://github.com/OpenVoiceOS/ovos-audio/pull/11) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.0.2a11](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a11) (2023-04-08)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a10...V0.0.2a11)
+
 ## [V0.0.2a10](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a10) (2023-04-05)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a9...V0.0.2a10)
