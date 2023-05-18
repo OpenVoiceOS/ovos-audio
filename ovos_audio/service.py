@@ -273,6 +273,10 @@ class PlaybackService(Thread):
                        'tts': self.tts.__class__.__name__})
 
     def _maybe_reload_tts(self):
+        """
+        Load TTS modules if not yet loaded or if configuration has changed.
+        Optionally pre-loads fallback TTS if configured
+        """
         config = self.config.get("tts", {})
 
         # update TTS object if configuration has changed
@@ -288,6 +292,10 @@ class PlaybackService(Thread):
 
         # if fallback TTS is the same as main TTS dont load it
         if config.get("module", "") == config.get("fallback_module", ""):
+            return
+
+        if not config.get('preload_fallback', True):
+            LOG.debug("Skipping fallback TTS init")
             return
 
         if not self._fallback_tts_hash or \
