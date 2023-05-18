@@ -295,6 +295,7 @@ class PlaybackService(Thread):
             return
 
         if not config.get('preload_fallback', True):
+            LOG.debug("Skipping fallback TTS init")
             return
 
         if not self._fallback_tts_hash or \
