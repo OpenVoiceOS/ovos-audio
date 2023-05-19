@@ -13,7 +13,7 @@
 from ovos_config.locale import setup_locale
 from ovos_utils import wait_for_exit_signal
 from ovos_utils.log import init_service_logger
-from ovos_utils.process_utils import PIDLock, reset_sigint_handler
+from ovos_utils.process_utils import reset_sigint_handler
 from ovos_utils.signal import check_for_signal
 
 from ovos_audio.service import PlaybackService, on_ready, on_error, on_stopping
@@ -21,11 +21,9 @@ from ovos_audio.service import PlaybackService, on_ready, on_error, on_stopping
 def main(ready_hook=on_ready, error_hook=on_error, stopping_hook=on_stopping,
          watchdog=lambda: None):
     """Start the Audio Service and connect to the Message Bus"""
-    PIDLock.init()
     reset_sigint_handler()
     init_service_logger("audio")
     check_for_signal("isSpeaking")
-    PIDLock("audio")
     setup_locale()
     service = PlaybackService(ready_hook=ready_hook, error_hook=error_hook,
                               stopping_hook=stopping_hook, watchdog=watchdog)
