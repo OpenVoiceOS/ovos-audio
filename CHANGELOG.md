@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a11...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a12...HEAD)
+
+**Fixed bugs:**
+
+- rm PIDLock [\#13](https://github.com/OpenVoiceOS/ovos-audio/pull/13) ([JarbasAl](https://github.com/JarbasAl))
+
+**Closed issues:**
+
+- Killed if previous audio.pid exists [\#12](https://github.com/OpenVoiceOS/ovos-audio/issues/12)
+
+## [V0.0.2a12](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a12) (2023-05-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a11...V0.0.2a12)
 
 **Merged pull requests:**
 
