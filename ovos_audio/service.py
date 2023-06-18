@@ -1,8 +1,9 @@
+import time
 from os.path import exists, expanduser
 from threading import Thread, Lock
 
-import time
 from ovos_bus_client import Message, MessageBusClient
+from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import get_audio_service_configs
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
@@ -255,20 +256,20 @@ class PlaybackService(Thread):
             return
 
         # Get conversation ID
-        if message.context and 'ident' in message.context:
-            ident = message.context['ident']
-        else:
-            ident = 'unknown'
+        if 'ident' in message.context:
+            LOG.warning("'ident' context metadata is deprecated, use session_id instead")
+
+        sess = SessionManager.get(message)
 
         stopwatch = Stopwatch()
         stopwatch.start()
 
         utterance = message.data['utterance']
         listen = message.data.get('expect_response', False)
-        self.execute_tts(utterance, ident, listen)
+        self.execute_tts(utterance, sess.session_id, listen, message)
 
         stopwatch.stop()
-        report_timing(ident, stopwatch,
+        report_timing(sess.session_id, stopwatch,
                       {'utterance': utterance,
                        'tts': self.tts.__class__.__name__})
 
@@ -308,7 +309,7 @@ class PlaybackService(Thread):
                 self._get_tts_fallback()
                 self._fallback_tts_hash = config.get("fallback_module", "")
 
-    def execute_tts(self, utterance, ident, listen=False):
+    def execute_tts(self, utterance, ident, listen=False, message: Message = None):
         """Mute mic and start speaking the utterance using selected tts backend.
 
         Args:
@@ -319,11 +320,12 @@ class PlaybackService(Thread):
         LOG.info("Speak: " + utterance)
         with self.lock:
             try:
-                self.tts.execute(utterance, ident, listen)
+                self.tts.execute(utterance, ident, listen,
+                                 message=message)  # accepts random kwargs
             except Exception as e:
                 LOG.exception(f"TTS synth failed! {e}")
                 if self._tts_hash != self._fallback_tts_hash:
-                    self.execute_fallback_tts(utterance, ident, listen)
+                    self.execute_fallback_tts(utterance, ident, listen, message)
 
     def _get_tts_fallback(self):
         """Lazily initializes the fallback TTS if needed."""
@@ -338,7 +340,7 @@ class PlaybackService(Thread):
 
         return self.fallback_tts
 
-    def execute_fallback_tts(self, utterance, ident, listen):
+    def execute_fallback_tts(self, utterance, ident, listen, message: Message = None):
         """Speak utterance using fallback TTS if connection is lost.
 
         Args:
@@ -349,7 +351,8 @@ class PlaybackService(Thread):
         try:
             tts = self._get_tts_fallback()
             LOG.debug("TTS fallback, utterance : " + str(utterance))
-            tts.execute(utterance, ident, listen)
+            tts.execute(utterance, ident, listen,
+                        message=message)  # accepts random kwargs
             return
         except Exception as e:
             LOG.error(e)
@@ -369,7 +372,6 @@ class PlaybackService(Thread):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
         viseme = message.data.get("viseme")
-        ident = message.data.get("ident") or message.context.get("ident")  # unused ?
         audio_ext = message.data.get("audio_ext")  # unused ?
         audio_file = message.data.get("filename")
         if not audio_file:
@@ -379,7 +381,9 @@ class PlaybackService(Thread):
             raise FileNotFoundError(f"{audio_file} does not exist")
         audio_ext = audio_ext or audio_file.split(".")[-1]
         listen = message.data.get("listen", False)
-        TTS.queue.put((audio_ext, str(audio_file), viseme, ident, listen))
+
+        sess_id = SessionManager.get(message).session_id
+        TTS.queue.put((audio_ext, str(audio_file), viseme, sess_id, listen, message))
 
     def handle_get_languages_tts(self, message):
         """
