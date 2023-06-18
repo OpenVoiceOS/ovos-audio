@@ -42,7 +42,8 @@ def on_stopping():
 class PlaybackService(Thread):
     def __init__(self, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
-                 started_hook=on_started, watchdog=lambda: None, bus=None):
+                 started_hook=on_started, watchdog=lambda: None,
+                 bus=None, disable_ocp=False):
         super(PlaybackService, self).__init__()
 
         LOG.info("Starting Audio Service")
@@ -78,7 +79,7 @@ class PlaybackService(Thread):
             self.status.set_error(e)
 
         try:
-            self.audio = AudioService(self.bus)
+            self.audio = AudioService(self.bus, disable_ocp=disable_ocp)
         except Exception as e:
             LOG.exception(e)
             self.status.set_error(e)
