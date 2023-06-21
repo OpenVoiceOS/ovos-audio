@@ -1,9 +1,9 @@
-ovos-utils~=0.0, >=0.0.31a3
-ovos-bus-client~=0.0, >=0.0.3a4
-ovos-config~=0.0,>=0.0.8a2
-ovos-plugin-manager~=0.0, >=0.0.23a4
+ovos-utils~=0.0, >=0.0.34
+ovos-bus-client~=0.0, >=0.0.5a1
+ovos-config~=0.0,>=0.0.10
+ovos-plugin-manager~=0.0, >=0.0.24a1
 
-ovos_plugin_common_play~=0.0, >=0.0.5a3
+ovos_plugin_common_play~=0.0, >=0.0.6a2
 
 ovos-tts-plugin-mimic3-server
 
