@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a12...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a13...HEAD)
+
+**Implemented enhancements:**
+
+- session\_id [\#18](https://github.com/OpenVoiceOS/ovos-audio/pull/18) ([JarbasAl](https://github.com/JarbasAl))
+
+**Closed issues:**
+
+- Add some TTS to the requirements.txt? [\#4](https://github.com/OpenVoiceOS/ovos-audio/issues/4)
+
+## [V0.0.2a13](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a13) (2023-05-19)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a12...V0.0.2a13)
 
 **Fixed bugs:**
 
