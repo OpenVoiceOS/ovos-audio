@@ -182,7 +182,8 @@ class TestSpeech(unittest.TestCase):
         speech.execute_tts = mock.Mock()
         speech.native_sources = ["A"]
 
-        msg = Message("speak", {"utterance": "hello world"}, {"ident": "123"})
+        msg = Message("speak", {"utterance": "hello world"},
+                      context={"session": {"session_id": "123"}})
 
         # test message.context.destination
         msg.context["destination"] = "B"  # not native source, ignore
@@ -197,11 +198,10 @@ class TestSpeech(unittest.TestCase):
         self.assertEqual(mock_timing.call_args[0][0], "123")
 
         msg.context.pop("destination")  # multi cast
-        msg.context.pop("ident")  # optional
         speech.handle_speak(msg)
         self.assertTrue(speech.execute_tts.called)
         self.assertTrue(mock_timing.called)
-        self.assertEqual(mock_timing.call_args[0][0], "unknown")
+        self.assertEqual(mock_timing.call_args[0][0], "123")
 
     @mock.patch('ovos_audio.service.get_tts_lang_configs')
     @mock.patch('ovos_audio.service.get_tts_supported_langs')
