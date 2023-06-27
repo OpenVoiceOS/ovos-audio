@@ -34,7 +34,7 @@ class AudioService:
         to be played.
     """
 
-    def __init__(self, bus, autoload=True, disable_ocp=False):
+    def __init__(self, bus, autoload=True, disable_ocp=False, validate_source=True):
         """
             Args:
                 bus: Mycroft messagebus
@@ -49,6 +49,7 @@ class AudioService:
         self.play_start_time = 0
         self.volume_is_low = False
         self.disable_ocp = disable_ocp
+        self.validate_source = validate_source
 
         self._loaded = MonotonicEvent()
         if autoload:
@@ -349,9 +350,8 @@ class AudioService:
         self.current = selected_service
         self.play_start_time = time.monotonic()
 
-    @staticmethod
-    def _is_message_for_service(message):
-        if not message:
+    def _is_message_for_service(self, message):
+        if not message or not self.validate_source:
             return True
         destination = message.context.get("destination")
         if destination:
