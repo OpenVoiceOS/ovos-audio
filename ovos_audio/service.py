@@ -79,7 +79,7 @@ class PlaybackService(Thread):
             self.status.set_error(e)
 
         try:
-            self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source)
+            self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
         except Exception as e:
             LOG.exception(e)
             self.status.set_error(e)
