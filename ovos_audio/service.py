@@ -63,6 +63,7 @@ class PlaybackService(Thread):
         self.fallback_tts = None
         self._fallback_tts_hash = None
         self._last_stop_signal = 0
+        self.validate_source = validate_source
 
         if not bus:
             bus = MessageBusClient()
@@ -252,7 +253,7 @@ class PlaybackService(Thread):
         # if the message is targeted and audio is not the target don't
         # don't synthesise speech
         message.context = message.context or {}
-        if message.context.get('destination') and not \
+        if self.validate_source and message.context.get('destination') and not \
                 any(s in message.context['destination'] for s in self.native_sources):
             return
 
