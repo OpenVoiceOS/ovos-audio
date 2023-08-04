@@ -15,7 +15,7 @@ from threading import Lock
 import time
 from ovos_bus_client.message import Message
 from ovos_config.config import Configuration
-from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins
+from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins, find_audio_service_plugins, setup_audio_service
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
@@ -34,7 +34,7 @@ class AudioService:
         to be played.
     """
 
-    def __init__(self, bus, autoload=True):
+    def __init__(self, bus, autoload=True, disable_ocp=False, validate_source=True):
         """
             Args:
                 bus: Mycroft messagebus
@@ -48,10 +48,35 @@ class AudioService:
         self.current = None
         self.play_start_time = 0
         self.volume_is_low = False
+        self.disable_ocp = disable_ocp
+        self.validate_source = validate_source
 
         self._loaded = MonotonicEvent()
         if autoload:
             self.load_services()
+
+    def find_ocp(self):
+        for s in self.service:
+            if OCPAudioBackend is not None and isinstance(s, OCPAudioBackend):
+                LOG.info('OCP - OVOS Common Play set as default backend')
+                self.default = s
+                return True
+
+    def find_default(self):
+        # Find default backend
+        default_name = self.config.get('default-backend', '')
+        if self.disable_ocp and default_name == "OCP":
+            LOG.warning("default backend set to OCP, but OCP is disabled")
+            default_name = ""
+        LOG.info('Finding default audio backend...')
+        for s in self.service:
+            if s.name == default_name:
+                self.default = s
+                LOG.info('Found ' + self.default.name)
+                return True
+        else:
+            self.default = None
+            LOG.info('no default found')
 
     def load_services(self):
         """Method for loading services.
@@ -59,34 +84,36 @@ class AudioService:
         Sets up the global service, default and registers the event handlers
         for the subsystem.
         """
-        services = load_plugins(self.config, self.bus)
+        found_plugins = find_audio_service_plugins()
+        if 'ovos_common_play' in found_plugins and self.disable_ocp:
+            found_plugins.pop('ovos_common_play')
+
+        local = []
+        remote = []
+        for plugin_name, plugin_module in found_plugins.items():
+            LOG.info(f'Loading audio service plugin: {plugin_name}')
+            s = setup_audio_service(plugin_module, bus=self.bus)
+            if not s:
+                continue
+            if isinstance(s, RemoteAudioBackend):
+                remote += s
+            else:
+                local += s
+
+
         # Sort services so local services are checked first
-        local = [s for s in services if not isinstance(s, RemoteAudioBackend)]
-        remote = [s for s in services if isinstance(s, RemoteAudioBackend)]
         self.service = local + remote
 
         # Register end of track callback
         for s in self.service:
             s.set_track_start_callback(self.track_start)
 
-        # Find OCP
-        for s in local:
-            if OCPAudioBackend is not None and isinstance(s, OCPAudioBackend):
-                LOG.info('OCP - OVOS Common Play set as default backend')
-                self.default = s
-                break
+        if self.disable_ocp:
+            # default to classic audio only service
+            self.find_default()
         else:
-            # Find default backend
-            default_name = self.config.get('default-backend', '')
-            LOG.info('Finding default backend...')
-            for s in self.service:
-                if s.name == default_name:
-                    self.default = s
-                    LOG.info('Found ' + self.default.name)
-                    break
-            else:
-                self.default = None
-                LOG.info('no default found')
+            # default to OCP, fallback to classic audio only service
+            self.find_ocp() or self.find_default()
 
         # Setup event handlers
         self.bus.on('mycroft.audio.service.play', self._play)
@@ -323,9 +350,8 @@ class AudioService:
         self.current = selected_service
         self.play_start_time = time.monotonic()
 
-    @staticmethod
-    def _is_message_for_service(message):
-        if not message:
+    def _is_message_for_service(self, message):
+        if not message or not self.validate_source:
             return True
         destination = message.context.get("destination")
         if destination:

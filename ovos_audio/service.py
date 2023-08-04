@@ -42,7 +42,8 @@ def on_stopping():
 class PlaybackService(Thread):
     def __init__(self, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
-                 started_hook=on_started, watchdog=lambda: None, bus=None):
+                 started_hook=on_started, watchdog=lambda: None,
+                 bus=None, disable_ocp=False, validate_source=True):
         super(PlaybackService, self).__init__()
 
         LOG.info("Starting Audio Service")
@@ -62,6 +63,7 @@ class PlaybackService(Thread):
         self.fallback_tts = None
         self._fallback_tts_hash = None
         self._last_stop_signal = 0
+        self.validate_source = validate_source
 
         if not bus:
             bus = MessageBusClient()
@@ -78,7 +80,7 @@ class PlaybackService(Thread):
             self.status.set_error(e)
 
         try:
-            self.audio = AudioService(self.bus)
+            self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
         except Exception as e:
             LOG.exception(e)
             self.status.set_error(e)
@@ -251,7 +253,7 @@ class PlaybackService(Thread):
         # if the message is targeted and audio is not the target don't
         # don't synthesise speech
         message.context = message.context or {}
-        if message.context.get('destination') and not \
+        if self.validate_source and message.context.get('destination') and not \
                 any(s in message.context['destination'] for s in self.native_sources):
             return
 
