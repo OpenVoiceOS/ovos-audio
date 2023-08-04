@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a13...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a14...HEAD)
+
+**Closed issues:**
+
+- Audio Service Non-Functioning [\#20](https://github.com/OpenVoiceOS/ovos-audio/issues/20)
+
+**Merged pull requests:**
+
+- refactor/optional-ocp [\#17](https://github.com/OpenVoiceOS/ovos-audio/pull/17) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a14](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a14) (2023-06-21)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a13...V0.0.2a14)
 
 **Implemented enhancements:**
 
