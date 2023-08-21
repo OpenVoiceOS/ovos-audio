@@ -92,7 +92,7 @@ class AudioService:
         remote = []
         for plugin_name, plugin_module in found_plugins.items():
             LOG.info(f'Loading audio service plugin: {plugin_name}')
-            s = setup_audio_service(plugin_module, bus=self.bus)
+            s = setup_audio_service(plugin_module, config=self.config, bus=self.bus)
             if not s:
                 continue
             if isinstance(s, RemoteAudioBackend):
