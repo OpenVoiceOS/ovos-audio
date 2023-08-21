@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a14...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a15...HEAD)
+
+**Fixed bugs:**
+
+- Fix loading of OCP plugin [\#23](https://github.com/OpenVoiceOS/ovos-audio/pull/23) ([Ramblurr](https://github.com/Ramblurr))
+
+**Closed issues:**
+
+- Possible issue with pre-release [\#21](https://github.com/OpenVoiceOS/ovos-audio/issues/21)
+
+## [V0.0.2a15](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a15) (2023-08-04)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a14...V0.0.2a15)
 
 **Closed issues:**
 
