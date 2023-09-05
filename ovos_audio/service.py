@@ -1,7 +1,7 @@
 import os
 import os.path
 import time
-from os.path import exists, expanduser
+from os.path import exists
 from threading import Thread, Lock
 
 from ovos_bus_client import Message, MessageBusClient
@@ -388,7 +388,10 @@ class PlaybackService(Thread):
             local_uri = f"{os.path.dirname(__file__)}/res/{uri}"
             if os.path.isfile(local_uri):
                 return local_uri
-        return resolve_resource_file(uri)
+        audio_file = resolve_resource_file(uri)
+        if not exists(audio_file):
+            raise FileNotFoundError(f"{audio_file} does not exist")
+        return audio_file
 
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
@@ -397,12 +400,9 @@ class PlaybackService(Thread):
         audio_ext = message.data.get("audio_ext")  # unused ?
         audio_file = message.data.get("uri") or \
                      message.data.get("filename")  # backwards compat
-        audio_file = self._resolve_sound_uri(audio_file)
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
-        audio_file = expanduser(audio_file)
-        if not exists(audio_file):
-            raise FileNotFoundError(f"{audio_file} does not exist")
+        audio_file = self._resolve_sound_uri(audio_file)
         audio_ext = audio_ext or audio_file.split(".")[-1]
         listen = message.data.get("listen", False)
 
@@ -412,14 +412,9 @@ class PlaybackService(Thread):
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
         audio_file = message.data.get("uri")
-        audio_file = self._resolve_sound_uri(audio_file)
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
-
-        audio_file = expanduser(audio_file)
-        if not exists(audio_file):
-            raise FileNotFoundError(f"{audio_file} does not exist")
-
+        audio_file = self._resolve_sound_uri(audio_file)
         play_audio(audio_file)
 
     def handle_get_languages_tts(self, message):
