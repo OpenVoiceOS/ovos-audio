@@ -13,6 +13,7 @@ from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.signal import check_for_signal
+from ovos_utils.sound import play_audio
 
 from ovos_audio.audio import AudioService
 from ovos_audio.tts import TTSFactory
@@ -375,9 +376,10 @@ class PlaybackService(Thread):
          ensures it doesnt play over TTS """
         viseme = message.data.get("viseme")
         audio_ext = message.data.get("audio_ext")  # unused ?
-        audio_file = message.data.get("filename")
+        audio_file = message.data.get("uri") or \
+                     message.data.get("filename")  # backwards compat
         if not audio_file:
-            raise ValueError(f"'filename' missing from message.data: {message.data}")
+            raise ValueError(f"'uri' missing from message.data: {message.data}")
         audio_file = expanduser(audio_file)
         if not exists(audio_file):
             raise FileNotFoundError(f"{audio_file} does not exist")
@@ -386,6 +388,18 @@ class PlaybackService(Thread):
 
         sess_id = SessionManager.get(message).session_id
         TTS.queue.put((audio_ext, str(audio_file), viseme, sess_id, listen, message))
+
+    def handle_instant_play(self, message):
+        """ play a sound file immediately (may play over TTS) """
+        audio_file = message.data.get("uri")
+        if not audio_file:
+            raise ValueError(f"'uri' missing from message.data: {message.data}")
+
+        audio_file = expanduser(audio_file)
+        if not exists(audio_file):
+            raise FileNotFoundError(f"{audio_file} does not exist")
+
+        play_audio(audio_file).wait()
 
     def handle_get_languages_tts(self, message):
         """
@@ -416,6 +430,7 @@ class PlaybackService(Thread):
         self.bus.on('mycroft.stop', self.handle_stop)
         self.bus.on('mycroft.audio.speech.stop', self.handle_stop)
         self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
+        self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
         self.bus.on('speak', self.handle_speak)
         self.bus.on('ovos.languages.tts', self.handle_get_languages_tts)
         self.bus.on("opm.tts.query", self.handle_opm_tts_query)
