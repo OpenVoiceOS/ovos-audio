@@ -1,3 +1,4 @@
+import os.path
 import time
 from os.path import exists, expanduser
 from threading import Thread, Lock
@@ -9,6 +10,7 @@ from ovos_plugin_manager.audio import get_audio_service_configs
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
 from ovos_plugin_manager.tts import TTS
 from ovos_plugin_manager.tts import get_tts_supported_langs, get_tts_lang_configs, get_tts_module_configs
+from ovos_utils.file_utils import resolve_resource_file
 from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
@@ -371,6 +373,17 @@ class PlaybackService(Thread):
             self.tts.playback.clear()  # Clear here to get instant stop
             self.bus.emit(Message("mycroft.stop.handled", {"by": "TTS"}))
 
+    @staticmethod
+    def _resolve_sound_uri(uri: str):
+        """ helper to resolve sound files full path"""
+        if uri is None:
+            return None
+        if uri.startswith("snd/"):
+            local_uri = f"{os.path.dirname(__file__)}/res/{uri}"
+            if os.path.isfile(local_uri):
+                return local_uri
+        return resolve_resource_file(uri)
+
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
@@ -378,6 +391,7 @@ class PlaybackService(Thread):
         audio_ext = message.data.get("audio_ext")  # unused ?
         audio_file = message.data.get("uri") or \
                      message.data.get("filename")  # backwards compat
+        audio_file = self._resolve_sound_uri(audio_file)
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
         audio_file = expanduser(audio_file)
@@ -392,6 +406,7 @@ class PlaybackService(Thread):
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
         audio_file = message.data.get("uri")
+        audio_file = self._resolve_sound_uri(audio_file)
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
 
