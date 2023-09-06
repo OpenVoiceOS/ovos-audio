@@ -256,7 +256,7 @@ class PlaybackService(Thread):
         # if the message is targeted and audio is not the target don't
         # don't synthesise speech
         message.context = message.context or {}
-        if self.validate_source and not validate_message_context(message):
+        if self.validate_source and not validate_message_context(message, self.native_sources):
             return
 
         # Get conversation ID
@@ -392,7 +392,7 @@ class PlaybackService(Thread):
             if os.path.isfile(local_uri):
                 return local_uri
         audio_file = resolve_resource_file(uri)
-        if not exists(audio_file):
+        if audio_file is None or not exists(audio_file):
             raise FileNotFoundError(f"{audio_file} does not exist")
         return audio_file
 

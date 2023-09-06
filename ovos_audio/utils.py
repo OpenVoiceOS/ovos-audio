@@ -13,15 +13,17 @@
 # limitations under the License.
 #
 import time
-from ovos_utils.log import LOG, deprecated
+
+from ovos_bus_client.send_func import send
 from ovos_config import Configuration
+from ovos_utils.log import LOG, deprecated
 from ovos_utils.signal import check_for_signal
 
 
-def validate_message_context(message):
+def validate_message_context(message, native_sources=None):
     destination = message.context.get("destination")
     if destination:
-        native_sources = Configuration()["Audio"].get(
+        native_sources = native_sources or Configuration()["Audio"].get(
             "native_sources", ["debug_cli", "audio"]) or []
         if any(s in destination for s in native_sources):
             # request from device
@@ -65,7 +67,6 @@ def stop_speaking():
     TODO: Skills should only be able to stop speech they've initiated
     """
     if is_speaking():
-        from ovos_bus_client.send_func import send
 
         send('mycroft.audio.speech.stop')
 

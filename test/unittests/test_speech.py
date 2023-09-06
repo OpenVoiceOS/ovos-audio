@@ -73,20 +73,23 @@ class TestSpeech(unittest.TestCase):
         speech.run()
         self.assertTrue(speech.status.state == ProcessState.ERROR)
 
-    @mock.patch('ovos_audio.service.check_for_signal')
-    def test_stop(self, check_for_signal_mock, tts_factory_mock, config_mock):
+    def test_stop(self, tts_factory_mock, config_mock):
         """Ensure the stop handler signals stop correctly."""
         setup_mocks(config_mock, tts_factory_mock)
         bus = mock.Mock()
         config_mock.get.return_value = {'tts': {'module': 'test'}}
         speech = PlaybackService(bus=bus)
+        speech.tts.playback = mock.Mock()
+        speech.tts.playback.return_value = True  # not None
+        speech.tts.playback._now_playing = None
 
         speech._last_stop_signal = 0
-        check_for_signal_mock.return_value = False
+        self.assertFalse(speech.is_speaking)
         speech.handle_stop(Message('mycroft.stop'))
         self.assertEqual(speech._last_stop_signal, 0)
 
-        check_for_signal_mock.return_value = True
+        speech.tts.playback._now_playing = True  # not None
+        self.assertTrue(speech.is_speaking)
         speech.handle_stop(Message('mycroft.stop'))
         self.assertNotEqual(speech._last_stop_signal, 0)
         speech.shutdown()
