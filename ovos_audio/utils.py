@@ -66,8 +66,8 @@ def stop_speaking():
     """
     if is_speaking():
         from ovos_bus_client.send_func import send
-        bus_cfg = Configuration().get("websocket", {})
-        send('mycroft.audio.speech.stop', config=bus_cfg)
+
+        send('mycroft.audio.speech.stop')
 
         # Block until stopped
         while check_for_signal("isSpeaking", -1):
