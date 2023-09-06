@@ -19,6 +19,7 @@ from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
+from ovos_audio.utils import validate_message_context
 
 try:
     from ovos_plugin_common_play import OCPAudioBackend
@@ -353,17 +354,7 @@ class AudioService:
     def _is_message_for_service(self, message):
         if not message or not self.validate_source:
             return True
-        destination = message.context.get("destination")
-        if destination:
-            native_sources = Configuration()["Audio"].get(
-                "native_sources", ["debug_cli", "audio"]) or []
-            if any(s in destination for s in native_sources):
-                # request from device
-                return True
-            # external request, do not handle
-            return False
-        # broadcast for everyone
-        return True
+        return validate_message_context(message)
 
     def _queue(self, message):
         if not self._is_message_for_service(message):

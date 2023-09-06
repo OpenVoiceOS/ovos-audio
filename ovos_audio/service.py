@@ -19,7 +19,7 @@ from ovos_utils.sound import play_audio
 
 from ovos_audio.audio import AudioService
 from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing
+from ovos_audio.utils import report_timing, validate_message_context
 
 
 def on_ready():
@@ -396,6 +396,9 @@ class PlaybackService(Thread):
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
+        if not validate_message_context(message):
+            LOG.debug("ignoring playback, message is not from a native source")
+            return
         viseme = message.data.get("viseme")
         audio_ext = message.data.get("audio_ext")  # unused ?
         audio_file = message.data.get("uri") or \
@@ -411,6 +414,9 @@ class PlaybackService(Thread):
 
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
+        if not validate_message_context(message):
+            LOG.debug("ignoring playback, message is not from a native source")
+            return
         audio_file = message.data.get("uri")
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
