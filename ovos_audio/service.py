@@ -256,8 +256,7 @@ class PlaybackService(Thread):
         # if the message is targeted and audio is not the target don't
         # don't synthesise speech
         message.context = message.context or {}
-        if self.validate_source and message.context.get('destination') and not \
-                any(s in message.context['destination'] for s in self.native_sources):
+        if self.validate_source and not validate_message_context(message):
             return
 
         # Get conversation ID
@@ -368,7 +367,11 @@ class PlaybackService(Thread):
         return self.tts.playback is not None and \
             self.tts.playback._now_playing is not None
 
-    def handle_stop(self, message):
+    def handle_speak_status(self, message: Message):
+        self.bus.emit(message.reply("mycroft.audio.is_speaking",
+                                    {"speaking": self.is_speaking}))
+
+    def handle_stop(self, message: Message):
         """Handle stop message.
 
         Shutdown any speech.
@@ -377,7 +380,7 @@ class PlaybackService(Thread):
         if self.is_speaking:
             self._last_stop_signal = time.time()
             self.tts.playback.clear()  # Clear here to get instant stop
-            self.bus.emit(Message("mycroft.stop.handled", {"by": "TTS"}))
+            self.bus.emit(message.forward("mycroft.stop.handled", {"by": "TTS"}))
 
     @staticmethod
     def _resolve_sound_uri(uri: str):
@@ -451,6 +454,7 @@ class PlaybackService(Thread):
         Configuration.set_config_update_handlers(self.bus)
         self.bus.on('mycroft.stop', self.handle_stop)
         self.bus.on('mycroft.audio.speech.stop', self.handle_stop)
+        self.bus.on('mycroft.audio.speak.status', self.handle_speak_status)
         self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
         self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
         self.bus.on('speak', self.handle_speak)
