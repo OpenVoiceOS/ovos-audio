@@ -13,11 +13,29 @@
 # limitations under the License.
 #
 import time
+
 from ovos_bus_client.send_func import send
-from ovos_utils.log import LOG
+from ovos_config import Configuration
+from ovos_utils.log import LOG, deprecated
 from ovos_utils.signal import check_for_signal
 
 
+def validate_message_context(message, native_sources=None):
+    destination = message.context.get("destination")
+    if destination:
+        native_sources = native_sources or Configuration()["Audio"].get(
+            "native_sources", ["debug_cli", "audio"]) or []
+        if any(s in destination for s in native_sources):
+            # request from device
+            return True
+        # external request, do not handle
+        return False
+    # broadcast for everyone
+    return True
+
+
+# NOTE: nothing imports these from here, utils accidentally dragged while isolating ovos-audio
+@deprecated("file signals have been deprecated", "0.1.0")
 def is_speaking():
     """Determine if Text to Speech is occurring
 
@@ -27,6 +45,8 @@ def is_speaking():
     return check_for_signal("isSpeaking", -1)
 
 
+# NOTE: nothing imports these from here, utils accidentally dragged while isolating ovos-audio
+@deprecated("file signals have been deprecated", "0.1.0")
 def wait_while_speaking():
     """Pause as long as Text to Speech is still happening
 
@@ -39,16 +59,16 @@ def wait_while_speaking():
         time.sleep(0.1)
 
 
+# NOTE: nothing imports these from here, utils accidentally dragged while isolating ovos-audio
+@deprecated("file signals have been deprecated", "0.1.0")
 def stop_speaking():
     """Stop mycroft speech.
 
     TODO: Skills should only be able to stop speech they've initiated
     """
-    print(666, is_speaking())
     if is_speaking():
-        from ovos_config import Configuration
-        bus_cfg = Configuration().get("websocket", {})
-        send('mycroft.audio.speech.stop', config=bus_cfg)
+
+        send('mycroft.audio.speech.stop')
 
         # Block until stopped
         while check_for_signal("isSpeaking", -1):

@@ -1,5 +1,7 @@
+import os
+import os.path
 import time
-from os.path import exists, expanduser
+from os.path import exists
 from threading import Thread, Lock
 
 from ovos_bus_client import Message, MessageBusClient
@@ -9,14 +11,15 @@ from ovos_plugin_manager.audio import get_audio_service_configs
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
 from ovos_plugin_manager.tts import TTS
 from ovos_plugin_manager.tts import get_tts_supported_langs, get_tts_lang_configs, get_tts_module_configs
+from ovos_utils.file_utils import resolve_resource_file
 from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
-from ovos_utils.signal import check_for_signal
+from ovos_utils.sound import play_audio
 
 from ovos_audio.audio import AudioService
 from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing
+from ovos_audio.utils import report_timing, validate_message_context
 
 
 def on_ready():
@@ -253,8 +256,8 @@ class PlaybackService(Thread):
         # if the message is targeted and audio is not the target don't
         # don't synthesise speech
         message.context = message.context or {}
-        if self.validate_source and message.context.get('destination') and not \
-                any(s in message.context['destination'] for s in self.native_sources):
+        if self.validate_source and not validate_message_context(message, self.native_sources):
+            LOG.debug("ignoring speak from non-native source, playback handled directly by client")
             return
 
         # Get conversation ID
@@ -360,32 +363,69 @@ class PlaybackService(Thread):
             LOG.error(e)
             LOG.exception(f"TTS FAILURE! utterance : {utterance}")
 
-    def handle_stop(self, message):
+    @property
+    def is_speaking(self):
+        return self.tts.playback is not None and \
+            self.tts.playback._now_playing is not None
+
+    def handle_speak_status(self, message: Message):
+        self.bus.emit(message.reply("mycroft.audio.is_speaking",
+                                    {"speaking": self.is_speaking}))
+
+    def handle_stop(self, message: Message):
         """Handle stop message.
 
         Shutdown any speech.
         """
-        if check_for_signal("isSpeaking", -1):
+        # check PlaybackThread
+        if self.is_speaking:
             self._last_stop_signal = time.time()
             self.tts.playback.clear()  # Clear here to get instant stop
-            self.bus.emit(Message("mycroft.stop.handled", {"by": "TTS"}))
+            self.bus.emit(message.forward("mycroft.stop.handled", {"by": "TTS"}))
+
+    @staticmethod
+    def _resolve_sound_uri(uri: str):
+        """ helper to resolve sound files full path"""
+        if uri is None:
+            return None
+        if uri.startswith("snd/"):
+            local_uri = f"{os.path.dirname(__file__)}/res/{uri}"
+            if os.path.isfile(local_uri):
+                return local_uri
+        audio_file = resolve_resource_file(uri)
+        if audio_file is None or not exists(audio_file):
+            raise FileNotFoundError(f"{audio_file} does not exist")
+        return audio_file
 
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
+        if not validate_message_context(message):
+            LOG.debug("ignoring playback, message is not from a native source")
+            return
         viseme = message.data.get("viseme")
         audio_ext = message.data.get("audio_ext")  # unused ?
-        audio_file = message.data.get("filename")
+        audio_file = message.data.get("uri") or \
+                     message.data.get("filename")  # backwards compat
         if not audio_file:
-            raise ValueError(f"'filename' missing from message.data: {message.data}")
-        audio_file = expanduser(audio_file)
-        if not exists(audio_file):
-            raise FileNotFoundError(f"{audio_file} does not exist")
+            raise ValueError(f"'uri' missing from message.data: {message.data}")
+        audio_file = self._resolve_sound_uri(audio_file)
         audio_ext = audio_ext or audio_file.split(".")[-1]
         listen = message.data.get("listen", False)
 
         sess_id = SessionManager.get(message).session_id
         TTS.queue.put((audio_ext, str(audio_file), viseme, sess_id, listen, message))
+
+    def handle_instant_play(self, message):
+        """ play a sound file immediately (may play over TTS) """
+        if not validate_message_context(message):
+            LOG.debug("ignoring playback, message is not from a native source")
+            return
+        audio_file = message.data.get("uri")
+        if not audio_file:
+            raise ValueError(f"'uri' missing from message.data: {message.data}")
+        audio_file = self._resolve_sound_uri(audio_file)
+        play_audio(audio_file)
 
     def handle_get_languages_tts(self, message):
         """
@@ -415,7 +455,9 @@ class PlaybackService(Thread):
         Configuration.set_config_update_handlers(self.bus)
         self.bus.on('mycroft.stop', self.handle_stop)
         self.bus.on('mycroft.audio.speech.stop', self.handle_stop)
+        self.bus.on('mycroft.audio.speak.status', self.handle_speak_status)
         self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
+        self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
         self.bus.on('speak', self.handle_speak)
         self.bus.on('ovos.languages.tts', self.handle_get_languages_tts)
         self.bus.on("opm.tts.query", self.handle_opm_tts_query)
