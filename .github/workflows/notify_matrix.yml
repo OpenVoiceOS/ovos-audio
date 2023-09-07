@@ -20,4 +20,4 @@ jobs:
           token: ${{ secrets.MATRIX_TOKEN }}
           channel: '!WjxEKjjINpyBRPFgxl:krbel.duckdns.org'
           message: |
-            new ovos-config PR merged! https://github.com/OpenVoiceOS/ovos-config/pull/${{ github.event.number }}
+            new ovos-audio PR merged! https://github.com/OpenVoiceOS/ovos-audio/pull/${{ github.event.number }}
