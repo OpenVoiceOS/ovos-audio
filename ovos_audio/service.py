@@ -257,6 +257,7 @@ class PlaybackService(Thread):
         # don't synthesise speech
         message.context = message.context or {}
         if self.validate_source and not validate_message_context(message, self.native_sources):
+            LOG.debug("ignoring speak from non-native source, playback handled directly by client")
             return
 
         # Get conversation ID
