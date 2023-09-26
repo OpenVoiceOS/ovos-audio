@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a16...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a17...HEAD)
+
+**Implemented enhancements:**
+
+- add soundfile [\#26](https://github.com/OpenVoiceOS/ovos-audio/pull/26) ([emphasize](https://github.com/emphasize))
+
+## [V0.0.2a17](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a17) (2023-09-07)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a16...V0.0.2a17)
 
 **Implemented enhancements:**
 
