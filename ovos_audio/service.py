@@ -5,6 +5,7 @@ from os.path import exists
 from ovos_audio.audio import AudioService
 from ovos_audio.playback import PlaybackThread
 from ovos_audio.tts import TTSFactory
+from ovos_audio.transformers import DialogTransformersService
 from ovos_audio.utils import report_timing, validate_message_context
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
@@ -73,6 +74,7 @@ class PlaybackService(Thread):
         self.bus = bus
         self.status.bind(self.bus)
         self.init_messagebus()
+        self.dialog_transform = DialogTransformersService(self.bus)
 
         try:
             self._maybe_reload_tts()
@@ -269,6 +271,14 @@ class PlaybackService(Thread):
         stopwatch.start()
 
         utterance = message.data['utterance']
+
+        # allow dialog transformers to rewrite speech
+        utt2 = self.dialog_transform.transform(utterance, sess)
+        if utterance != utt22:
+            LOG.debug(f"original dialog: {utterance}")
+            LOG.info(f"dialog transformed to: {utt2}")
+            utterance = utt2
+
         listen = message.data.get('expect_response', False)
         self.execute_tts(utterance, sess.session_id, listen, message)
 
