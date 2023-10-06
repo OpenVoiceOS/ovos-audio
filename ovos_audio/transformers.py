@@ -23,7 +23,7 @@ class DialogTransformersService:
                 if not self.config[plug_name].get("active", True):
                     continue
                 try:
-                    self.loaded_plugins[plug_name] = plug()
+                    self.loaded_plugins[plug_name] = plug(config=self.config[plug_name])
                     self.loaded_plugins[plug_name].bind(self.bus)
                     LOG.info(f"loaded audio transformer plugin: {plug_name}")
                 except Exception as e:
@@ -72,7 +72,7 @@ class DialogTransformersService:
         for module in active_transformers:
             try:
                 LOG.debug(f"checking dialog transformer: {module}")
-                dialog, context = module.transform(dialog, context=kwargs)
+                dialog, context = module.transform(dialog, context=context)
                 LOG.debug(f"{module.name}: {dialog}")
             except Exception as e:
                 LOG.exception(e)
@@ -97,7 +97,7 @@ class TTSTransformersService:
                 if not self.config[plug_name].get("active", True):
                     continue
                 try:
-                    self.loaded_plugins[plug_name] = plug()
+                    self.loaded_plugins[plug_name] = plug(config=self.config[plug_name])
                     if self.bus:
                         self.loaded_plugins[plug_name].bind(self.bus)
                     LOG.info(f"loaded audio transformer plugin: {plug_name}")

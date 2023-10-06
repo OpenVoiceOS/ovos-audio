@@ -19,6 +19,7 @@ from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.sound import play_audio
+from queue import Queue
 from threading import Thread, Lock
 
 
@@ -75,6 +76,8 @@ class PlaybackService(Thread):
         self.status.bind(self.bus)
         self.init_messagebus()
         self.dialog_transform = DialogTransformersService(self.bus)
+        if TTS.queue is None:
+            TTS.queue = Queue()
         self.playback_thread = PlaybackThread(TTS.queue, self.bus)
 
         try:
