@@ -1,6 +1,8 @@
 import random
 import threading
+from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
+from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG
 from ovos_utils.sound import play_audio
 from queue import Empty
@@ -13,19 +15,20 @@ class PlaybackThread(Thread):
     viseme data to enclosure.
     """
 
-    def __init__(self, queue):
+    def __init__(self, queue=TTS.queue, bus=None):
         super(PlaybackThread, self).__init__()
-        self.queue = queue
+        self.queue = queue or TTS.queue
         self._terminated = False
         self._processing_queue = False
         self._paused = False
         self.enclosure = None
         self.p = None
         self._tts = []
-        self.bus = None
+        self.bus = bus or None
         self._now_playing = None
         self.active_tts = None
         self._started = threading.Event()
+        self.tts_transform = TTSTransformersService(self.bus)
 
     @property
     def is_running(self):
@@ -55,6 +58,7 @@ class PlaybackThread(Thread):
             bus (MycroftBusClient): bus client
         """
         self.bus = bus
+        self.tts_transform.set_bus(bus)
 
     @property
     def tts(self):
@@ -151,6 +155,9 @@ class PlaybackThread(Thread):
             data, visemes, listen, tts_id, message = self._now_playing
             self.activate_tts(tts_id)
             self.on_start(message)
+
+            data = self.tts_transform.transform(data, message.context)
+
             self.p = play_audio(data)
             if visemes:
                 self.show_visemes(visemes)

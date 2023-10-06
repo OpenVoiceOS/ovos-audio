@@ -4,8 +4,8 @@ import time
 from os.path import exists
 from ovos_audio.audio import AudioService
 from ovos_audio.playback import PlaybackThread
-from ovos_audio.tts import TTSFactory
 from ovos_audio.transformers import DialogTransformersService
+from ovos_audio.tts import TTSFactory
 from ovos_audio.utils import report_timing, validate_message_context
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
@@ -75,6 +75,7 @@ class PlaybackService(Thread):
         self.status.bind(self.bus)
         self.init_messagebus()
         self.dialog_transform = DialogTransformersService(self.bus)
+        self.playback_thread = PlaybackThread(TTS.queue, self.bus)
 
         try:
             self._maybe_reload_tts()
@@ -273,7 +274,9 @@ class PlaybackService(Thread):
         utterance = message.data['utterance']
 
         # allow dialog transformers to rewrite speech
-        utt2 = self.dialog_transform.transform(utterance, sess)
+        utt2, message.context = self.dialog_transform.transform(dialog=utterance,
+                                                                context=message.context,
+                                                                sess=sess)
         if utterance != utt22:
             LOG.debug(f"original dialog: {utterance}")
             LOG.info(f"dialog transformed to: {utt2}")
@@ -302,7 +305,7 @@ class PlaybackService(Thread):
                 # Create new tts instance
                 LOG.info("(re)loading TTS engine")
                 self.tts = TTSFactory.create(config)
-                self.tts.init(self.bus, PlaybackThread)
+                self.tts.init(self.bus, self.playback_thread)
                 self._tts_hash = config.get("module", "")
 
         # if fallback TTS is the same as main TTS dont load it
@@ -350,7 +353,7 @@ class PlaybackService(Thread):
                            engine: config.get('tts', {}).get(engine, {})}}
             self.fallback_tts = TTSFactory.create(cfg)
             self.fallback_tts.validator.validate()
-            self.fallback_tts.init(self.bus, PlaybackThread)
+            self.fallback_tts.init(self.bus, self.playback_thread)
 
         return self.fallback_tts
 
