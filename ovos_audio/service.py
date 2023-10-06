@@ -2,8 +2,10 @@ import os
 import os.path
 import time
 from os.path import exists
-from threading import Thread, Lock
-
+from ovos_audio.audio import AudioService
+from ovos_audio.playback import PlaybackThread
+from ovos_audio.tts import TTSFactory
+from ovos_audio.utils import report_timing, validate_message_context
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
@@ -16,10 +18,7 @@ from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.sound import play_audio
-
-from ovos_audio.audio import AudioService
-from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing, validate_message_context
+from threading import Thread, Lock
 
 
 def on_ready():
@@ -293,7 +292,7 @@ class PlaybackService(Thread):
                 # Create new tts instance
                 LOG.info("(re)loading TTS engine")
                 self.tts = TTSFactory.create(config)
-                self.tts.init(self.bus)
+                self.tts.init(self.bus, PlaybackThread)
                 self._tts_hash = config.get("module", "")
 
         # if fallback TTS is the same as main TTS dont load it
@@ -341,7 +340,7 @@ class PlaybackService(Thread):
                            engine: config.get('tts', {}).get(engine, {})}}
             self.fallback_tts = TTSFactory.create(cfg)
             self.fallback_tts.validator.validate()
-            self.fallback_tts.init(self.bus)
+            self.fallback_tts.init(self.bus, PlaybackThread)
 
         return self.fallback_tts
 
