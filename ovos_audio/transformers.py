@@ -1,4 +1,5 @@
 from ovos_bus_client.session import Session, SessionManager
+from ovos_config import Configuration
 from ovos_plugin_manager.dialog_transformers import find_dialog_transformer_plugins, find_tts_transformer_plugins
 from ovos_utils.log import LOG
 
