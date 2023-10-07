@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a17...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a18...HEAD)
+
+**Implemented enhancements:**
+
+- feat/dialog\_transformers [\#27](https://github.com/OpenVoiceOS/ovos-audio/pull/27) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a18](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a18) (2023-09-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a17...V0.0.2a18)
 
 **Implemented enhancements:**
 
