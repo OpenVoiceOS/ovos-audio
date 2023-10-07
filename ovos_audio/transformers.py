@@ -2,6 +2,7 @@ from ovos_bus_client.session import Session, SessionManager
 from ovos_config import Configuration
 from ovos_plugin_manager.dialog_transformers import find_dialog_transformer_plugins, find_tts_transformer_plugins
 from ovos_utils.log import LOG
+from typing import Tuple
 
 
 class DialogTransformersService:
@@ -53,7 +54,7 @@ class DialogTransformersService:
             except Exception as e:
                 LOG.warning(e)
 
-    def transform(self, wav_file: str, context: dict = None, sess: Session = None) -> str:
+    def transform(self, dialog: str, context: dict = None, sess: Session = None) -> Tuple[str, dict]:
         """
         Get transformed audio and context for the preceding audio
         @param dialog: str to be spoken
@@ -75,7 +76,7 @@ class DialogTransformersService:
                 LOG.debug(f"{module.name}: {dialog}")
             except Exception as e:
                 LOG.exception(e)
-        return dialog
+        return dialog, context
 
 
 class TTSTransformersService:
@@ -133,7 +134,7 @@ class TTSTransformersService:
             except Exception as e:
                 LOG.warning(e)
 
-    def transform(self, wav_file: str, context: dict = None, sess: Session = None) -> str:
+    def transform(self, wav_file: str, context: dict = None, sess: Session = None) -> Tuple[str, dict]:
         """
         Get transformed audio and context for the preceding audio
         @param wav_file: str path for the TTS wav file
@@ -155,4 +156,4 @@ class TTSTransformersService:
                 LOG.debug(f"{module.name}: {wav_file}")
             except Exception as e:
                 LOG.exception(e)
-        return dialog
+        return wav_file, context
