@@ -202,7 +202,7 @@ class PlaybackThread(Thread):
                 if len(speech_data) == 5 and isinstance(speech_data[-1], Message):
                     data, visemes, listen, tts_id, message = speech_data
                 else:
-                    LOG.warning("it seems you interfacing with TTS.queue directly, this is not recommended!\n"
+                    LOG.warning("it seems you are interfacing with TTS.queue directly, this is not recommended!\n"
                                 "new expected TTS.queue contents -> data, visemes, listen, tts_id, message")
                     if len(speech_data) == 6:
                         # old ovos backwards compat
