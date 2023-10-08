@@ -16,7 +16,7 @@ class PlaybackThread(Thread):
     """
 
     def __init__(self, queue=TTS.queue, bus=None):
-        super(PlaybackThread, self).__init__()
+        super(PlaybackThread, self).__init__(daemon=True)
         self.queue = queue or TTS.queue
         self._terminated = False
         self._processing_queue = False
@@ -156,7 +156,7 @@ class PlaybackThread(Thread):
             self.activate_tts(tts_id)
             self.on_start(message)
 
-            data = self.tts_transform.transform(data, message.context)
+            data, message.context = self.tts_transform.transform(data, message.context)
 
             self.p = play_audio(data)
             if visemes:
@@ -191,11 +191,14 @@ class PlaybackThread(Thread):
         If the queue is empty the tts.end_audio() is called possibly triggering
         listening.
         """
+        LOG.info("PlaybackThread started")
         self._paused = False
         self._started.set()
         while not self._terminated:
             while self._paused:
                 sleep(0.2)
+            if self.queue.empty():
+                continue
             try:
                 # HACK: we do these check to account for direct usages of TTS.queue singletons
                 speech_data = self.queue.get(timeout=2)

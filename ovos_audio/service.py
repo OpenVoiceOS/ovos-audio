@@ -79,6 +79,7 @@ class PlaybackService(Thread):
         if TTS.queue is None:
             TTS.queue = Queue()
         self.playback_thread = PlaybackThread(TTS.queue, self.bus)
+        self.playback_thread.start()
 
         try:
             self._maybe_reload_tts()
