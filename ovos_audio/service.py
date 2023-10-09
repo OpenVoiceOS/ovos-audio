@@ -283,10 +283,10 @@ class PlaybackService(Thread):
             utt2, message.context = self.dialog_transform.transform(dialog=utterance,
                                                                     context=message.context,
                                                                     sess=sess)
-        if utterance != utt2:
-            LOG.debug(f"original dialog: {utterance}")
-            LOG.info(f"dialog transformed to: {utt2}")
-            utterance = utt2
+            if utterance != utt2:
+                LOG.debug(f"original dialog: {utterance}")
+                LOG.info(f"dialog transformed to: {utt2}")
+                utterance = utt2
 
         listen = message.data.get('expect_response', False)
         self.execute_tts(utterance, sess.session_id, listen, message)
