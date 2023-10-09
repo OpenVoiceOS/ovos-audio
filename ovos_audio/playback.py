@@ -197,8 +197,6 @@ class PlaybackThread(Thread):
         while not self._terminated:
             while self._paused:
                 sleep(0.2)
-            if self.queue.empty():
-                continue
             try:
                 # HACK: we do these check to account for direct usages of TTS.queue singletons
                 speech_data = self.queue.get(timeout=2)
