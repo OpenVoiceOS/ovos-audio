@@ -278,9 +278,11 @@ class PlaybackService(Thread):
         utterance = message.data['utterance']
 
         # allow dialog transformers to rewrite speech
-        utt2, message.context = self.dialog_transform.transform(dialog=utterance,
-                                                                context=message.context,
-                                                                sess=sess)
+        skill_id = message.data.get("meta", {}).get("skill") or message.context.get("skill_id")
+        if skill_id and skill_id not in self.dialog_transform.blacklisted_skills:
+            utt2, message.context = self.dialog_transform.transform(dialog=utterance,
+                                                                    context=message.context,
+                                                                    sess=sess)
         if utterance != utt2:
             LOG.debug(f"original dialog: {utterance}")
             LOG.info(f"dialog transformed to: {utt2}")

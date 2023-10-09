@@ -16,6 +16,13 @@ class DialogTransformersService:
         self.config = config or Configuration().get("dialog_transformers", {})
         self.load_plugins()
 
+    @property
+    def blacklisted_skills(self):
+        # dialog should NEVER be rewritten if it comes from these skills
+        return self.config.get("blacklisted_skills",
+                               ["skill-ovos-icanhazdadjokes.openvoiceos"] # blacklist jokes by default
+                               )
+
     def load_plugins(self):
         for plug_name, plug in find_dialog_transformer_plugins().items():
             if plug_name in self.config:
