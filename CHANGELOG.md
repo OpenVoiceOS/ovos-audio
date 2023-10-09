@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a20...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a21...HEAD)
+
+**Implemented enhancements:**
+
+- feat/skip\_skills\_in\_dialog\_transform [\#30](https://github.com/OpenVoiceOS/ovos-audio/pull/30) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a21](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a21) (2023-10-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a20...V0.0.2a21)
 
 **Fixed bugs:**
 
