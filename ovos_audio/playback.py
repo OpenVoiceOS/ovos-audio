@@ -1,13 +1,12 @@
 import random
-import threading
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.sound import play_audio
 from queue import Empty
-from threading import Thread
-from time import time, sleep
+from threading import Thread, Event
+from time import time
 
 
 class PlaybackThread(Thread):
@@ -20,14 +19,15 @@ class PlaybackThread(Thread):
         self.queue = queue or TTS.queue
         self._terminated = False
         self._processing_queue = False
-        self._paused = False
+        self._do_playback = Event()
         self.enclosure = None
         self.p = None
         self._tts = []
         self.bus = bus or None
         self._now_playing = None
         self.active_tts = None
-        self._started = threading.Event()
+        self._started = Event()
+        # TODO: Config to disable
         self.tts_transform = TTSTransformersService(self.bus)
 
     @property
@@ -192,11 +192,10 @@ class PlaybackThread(Thread):
         listening.
         """
         LOG.info("PlaybackThread started")
-        self._paused = False
+        self._do_playback.set()
         self._started.set()
         while not self._terminated:
-            while self._paused:
-                sleep(0.2)
+            self._do_playback.wait()
             try:
                 # HACK: we do these check to account for direct usages of TTS.queue singletons
                 speech_data = self.queue.get(timeout=2)
@@ -225,7 +224,7 @@ class PlaybackThread(Thread):
                 self._now_playing = (data, visemes, listen, tts_id, message)
                 self._play()
             except Exception as e:
-                pass
+                LOG.debug(e)
 
     def show_visemes(self, pairs):
         """Send viseme data to enclosure
@@ -241,7 +240,7 @@ class PlaybackThread(Thread):
 
     def pause(self):
         """pause thread"""
-        self._paused = True
+        self._do_playback.clear()
         if self.p:
             self.p.terminate()
 
@@ -249,7 +248,7 @@ class PlaybackThread(Thread):
         """resume thread"""
         if self._now_playing:
             self._play()
-        self._paused = False
+        self._do_playback.set()
 
     def clear(self):
         """Clear all pending actions for the TTS playback thread."""
