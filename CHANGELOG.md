@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a21...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a22...HEAD)
+
+**Closed issues:**
+
+- This service doesn't seem to get the combo-lock fix about "MemoryTempfile" [\#14](https://github.com/OpenVoiceOS/ovos-audio/issues/14)
+
+**Merged pull requests:**
+
+- Update dependencies [\#32](https://github.com/OpenVoiceOS/ovos-audio/pull/32) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.0.2a22](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a22) (2023-10-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a21...V0.0.2a22)
 
 **Implemented enhancements:**
 
