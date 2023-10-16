@@ -1,12 +1,12 @@
+import binascii
 import os
 import os.path
 import time
 from os.path import exists
-from ovos_audio.audio import AudioService
-from ovos_audio.playback import PlaybackThread
-from ovos_audio.transformers import DialogTransformersService
-from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing, validate_message_context
+from queue import Queue
+from tempfile import gettempdir
+from threading import Thread, Lock
+
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
@@ -19,8 +19,12 @@ from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.sound import play_audio
-from queue import Queue
-from threading import Thread, Lock
+
+from ovos_audio.audio import AudioService
+from ovos_audio.playback import PlaybackThread
+from ovos_audio.transformers import DialogTransformersService
+from ovos_audio.tts import TTSFactory
+from ovos_audio.utils import report_timing, validate_message_context
 
 
 def on_ready():
@@ -415,6 +419,18 @@ class PlaybackService(Thread):
             raise FileNotFoundError(f"{audio_file} does not exist")
         return audio_file
 
+    @staticmethod
+    def _path_from_hexdata(hex_audio, audio_ext=None):
+        bindata = binascii.unhexlify(hex_audio)
+        if not audio_ext:
+            LOG.warning("audio extension not sent, assuming wav")
+            audio_ext = "wav"
+
+        audio_file = f"{gettempdir()}/{hex_audio}.{audio_ext}"
+        with open(audio_file, "wb") as f:
+            f.write(bindata)
+        return audio_file
+
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
@@ -422,9 +438,13 @@ class PlaybackService(Thread):
             LOG.debug("ignoring playback, message is not from a native source")
             return
         viseme = message.data.get("viseme")
-        audio_ext = message.data.get("audio_ext")  # unused ?
         audio_file = message.data.get("uri") or \
                      message.data.get("filename")  # backwards compat
+        hex_audio = message.data.get("binary_data")
+        audio_ext = message.data.get("audio_ext")
+        if hex_audio:
+            audio_file = self._path_from_hexdata(hex_audio, audio_ext)
+
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
@@ -440,6 +460,10 @@ class PlaybackService(Thread):
             LOG.debug("ignoring playback, message is not from a native source")
             return
         audio_file = message.data.get("uri")
+        hex_audio = message.data.get("binary_data")
+        audio_ext = message.data.get("audio_ext")
+        if hex_audio:
+            audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
             raise ValueError(f"'uri' missing from message.data: {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
