@@ -436,7 +436,7 @@ class PlaybackService(Thread):
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
-        if not validate_message_context(message):
+        if self.validate_source and not validate_message_context(message):
             LOG.debug("ignoring playback, message is not from a native source")
             return
         viseme = message.data.get("viseme")
@@ -458,7 +458,7 @@ class PlaybackService(Thread):
 
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
-        if not validate_message_context(message):
+        if self.validate_source and not validate_message_context(message):
             LOG.debug("ignoring playback, message is not from a native source")
             return
         audio_file = message.data.get("uri")
