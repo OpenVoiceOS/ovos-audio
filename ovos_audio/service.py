@@ -2,6 +2,7 @@ import binascii
 import os
 import os.path
 import time
+from hashlib import md5
 from os.path import exists
 from queue import Queue
 from tempfile import gettempdir
@@ -421,12 +422,13 @@ class PlaybackService(Thread):
 
     @staticmethod
     def _path_from_hexdata(hex_audio, audio_ext=None):
+        fname = md5(hex_audio).hexdigest()
         bindata = binascii.unhexlify(hex_audio)
         if not audio_ext:
             LOG.warning("audio extension not sent, assuming wav")
             audio_ext = "wav"
 
-        audio_file = f"{gettempdir()}/{hex_audio}.{audio_ext}"
+        audio_file = f"{gettempdir()}/{fname}.{audio_ext}"
         with open(audio_file, "wb") as f:
             f.write(bindata)
         return audio_file
