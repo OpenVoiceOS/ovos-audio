@@ -422,6 +422,11 @@ class PlaybackService(Thread):
 
     @staticmethod
     def _path_from_hexdata(hex_audio, audio_ext=None):
+        """ hex_audio contains hex string encoded bytes
+         audio_ext if not provided assumed to be wav
+
+        recommended encoding via binascii.hexlify(byte_data).decode('utf-8')
+        """
         fname = md5(hex_audio.encode("utf-8")).hexdigest()
         bindata = binascii.unhexlify(hex_audio)
         if not audio_ext:
@@ -448,7 +453,7 @@ class PlaybackService(Thread):
             audio_file = self._path_from_hexdata(hex_audio, audio_ext)
 
         if not audio_file:
-            raise ValueError(f"'uri' missing from message.data: {message.data}")
+            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
         audio_ext = audio_ext or audio_file.split(".")[-1]
         listen = message.data.get("listen", False)
@@ -467,7 +472,7 @@ class PlaybackService(Thread):
         if hex_audio:
             audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
-            raise ValueError(f"'uri' missing from message.data: {message.data}")
+            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
         play_audio(audio_file)
 
