@@ -422,7 +422,7 @@ class PlaybackService(Thread):
 
     @staticmethod
     def _path_from_hexdata(hex_audio, audio_ext=None):
-        fname = md5(hex_audio).hexdigest()
+        fname = md5(hex_audio.encode("utf-8")).hexdigest()
         bindata = binascii.unhexlify(hex_audio)
         if not audio_ext:
             LOG.warning("audio extension not sent, assuming wav")
