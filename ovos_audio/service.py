@@ -454,7 +454,7 @@ class PlaybackService(Thread):
         listen = message.data.get("listen", False)
 
         sess_id = SessionManager.get(message).session_id
-        TTS.queue.put((audio_ext, str(audio_file), viseme, sess_id, listen, message))
+        TTS.queue.put((str(audio_file), viseme, sess_id, listen, message))
 
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
