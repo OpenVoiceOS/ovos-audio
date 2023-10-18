@@ -455,11 +455,12 @@ class PlaybackService(Thread):
         if not audio_file:
             raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
-        audio_ext = audio_ext or audio_file.split(".")[-1]
+
         listen = message.data.get("listen", False)
 
-        sess_id = SessionManager.get(message).session_id
-        TTS.queue.put((str(audio_file), viseme, sess_id, listen, message))
+        # expected queue contents: (data, visemes, listen, tts_id, message)
+        # a sound does not have a tts_id, assign that to "sounds"
+        TTS.queue.put((str(audio_file), viseme, listen, "sounds", message))
 
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
