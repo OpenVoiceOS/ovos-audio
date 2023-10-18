@@ -1,12 +1,13 @@
+import binascii
 import os
 import os.path
 import time
+from hashlib import md5
 from os.path import exists
-from ovos_audio.audio import AudioService
-from ovos_audio.playback import PlaybackThread
-from ovos_audio.transformers import DialogTransformersService
-from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing, validate_message_context
+from queue import Queue
+from tempfile import gettempdir
+from threading import Thread, Lock
+
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
@@ -19,8 +20,12 @@ from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.sound import play_audio
-from queue import Queue
-from threading import Thread, Lock
+
+from ovos_audio.audio import AudioService
+from ovos_audio.playback import PlaybackThread
+from ovos_audio.transformers import DialogTransformersService
+from ovos_audio.tts import TTSFactory
+from ovos_audio.utils import report_timing, validate_message_context
 
 
 def on_ready():
@@ -415,33 +420,60 @@ class PlaybackService(Thread):
             raise FileNotFoundError(f"{audio_file} does not exist")
         return audio_file
 
+    @staticmethod
+    def _path_from_hexdata(hex_audio, audio_ext=None):
+        """ hex_audio contains hex string encoded bytes
+         audio_ext if not provided assumed to be wav
+
+        recommended encoding via binascii.hexlify(byte_data).decode('utf-8')
+        """
+        fname = md5(hex_audio.encode("utf-8")).hexdigest()
+        bindata = binascii.unhexlify(hex_audio)
+        if not audio_ext:
+            LOG.warning("audio extension not sent, assuming wav")
+            audio_ext = "wav"
+
+        audio_file = f"{gettempdir()}/{fname}.{audio_ext}"
+        with open(audio_file, "wb") as f:
+            f.write(bindata)
+        return audio_file
+
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
-        if not validate_message_context(message):
+        if self.validate_source and not validate_message_context(message):
             LOG.debug("ignoring playback, message is not from a native source")
             return
         viseme = message.data.get("viseme")
-        audio_ext = message.data.get("audio_ext")  # unused ?
         audio_file = message.data.get("uri") or \
                      message.data.get("filename")  # backwards compat
+        hex_audio = message.data.get("binary_data")
+        audio_ext = message.data.get("audio_ext")
+        if hex_audio:
+            audio_file = self._path_from_hexdata(hex_audio, audio_ext)
+
         if not audio_file:
-            raise ValueError(f"'uri' missing from message.data: {message.data}")
+            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
-        audio_ext = audio_ext or audio_file.split(".")[-1]
+
         listen = message.data.get("listen", False)
 
-        sess_id = SessionManager.get(message).session_id
-        TTS.queue.put((audio_ext, str(audio_file), viseme, sess_id, listen, message))
+        # expected queue contents: (data, visemes, listen, tts_id, message)
+        # a sound does not have a tts_id, assign that to "sounds"
+        TTS.queue.put((str(audio_file), viseme, listen, "sounds", message))
 
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
-        if not validate_message_context(message):
+        if self.validate_source and not validate_message_context(message):
             LOG.debug("ignoring playback, message is not from a native source")
             return
         audio_file = message.data.get("uri")
+        hex_audio = message.data.get("binary_data")
+        audio_ext = message.data.get("audio_ext")
+        if hex_audio:
+            audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
-            raise ValueError(f"'uri' missing from message.data: {message.data}")
+            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
         play_audio(audio_file)
 
