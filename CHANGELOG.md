@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a22...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a23...HEAD)
+
+**Implemented enhancements:**
+
+- feat/handle\_hex\_audiodata [\#34](https://github.com/OpenVoiceOS/ovos-audio/pull/34) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a23](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a23) (2023-10-12)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a22...V0.0.2a23)
 
 **Closed issues:**
 
