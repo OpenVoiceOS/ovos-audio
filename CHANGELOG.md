@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a23...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a24...HEAD)
+
+**Merged pull requests:**
+
+- Update queue warning to deprecation log [\#37](https://github.com/OpenVoiceOS/ovos-audio/pull/37) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.0.2a24](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a24) (2023-10-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a23...V0.0.2a24)
 
 **Implemented enhancements:**
 
