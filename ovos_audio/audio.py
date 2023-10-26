@@ -398,7 +398,7 @@ class AudioService:
                 prefered_service = None
             try:
                 self.play(tracks, prefered_service, repeat)
-                time.sleep(0.5)
+                # time.sleep(0.5)  # TODO: Was this hard-coded delay necessary?
             except Exception as e:
                 LOG.exception(e)
 
