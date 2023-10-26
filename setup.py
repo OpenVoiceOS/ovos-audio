@@ -63,7 +63,10 @@ setup(
     description="ovos-core audio daemon client",
     include_package_data=True,
     packages=find_packages(include=['ovos*']),
-    install_requires=required("requirements.txt"),
+    install_requires=required('requirements/requirements.txt'),
+    extras_require={
+        "extras": required("requirements/extras.txt")
+    },
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",

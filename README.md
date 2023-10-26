@@ -4,6 +4,14 @@ The "mouth" of the OVOS assistant!
 
 Handles TTS generation and audio playback
 
+## Install
+
+`pip install ovos-audio[extras]` to install this package and the default
+plugins.
+
+Without `extras`, you will also need to manually install,
+and possibly configure TTS and Audio Backend modules as described below.
+
 # Configuration
 
 under mycroft.conf
