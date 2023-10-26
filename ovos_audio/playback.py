@@ -27,7 +27,6 @@ class PlaybackThread(Thread):
         self._now_playing = None
         self.active_tts = None
         self._started = Event()
-        # TODO: Config to disable
         self.tts_transform = TTSTransformersService(self.bus)
 
     @property
