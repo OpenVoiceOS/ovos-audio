@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a24...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a25...HEAD)
+
+**Merged pull requests:**
+
+- Refactor looped `time.sleep` to use `Event.wait` [\#31](https://github.com/OpenVoiceOS/ovos-audio/pull/31) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.0.2a25](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a25) (2023-10-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a24...V0.0.2a25)
 
 **Merged pull requests:**
 
