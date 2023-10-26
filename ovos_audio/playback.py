@@ -3,7 +3,7 @@ import threading
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
 from ovos_plugin_manager.templates.tts import TTS
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.sound import play_audio
 from queue import Empty
 from threading import Thread
@@ -203,8 +203,10 @@ class PlaybackThread(Thread):
                 if len(speech_data) == 5 and isinstance(speech_data[-1], Message):
                     data, visemes, listen, tts_id, message = speech_data
                 else:
-                    LOG.warning("it seems you are interfacing with TTS.queue directly, this is not recommended!\n"
-                                "new expected TTS.queue contents -> data, visemes, listen, tts_id, message")
+                    log_deprecation(
+                        "Direct modification of TTS.queue is not recommended!\n"
+                        "expected=(data, visemes, listen, tts_id, message)",
+                        "0.1.0")
                     if len(speech_data) == 6:
                         # old ovos backwards compat
                         _, data, visemes, ident, listen, tts_id = speech_data
