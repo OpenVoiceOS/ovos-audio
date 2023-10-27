@@ -222,8 +222,10 @@ class PlaybackThread(Thread):
 
                 self._now_playing = (data, visemes, listen, tts_id, message)
                 self._play()
+            except Empty:
+                pass
             except Exception as e:
-                LOG.debug(e)
+                LOG.error(e)
 
     def show_visemes(self, pairs):
         """Send viseme data to enclosure
