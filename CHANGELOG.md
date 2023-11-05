@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a27...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a28...HEAD)
+
+**Implemented enhancements:**
+
+- unmute on hotword [\#40](https://github.com/OpenVoiceOS/ovos-audio/pull/40) ([emphasize](https://github.com/emphasize))
+
+## [V0.0.2a28](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a28) (2023-10-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a27...V0.0.2a28)
 
 **Merged pull requests:**
 
