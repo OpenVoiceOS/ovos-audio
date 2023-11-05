@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a28...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a29...HEAD)
+
+**Merged pull requests:**
+
+- Delete .github/workflows/publish\_docker.yml [\#41](https://github.com/OpenVoiceOS/ovos-audio/pull/41) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a29](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a29) (2023-11-05)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a28...V0.0.2a29)
 
 **Implemented enhancements:**
 
