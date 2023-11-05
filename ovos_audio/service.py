@@ -470,12 +470,34 @@ class PlaybackService(Thread):
         audio_file = message.data.get("uri")
         hex_audio = message.data.get("binary_data")
         audio_ext = message.data.get("audio_ext")
+        ensure_volume = message.data.get("force_unmute", False)
         if hex_audio:
             audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
             raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
         audio_file = self._resolve_sound_uri(audio_file)
-        play_audio(audio_file)
+        if ensure_volume:
+            volume_poll: Message = self.bus.wait_for_response(Message("mycroft.volume.get"))
+            volume = volume_poll.data.get("percent", 0) if volume_poll else 80
+            muted = volume_poll.data.get("muted", False) if volume_poll else False
+            volume_changed = False
+            if volume == 0:
+                self.bus.emit(Message("mycroft.volume.set", {"percent": 80,
+                                                             "play_sound": False}))
+                volume_changed = True
+            elif muted:
+                self.bus.emit(Message("mycroft.volume.unmute"))
+            
+        play_audio(audio_file).wait()
+
+        if ensure_volume:
+            if volume_changed:
+                self.bus.emit(Message("mycroft.volume.set", {"percent": volume,
+                                                             "play_sound": False}))
+            if muted:
+                self.bus.emit(Message("mycroft.volume.mute"))
+        
+        self.bus.emit(message.response({}))
 
     def handle_get_languages_tts(self, message):
         """
