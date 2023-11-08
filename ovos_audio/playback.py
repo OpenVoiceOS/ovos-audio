@@ -112,6 +112,8 @@ class PlaybackThread(Thread):
     def begin_audio(self, message=None):
         """Perform beginning of speech actions."""
         if self.bus:
+            if not self.tts.config.get("pulse_duck", False):
+                self.bus.emit(Message("ovos.common_play.duck"))
             message = message or Message("speak")
             self.bus.emit(message.forward("recognizer_loop:audio_output_start"))
         else:
@@ -125,6 +127,8 @@ class PlaybackThread(Thread):
             listen (bool): True if listening event should be emitted
         """
         if self.bus:
+            if not self.tts.config.get("pulse_duck", False):
+                self.bus.emit(Message("ovos.common_play.unduck"))
             # Send end of speech signals to the system
             message = message or Message("speak")
             self.bus.emit(message.forward("recognizer_loop:audio_output_end"))
