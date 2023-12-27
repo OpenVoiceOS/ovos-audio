@@ -3,3 +3,4 @@ include LICENSE.md
 include ovos_audio/res/snd/start_listening.wav
 include ovos_audio/res/snd/acknowledge.mp3
 include ovos_audio/res/snd/error.mp3
+include ovos_audio/res/snd/blop-mark-diangelo.wav
