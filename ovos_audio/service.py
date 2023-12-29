@@ -475,13 +475,14 @@ class PlaybackService(Thread):
             audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
             raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
+
         audio_file = self._resolve_sound_uri(audio_file)
 
         # volume handling and audio service ducking
         ensure_volume = message.data.get("force_unmute", False)
         duck_pulse_handled = bool(self.tts and self.tts.config.get("pulse_duck"))
         if ensure_volume:
-            volume_poll: Message = self.bus.wait_for_response(Message("mycroft.volume.get"))
+            volume_poll: Message = self.bus.wait_for_response(Message("mycroft.volume.get"), timeout=0.3)
             volume = volume_poll.data.get("percent", 0) if volume_poll else 80
             muted = volume_poll.data.get("muted", False) if volume_poll else False
             volume_changed = False
