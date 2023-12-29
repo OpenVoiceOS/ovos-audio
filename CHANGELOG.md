@@ -2,7 +2,26 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a30...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a31...HEAD)
+
+**Fixed bugs:**
+
+- snd/blop-mark-diangelo.wav file doesn't not exist [\#43](https://github.com/OpenVoiceOS/ovos-audio/issues/43)
+- During the service initialization, watchdog complains about something already scheduled. [\#16](https://github.com/OpenVoiceOS/ovos-audio/issues/16)
+- The start/end\_listening sounds should be called with the pulse media.role=phone to enable ducking [\#36](https://github.com/OpenVoiceOS/ovos-audio/issues/36)
+- Fix issue \#43 [\#44](https://github.com/OpenVoiceOS/ovos-audio/pull/44) ([goldyfruit](https://github.com/goldyfruit))
+
+**Closed issues:**
+
+- paplay not available on Mac OS [\#35](https://github.com/OpenVoiceOS/ovos-audio/issues/35)
+
+**Merged pull requests:**
+
+- Update requirements.txt [\#45](https://github.com/OpenVoiceOS/ovos-audio/pull/45) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a31](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a31) (2023-11-08)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a30...V0.0.2a31)
 
 **Implemented enhancements:**
 
