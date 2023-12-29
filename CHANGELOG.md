@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a31...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a32...HEAD)
+
+**Fixed bugs:**
+
+- fix - 3 second delay on listen sound [\#46](https://github.com/OpenVoiceOS/ovos-audio/pull/46) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a32](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a32) (2023-12-29)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a31...V0.0.2a32)
 
 **Fixed bugs:**
 
