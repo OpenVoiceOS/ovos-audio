@@ -76,8 +76,4 @@ def stop_speaking():
 
 
 def report_timing(ident, stopwatch, data):
-    try:
-        from mycroft.metrics import report_timing
-        report_timing(ident, 'speech', stopwatch, data)
-    except:
-        LOG.error("Failed to upload metrics")
+    """ TODO - implement metrics upload at some point """

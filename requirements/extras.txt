@@ -1,4 +1,4 @@
-ovos_plugin_common_play~=0.0, >=0.0.6a2
+ovos_plugin_common_play~=0.0, >=0.0.6a11
 
 ovos-tts-plugin-server
 
