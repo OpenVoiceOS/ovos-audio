@@ -2,11 +2,11 @@
 
 The "mouth" of the OVOS assistant!
 
-Handles TTS generation and audio playback
+Handles TTS generation and media playback
 
 ## Install
 
-`pip install ovos-audio[extras]` to install this package and the default
+`pip install ovos-media[extras]` to install this package and the default
 plugins.
 
 Without `extras`, you will also need to manually install,
@@ -20,7 +20,6 @@ under mycroft.conf
 {
 
   // Text to Speech parameters
-  // Override: REMOTE
   "tts": {
     "pulse_duck": false,
     "module": "ovos-tts-plugin-mimic3-server",
@@ -51,27 +50,6 @@ under mycroft.conf
 
   // Mechanism used to play OGG audio files
   // Override: SYSTEM
-  "play_ogg_cmdline": "ogg123 -q %1",
-  
-  "Audio": {
-    // message.context may contains a source and destination
-    // native audio (playback / TTS) will only be played if a
-    // message destination is a native_source or if missing (considered a broadcast)
-    "native_sources": ["debug_cli", "audio"],
-
-    "backends": {
-      "OCP": {
-        "type": "ovos_common_play",
-        "active": true
-      },
-      "simple": {
-        "type": "ovos_audio_simple",
-        "active": true
-      },
-      "vlc": {
-        "type": "ovos_vlc",
-        "active": true
-      }
-  }
+  "play_ogg_cmdline": "ogg123 -q %1"
 }
 ```

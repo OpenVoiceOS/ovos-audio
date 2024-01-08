@@ -7,7 +7,7 @@ on:
     branches:
       - dev
     paths-ignore:
-      - 'ovos_audio/version.py'
+      - 'ovos_media/version.py'
       - 'test/**'
       - 'examples/**'
       - '.github/**'

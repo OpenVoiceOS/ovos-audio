@@ -63,7 +63,7 @@ class TestService(unittest.TestCase):
     emitter = MockEmitter()
     service_path = abspath(join(dirname(__file__), 'services'))
 
-    @mock.patch('ovos_audio.audio.find_audio_service_plugins')
+    @mock.patch('ovos_media.audio.find_audio_service_plugins')
     def test_audio_backend_shutdown(self, mock_load_services):
         """Test shutdown of audio backend."""
         backend, second_backend = setup_mock_backends(mock_load_services,
@@ -78,7 +78,7 @@ class TestService(unittest.TestCase):
         self.assertTrue(backend.shutdown.called)
         self.assertTrue(second_backend.shutdown.called)
 
-    @mock.patch('ovos_audio.audio.load_plugins')
+    @mock.patch('ovos_media.audio.load_plugins')
     def test_audio_service_track_start(self, mock_load_services):
         """Test start of new track messages."""
         backend, second_backend = setup_mock_backends(mock_load_services,
@@ -97,7 +97,7 @@ class TestService(unittest.TestCase):
 
         service.shutdown()
 
-    @mock.patch('ovos_audio.audio.load_plugins')
+    @mock.patch('ovos_media.audio.load_plugins')
     def test_audio_service_methods_not_playing(self, mock_load_services):
         """Check that backend methods aren't called when stopped."""
         backend, second_backend = setup_mock_backends(mock_load_services,
@@ -130,7 +130,7 @@ class TestService(unittest.TestCase):
 
         service.shutdown()
 
-    @mock.patch('ovos_audio.audio.load_plugins')
+    @mock.patch('ovos_media.audio.load_plugins')
     def test_audio_service_methods_playing(self, mock_load_services):
         """Check that backend methods are called during playback."""
         backend, second_backend = setup_mock_backends(mock_load_services,
@@ -192,7 +192,7 @@ class TestService(unittest.TestCase):
 
         service.shutdown()
 
-    @mock.patch('ovos_audio.audio.load_plugins')
+    @mock.patch('ovos_media.audio.load_plugins')
     def test_audio_service_queue_methods(self, mock_load_services):
         """Check that backend methods are called during playback."""
         backend, second_backend = setup_mock_backends(mock_load_services,

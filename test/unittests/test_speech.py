@@ -37,8 +37,8 @@ def setup_mocks(config_mock, tts_factory_mock, fallback="A"):
     tts_mock.reset_mock()
 
 
-@mock.patch('ovos_audio.service.Configuration')
-@mock.patch('ovos_audio.service.TTSFactory')
+@mock.patch('ovos_media.service.Configuration')
+@mock.patch('ovos_media.service.TTSFactory')
 class TestSpeech(unittest.TestCase):
     def test_life_cycle(self, tts_factory_mock, config_mock):
         """Ensure the init and shutdown behaves as expected."""
@@ -153,7 +153,7 @@ class TestSpeech(unittest.TestCase):
         speech.execute_tts("hello", "123")
         self.assertTrue(speech.fallback_tts.execute.called)
 
-    @mock.patch('ovos_audio.service.TTS')
+    @mock.patch('ovos_media.service.TTS')
     def test_queue(self, mock_TTS, tts_factory_mock, config_mock):
         mock_TTS.queue = Queue()
         setup_mocks(config_mock, tts_factory_mock)
@@ -177,7 +177,7 @@ class TestSpeech(unittest.TestCase):
         #self.assertEqual(data[1], f)
         #self.assertEqual(data[-1], False)
 
-    @mock.patch('ovos_audio.service.report_timing')
+    @mock.patch('ovos_media.service.report_timing')
     def test_speak(self, mock_timing, tts_factory_mock, config_mock):
         setup_mocks(config_mock, tts_factory_mock)
         bus = mock.Mock()
@@ -206,9 +206,9 @@ class TestSpeech(unittest.TestCase):
         self.assertTrue(mock_timing.called)
         self.assertEqual(mock_timing.call_args[0][0], "123")
 
-    @mock.patch('ovos_audio.service.get_tts_lang_configs')
-    @mock.patch('ovos_audio.service.get_tts_supported_langs')
-    @mock.patch('ovos_audio.service.get_tts_module_configs')
+    @mock.patch('ovos_media.service.get_tts_lang_configs')
+    @mock.patch('ovos_media.service.get_tts_supported_langs')
+    @mock.patch('ovos_media.service.get_tts_module_configs')
     def test_opm_tts(self,
                      mock_get_configs, mock_get_lang, mock_get_lang_configs,
                      tts_factory_mock, config_mock):
@@ -246,9 +246,9 @@ class TestSpeech(unittest.TestCase):
 
         speech.handle_opm_tts_query(Message("opm.tts.query"))
 
-    @mock.patch('ovos_audio.service.get_g2p_lang_configs')
-    @mock.patch('ovos_audio.service.get_g2p_supported_langs')
-    @mock.patch('ovos_audio.service.get_g2p_module_configs')
+    @mock.patch('ovos_media.service.get_g2p_lang_configs')
+    @mock.patch('ovos_media.service.get_g2p_supported_langs')
+    @mock.patch('ovos_media.service.get_g2p_module_configs')
     def test_opm_g2p(self,
                      mock_get_configs, mock_get_lang, mock_get_lang_configs,
                      tts_factory_mock, config_mock):
@@ -286,7 +286,7 @@ class TestSpeech(unittest.TestCase):
 
         speech.handle_opm_g2p_query(Message("opm.g2p.query"))
 
-    @mock.patch('ovos_audio.service.get_audio_service_configs')
+    @mock.patch('ovos_media.service.get_audio_service_configs')
     def test_opm_audio(self, mock_get_configs, tts_factory_mock, config_mock):
         setup_mocks(config_mock, tts_factory_mock)
 

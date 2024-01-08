@@ -8,8 +8,14 @@ from queue import Queue
 from tempfile import gettempdir
 from threading import Thread, Lock
 
+from .player import OCPMediaPlayer
+from .playback import PlaybackThread
+from .transformers import DialogTransformersService
+from .tts import TTSFactory
+from .utils import report_timing, validate_message_context
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
+
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import get_audio_service_configs
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
@@ -20,12 +26,6 @@ from ovos_utils.log import LOG
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.sound import play_audio
-
-from ovos_audio.audio import AudioService
-from ovos_audio.playback import PlaybackThread
-from ovos_audio.transformers import DialogTransformersService
-from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing, validate_message_context
 
 
 def on_ready():
@@ -94,7 +94,7 @@ class PlaybackService(Thread):
             self.status.set_error(e)
 
         try:
-            self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
+            self.ocp = OCPMediaPlayer(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
         except Exception as e:
             LOG.exception(e)
             self.status.set_error(e)
@@ -247,11 +247,11 @@ class PlaybackService(Thread):
 
     def run(self):
         self.status.set_alive()
-        if self.audio.wait_for_load():
-            if len(self.audio.service) == 0:
-                LOG.warning('No audio backends loaded! '
-                            'Audio playback is not available')
-                LOG.info("Running audio service in TTS only mode")
+        #if self.ocp.wait_for_load():
+        #    if len(self.ocp.service) == 0:
+        #        LOG.warning('No audio backends loaded! '
+        #                    'Audio playback is not available')
+        #        LOG.info("Running audio service in TTS only mode")
         # If at least TTS exists, report ready
         if self.tts:
             self.status.set_ready()
@@ -492,14 +492,14 @@ class PlaybackService(Thread):
                 volume_changed = True
             elif muted:
                 self.bus.emit(Message("mycroft.volume.unmute"))
-        if self.audio.current and not duck_pulse_handled:
-            self.audio.current.lower_volume()
+        if self.ocp.current and not duck_pulse_handled:
+            self.ocp.current.lower_volume()
 
         play_audio(audio_file).wait()
 
         # return to previous state
-        if self.audio.current and not duck_pulse_handled:
-            self.audio.current.restore_volume()
+        if self.ocp.current and not duck_pulse_handled:
+            self.ocp.current.restore_volume()
         if ensure_volume:
             if volume_changed:
                 self.bus.emit(Message("mycroft.volume.set", {"percent": volume,
@@ -528,7 +528,7 @@ class PlaybackService(Thread):
         if self.tts.playback:
             self.tts.playback.shutdown()
             self.tts.playback.join()
-        self.audio.shutdown()
+        self.ocp.shutdown()
 
     def init_messagebus(self):
         """

@@ -1,12 +1,14 @@
 import random
-from ovos_audio.transformers import TTSTransformersService
-from ovos_bus_client.message import Message
-from ovos_plugin_manager.templates.tts import TTS
-from ovos_utils.log import LOG, log_deprecation
-from ovos_utils.sound import play_audio
 from queue import Empty
 from threading import Thread, Event
 from time import time
+
+from ovos_bus_client.message import Message
+
+from ovos_plugin_manager.templates.tts import TTS
+from ovos_utils.log import LOG, log_deprecation
+from ovos_utils.sound import play_audio
+from .transformers import TTSTransformersService
 
 
 class PlaybackThread(Thread):

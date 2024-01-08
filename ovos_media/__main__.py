@@ -10,11 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from ovos_audio.service import PlaybackService, on_ready, on_error, on_stopping
 from ovos_config.locale import setup_locale
 from ovos_utils import wait_for_exit_signal
 from ovos_utils.log import init_service_logger
 from ovos_utils.process_utils import reset_sigint_handler
+from .service import PlaybackService, on_ready, on_error, on_stopping
 
 
 def main(ready_hook=on_ready, error_hook=on_error, stopping_hook=on_stopping,

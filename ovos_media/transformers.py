@@ -1,8 +1,10 @@
+from typing import Tuple
+
 from ovos_bus_client.session import Session, SessionManager
+
 from ovos_config import Configuration
 from ovos_plugin_manager.dialog_transformers import find_dialog_transformer_plugins, find_tts_transformer_plugins
 from ovos_utils.log import LOG
-from typing import Tuple
 
 
 class DialogTransformersService:
@@ -20,7 +22,7 @@ class DialogTransformersService:
     def blacklisted_skills(self):
         # dialog should NEVER be rewritten if it comes from these skills
         return self.config.get("blacklisted_skills",
-                               ["skill-ovos-icanhazdadjokes.openvoiceos"] # blacklist jokes by default
+                               ["skill-ovos-icanhazdadjokes.openvoiceos"]  # blacklist jokes by default
                                )
 
     def load_plugins(self):

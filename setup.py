@@ -33,7 +33,7 @@ def required(requirements_file):
 def get_version():
     """ Find the version of ovos-core"""
     version = None
-    version_file = os.path.join(BASEDIR, 'ovos_audio', 'version.py')
+    version_file = os.path.join(BASEDIR, 'ovos_media', 'version.py')
     major, minor, build, alpha = (None, None, None, None)
     with open(version_file) as f:
         for line in f:
@@ -56,7 +56,7 @@ def get_version():
 
 
 setup(
-    name="ovos-audio",
+    name="ovos-media",
     version=get_version(),
     license="Apache-2.0",
     url="https://github.com/OpenVoiceOS/ovos-audio",
@@ -72,5 +72,5 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
     ],
-    entry_points={"console_scripts": ["ovos-audio=ovos_audio.__main__:main"]},
+    entry_points={"console_scripts": ["ovos-media=ovos_media.__main__:main"]},
 )
