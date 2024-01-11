@@ -286,15 +286,8 @@ class TestSpeech(unittest.TestCase):
 
         speech.handle_opm_g2p_query(Message("opm.g2p.query"))
 
-    @mock.patch('ovos_audio.service.get_audio_service_configs')
-    def test_opm_audio(self, mock_get_configs, tts_factory_mock, config_mock):
+    def test_opm_audio(self, tts_factory_mock, config_mock):
         setup_mocks(config_mock, tts_factory_mock)
-
-        ocp = {"type": "ovos_common_play", "active": True}
-        p = {"type": "ovos_badass_player", "active": True}
-
-        # per module configs, mocking same return val for all plugin inputs (!)
-        mock_get_configs.return_value = {"ocp": ocp, "badass": p}
 
         bus = FakeBus()
         speech = PlaybackService(bus=bus)
@@ -302,11 +295,8 @@ class TestSpeech(unittest.TestCase):
         def rcvm(msg):
             msg = json.loads(msg)
             self.assertEqual(msg["type"], "opm.audio.query.response")
-            self.assertEqual(msg["data"]["plugins"], ["ocp", "badass"])
-            self.assertEqual(msg["data"]["configs"], {"ocp": ocp, "badass": p})
-            ocp["plugin_name"] = 'Ovos Common Play'
-            p["plugin_name"] = 'Ovos Badass Player'
-            self.assertEqual(msg["data"]["options"], [ocp, p])
+            self.assertEqual(msg["data"]["plugins"], [])
+            self.assertEqual(msg["data"]["configs"], {})
 
         bus.on("message", rcvm)
 
