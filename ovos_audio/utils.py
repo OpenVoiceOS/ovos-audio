@@ -14,10 +14,11 @@
 #
 import time
 
+from ovos_utils.log import deprecated
+from ovos_utils.signal import check_for_signal
+
 from ovos_bus_client.send_func import send
 from ovos_config import Configuration
-from ovos_utils.log import LOG, deprecated
-from ovos_utils.signal import check_for_signal
 
 
 def validate_message_context(message, native_sources=None):
