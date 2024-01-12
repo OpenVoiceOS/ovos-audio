@@ -1,9 +1,1 @@
-ovos_plugin_common_play~=0.0, >=0.0.6a11
-
 ovos-tts-plugin-server
-
-# ovos-ocp-youtube-plugin
-ovos-ocp-m3u-plugin
-ovos-ocp-rss-plugin
-ovos-ocp-files-plugin
-ovos-ocp-news-plugin

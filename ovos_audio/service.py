@@ -11,12 +11,11 @@ from threading import Thread, Lock
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
-from ovos_plugin_manager.audio import get_audio_service_configs
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
 from ovos_plugin_manager.tts import TTS
 from ovos_plugin_manager.tts import get_tts_supported_langs, get_tts_lang_configs, get_tts_module_configs
 from ovos_utils.file_utils import resolve_resource_file
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, deprecated
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
 from ovos_utils.sound import play_audio
@@ -29,23 +28,23 @@ from ovos_audio.utils import report_timing, validate_message_context
 
 
 def on_ready():
-    LOG.info('Audio service is ready.')
+    LOG.info('TTS service is ready.')
 
 
 def on_alive():
-    LOG.info('Audio service is alive.')
+    LOG.info('TTS service is alive.')
 
 
 def on_started():
-    LOG.info('Audio service started.')
+    LOG.info('TTS service started.')
 
 
 def on_error(e='Unknown'):
-    LOG.error(f'Audio service failed to launch ({e}).')
+    LOG.error(f'TTS service failed to launch ({e}).')
 
 
 def on_stopping():
-    LOG.info('Audio service is shutting down...')
+    LOG.info('TTS service is shutting down...')
 
 
 class PlaybackService(Thread):
@@ -93,11 +92,13 @@ class PlaybackService(Thread):
             LOG.exception(e)
             self.status.set_error(e)
 
-        try:
-            self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
-        except Exception as e:
-            LOG.exception(e)
-            self.status.set_error(e)
+        self.audio = None
+        self.audio_enabled = self.config.get("enable_old_audioservice", True)  # TODO default to False soon
+        if self.audio_enabled:
+            try:
+                self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
+            except Exception as e:
+                LOG.exception(e)
 
     @staticmethod
     def get_tts_lang_options(lang, blacklist=None):
@@ -157,6 +158,7 @@ class PlaybackService(Thread):
         return opts
 
     @staticmethod
+    @deprecated("audio service moved to ovos-media", "0.1.0")
     def get_audio_options(blacklist=None):
         """ returns a list of options to be consumed by an external UI
         each dict contains metadata about the plugins
@@ -166,17 +168,7 @@ class PlaybackService(Thread):
           "active": True,
           "plugin_name": 'Ovos Common Play'}]
         """
-        blacklist = blacklist or []
         opts = []
-        cfgs = get_audio_service_configs()
-        for name, config in cfgs.items():
-            engine = config["type"]
-            if engine in blacklist:
-                continue
-            # For Display purposes, we want to show the engine name without the underscore or dash and capitalized all
-            plugin_display_name = engine.replace("_", " ").replace("-", " ").title()
-            config["plugin_name"] = plugin_display_name
-            opts.append(config)
         return opts
 
     def handle_opm_tts_query(self, message):
@@ -229,6 +221,7 @@ class PlaybackService(Thread):
         }
         self.bus.emit(message.response(data))
 
+    @deprecated("audio service moved to ovos-media", "0.1.0")
     def handle_opm_audio_query(self, message):
         """ Responds to opm.audio.query with data about installed plugins
 
@@ -237,21 +230,23 @@ class PlaybackService(Thread):
         "configs" - {backend_name: backend_cfg}}
         "options" - {lang: [list_of_valid_ui_metadata]}
         """
-        cfgs = get_audio_service_configs()
         data = {
-            "plugins": list(cfgs.keys()),
-            "configs": cfgs,
-            "options": self.get_audio_options()
+            "plugins": [],
+            "configs": {},
+            "options": {}
         }
         self.bus.emit(message.response(data))
 
     def run(self):
         self.status.set_alive()
-        if self.audio.wait_for_load():
-            if len(self.audio.service) == 0:
-                LOG.warning('No audio backends loaded! '
-                            'Audio playback is not available')
-                LOG.info("Running audio service in TTS only mode")
+        if self.audio_enabled:
+            LOG.warning("audio service has moved to ovos-media, if you already migrated to ovos-media "
+                        'set "enable_old_audioservice": false in mycroft.conf')
+            if self.audio.wait_for_load():
+                if len(self.audio.service) == 0:
+                    LOG.warning('No audio backends loaded! '
+                                'Audio playback is not available')
+                    LOG.info("Running audio service in TTS only mode")
         # If at least TTS exists, report ready
         if self.tts:
             self.status.set_ready()
@@ -492,14 +487,18 @@ class PlaybackService(Thread):
                 volume_changed = True
             elif muted:
                 self.bus.emit(Message("mycroft.volume.unmute"))
-        if self.audio.current and not duck_pulse_handled:
-            self.audio.current.lower_volume()
+
+        if self.audio:
+            if self.audio.current and not duck_pulse_handled:
+                self.audio.current.lower_volume()
 
         play_audio(audio_file).wait()
 
         # return to previous state
-        if self.audio.current and not duck_pulse_handled:
-            self.audio.current.restore_volume()
+        if self.audio:
+            if self.audio.current and not duck_pulse_handled:
+                self.audio.current.restore_volume()
+
         if ensure_volume:
             if volume_changed:
                 self.bus.emit(Message("mycroft.volume.set", {"percent": volume,
@@ -528,7 +527,8 @@ class PlaybackService(Thread):
         if self.tts.playback:
             self.tts.playback.shutdown()
             self.tts.playback.join()
-        self.audio.shutdown()
+        if self.audio:
+            self.audio.shutdown()
 
     def init_messagebus(self):
         """
