@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a32...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a33...HEAD)
+
+**Merged pull requests:**
+
+- refactor/drop audio service [\#49](https://github.com/OpenVoiceOS/ovos-audio/pull/49) ([NeonJarbas](https://github.com/NeonJarbas))
+
+## [V0.0.2a33](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a33) (2023-12-29)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a32...V0.0.2a33)
 
 **Fixed bugs:**
 
