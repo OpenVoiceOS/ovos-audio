@@ -315,7 +315,7 @@ class PlaybackService(Thread):
                 self._tts_hash = config.get("module", "")
 
         # if fallback TTS is the same as main TTS dont load it
-        if config.get("module", "") == config.get("fallback_module", "") or config.get("fallback_module", "")=="":
+        if config.get("module", "") == config.get("fallback_module", "") or not config.get("fallback_module", ""):
             LOG.debug("Skipping fallback TTS init, fallback is empty or same as main TTS")
             return            
 
@@ -356,6 +356,8 @@ class PlaybackService(Thread):
         if not self.fallback_tts:
             config = Configuration()
             engine = config.get('tts', {}).get("fallback_module", "")
+            if not engine:
+                return
             cfg = {"tts": {"module": engine,
                            engine: config.get('tts', {}).get(engine, {})}}
             self.fallback_tts = TTSFactory.create(cfg)
