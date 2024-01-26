@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a33...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a34...HEAD)
+
+**Implemented enhancements:**
+
+- Skip dummy fallback TTS, remove mimic as default fallback. [\#51](https://github.com/OpenVoiceOS/ovos-audio/pull/51) ([LordIvanhoe](https://github.com/LordIvanhoe))
+
+**Fixed bugs:**
+
+- ovos-audio stops speaking when some chars are present [\#33](https://github.com/OpenVoiceOS/ovos-audio/issues/33)
+
+## [V0.0.2a34](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a34) (2024-01-12)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a33...V0.0.2a34)
 
 **Merged pull requests:**
 
