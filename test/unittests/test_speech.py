@@ -27,7 +27,7 @@ tts_mock = mock.Mock()
 
 def setup_mocks(config_mock, tts_factory_mock, fallback="A"):
     """Do the common setup for the mocks."""
-    c = Configuration.get()
+    c = Configuration()
     c["tts"] = {"module": "A", "fallback_module": fallback}
     config_mock.return_value = c
 
