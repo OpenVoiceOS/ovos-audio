@@ -376,6 +376,9 @@ class PlaybackService(Thread):
         """
         try:
             tts = self._get_tts_fallback()
+            if tts is None:
+                LOG.error("No fallback TTS available and main TTS failed!")
+                return
             LOG.debug("TTS fallback, utterance : " + str(utterance))
             tts.execute(utterance, ident, listen,
                         message=message)  # accepts random kwargs
