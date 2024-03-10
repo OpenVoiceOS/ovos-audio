@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a36...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a37...HEAD)
+
+**Merged pull requests:**
+
+- chore\(docs\): add a long description to PyPi [\#56](https://github.com/OpenVoiceOS/ovos-audio/pull/56) ([mikejgray](https://github.com/mikejgray))
+
+## [V0.0.2a37](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a37) (2024-02-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a36...V0.0.2a37)
 
 **Implemented enhancements:**
 
