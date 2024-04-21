@@ -1,4 +1,6 @@
+import base64
 import binascii
+import json
 import os
 import os.path
 import time
@@ -253,6 +255,29 @@ class PlaybackService(Thread):
         else:
             self.status.set_error('No TTS loaded')
 
+    def handle_b64_audio(self, message):
+        """syntehsizes speech, but instead of queuing for playback
+        returns it b64 encoded in the bus
+        allows 3rd party integrations to use OVOS as a TTS service
+        """
+        sess = SessionManager.get(message)
+        stopwatch = Stopwatch()
+        stopwatch.start()
+        utterance = message.data['utterance']
+
+        ctxt = self.tts._get_ctxt({"message": message})
+        wav, _ = self.tts.synth(utterance, ctxt)
+        with open(wav, "rb") as f:
+            audio = f.read()
+
+        b64_audio = base64.b64encode(audio)
+        self.bus.emit(message.response({"audio": b64_audio}))
+
+        stopwatch.stop()
+        report_timing(sess.session_id, stopwatch,
+                      {'utterance': utterance,
+                       'tts': self.tts.plugin_id})
+
     def handle_speak(self, message):
         """Handle "speak" message
 
@@ -294,7 +319,7 @@ class PlaybackService(Thread):
         stopwatch.stop()
         report_timing(sess.session_id, stopwatch,
                       {'utterance': utterance,
-                       'tts': self.tts.__class__.__name__})
+                       'tts': self.tts.plugin_id})
 
     def _maybe_reload_tts(self):
         """
@@ -317,7 +342,7 @@ class PlaybackService(Thread):
         # if fallback TTS is the same as main TTS dont load it
         if config.get("module", "") == config.get("fallback_module", "") or not config.get("fallback_module", ""):
             LOG.debug("Skipping fallback TTS init, fallback is empty or same as main TTS")
-            return            
+            return
 
         if not config.get('preload_fallback', True):
             LOG.debug("Skipping fallback TTS init")
@@ -547,6 +572,7 @@ class PlaybackService(Thread):
         self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
         self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
         self.bus.on('speak', self.handle_speak)
+        self.bus.on('speak:b64_audio', self.handle_b64_audio)
         self.bus.on('ovos.languages.tts', self.handle_get_languages_tts)
         self.bus.on("opm.tts.query", self.handle_opm_tts_query)
         self.bus.on("opm.audio.query", self.handle_opm_audio_query)
