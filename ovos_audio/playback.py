@@ -93,7 +93,7 @@ class PlaybackThread(Thread):
         # Clear cache for all attached tts objects
         # This is basically the only safe time
         try:
-            from ovos_plugin_manager.templates.tts import TTS, TTSContext
+            from ovos_plugin_manager.templates.tts import TTSContext
             TTSContext.curate_caches()
         except ImportError:
             LOG.warning("failed to curate TTS cache. please update ovos-plugin-manager")
