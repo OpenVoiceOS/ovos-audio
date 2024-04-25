@@ -1,7 +1,7 @@
 import random
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
-from ovos_plugin_manager.templates.tts import TTS
+from ovos_plugin_manager.templates.tts import TTS, TTSContext
 from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.sound import play_audio
 from queue import Empty
@@ -22,10 +22,8 @@ class PlaybackThread(Thread):
         self._do_playback = Event()
         self.enclosure = None
         self.p = None
-        self._tts = []
         self.bus = bus or None
         self._now_playing = None
-        self.active_tts = None
         self._started = Event()
         self.tts_transform = TTSTransformersService(self.bus)
 
@@ -33,22 +31,8 @@ class PlaybackThread(Thread):
     def is_running(self):
         return self._started.is_set() and not self._terminated
 
-    def activate_tts(self, tts_id):
-        self.active_tts = tts_id
-        tts = self.get_attached_tts()
-        if tts:
-            tts.begin_audio()
-
-    def deactivate_tts(self):
-        if self.active_tts:
-            tts = self.get_attached_tts()
-            if tts:
-                tts.end_audio()
-        self.active_tts = None
-
     def init(self, tts):
         """DEPRECATED! Init the TTS Playback thread."""
-        self.attach_tts(tts)
         self.set_bus(tts.bus)
 
     def set_bus(self, bus):
@@ -58,47 +42,6 @@ class PlaybackThread(Thread):
         """
         self.bus = bus
         self.tts_transform.set_bus(bus)
-
-    @property
-    def tts(self):
-        tts = self.get_attached_tts()
-        if not tts and self._tts:
-            return self._tts[0]
-        return tts
-
-    @tts.setter
-    def tts(self, val):
-        self.attach_tts(val)
-
-    @property
-    def attached_tts(self):
-        return self._tts
-
-    def attach_tts(self, tts):
-        """Add TTS to be cache checked."""
-        if tts not in self.attached_tts:
-            self.attached_tts.append(tts)
-
-    def detach_tts(self, tts):
-        """Remove TTS from cache check."""
-        if tts in self.attached_tts:
-            self.attached_tts.remove(tts)
-
-    def get_attached_tts(self, tts_id=None):
-        tts_id = tts_id or self.active_tts
-        if not tts_id:
-            return
-        for tts in self.attached_tts:
-            if hasattr(tts, "tts_id"):
-                # opm plugin
-                if tts.tts_id == tts_id:
-                    return tts
-
-        for tts in self.attached_tts:
-            if not hasattr(tts, "tts_id"):
-                # non-opm plugin
-                if tts.tts_name == tts_id:
-                    return tts
 
     def clear_queue(self):
         """Remove all pending playbacks."""
@@ -149,14 +92,13 @@ class PlaybackThread(Thread):
             self._processing_queue = False
         # Clear cache for all attached tts objects
         # This is basically the only safe time
-        for tts in self.attached_tts:
-            tts.cache.curate()
+        TTSContext.curate_caches()
         self.blink(0.2)
 
     def _play(self):
         try:
             data, visemes, listen, tts_id, message = self._now_playing
-            self.activate_tts(tts_id)
+
             self.on_start(message)
 
             data, message.context = self.tts_transform.transform(data, message.context)
@@ -167,7 +109,7 @@ class PlaybackThread(Thread):
             if self.p:
                 self.p.communicate()
                 self.p.wait()
-            self.deactivate_tts()
+
             if self.queue.empty():
                 self.on_end(listen, message)
         except Empty:
@@ -272,8 +214,6 @@ class PlaybackThread(Thread):
 
     def shutdown(self):
         self.stop()
-        for tts in self.attached_tts:
-            self.detach_tts(tts)
 
     def __del__(self):
         self.shutdown()
