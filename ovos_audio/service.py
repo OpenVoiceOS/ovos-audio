@@ -256,7 +256,7 @@ class PlaybackService(Thread):
             self.status.set_error('No TTS loaded')
 
     def handle_b64_audio(self, message):
-        """syntehsizes speech, but instead of queuing for playback
+        """synthesizes speech, but instead of queuing for playback
         returns it b64 encoded in the bus
         allows 3rd party integrations to use OVOS as a TTS service
         """
