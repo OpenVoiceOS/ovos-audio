@@ -1,7 +1,7 @@
 import random
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
-from ovos_plugin_manager.templates.tts import TTS, TTSContext
+from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.sound import play_audio
 from queue import Empty
@@ -92,7 +92,11 @@ class PlaybackThread(Thread):
             self._processing_queue = False
         # Clear cache for all attached tts objects
         # This is basically the only safe time
-        TTSContext.curate_caches()
+        try:
+            from ovos_plugin_manager.templates.tts import TTS, TTSContext
+            TTSContext.curate_caches()
+        except ImportError:
+            LOG.warning("failed to curate TTS cache. please update ovos-plugin-manager")
         self.blink(0.2)
 
     def _play(self):
