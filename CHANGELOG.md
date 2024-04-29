@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a40...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a41...HEAD)
+
+**Fixed bugs:**
+
+- fix/tts\_reload [\#57](https://github.com/OpenVoiceOS/ovos-audio/pull/57) ([JarbasAl](https://github.com/JarbasAl))
+
+**Closed issues:**
+
+- config file is not reloaded on change [\#19](https://github.com/OpenVoiceOS/ovos-audio/issues/19)
+
+## [V0.0.2a41](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a41) (2024-04-29)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a40...V0.0.2a41)
 
 **Fixed bugs:**
 
