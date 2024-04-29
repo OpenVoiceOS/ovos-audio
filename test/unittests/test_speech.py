@@ -149,6 +149,7 @@ class TestSpeech(unittest.TestCase):
 
         speech = PlaybackService(bus=bus)
         speech.tts = FailingTTS()
+        speech._tts_hash = "123failing"
 
         speech.execute_tts("hello", "123")
         self.assertTrue(speech.fallback_tts.execute.called)
