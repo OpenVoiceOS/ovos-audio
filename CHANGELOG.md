@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a37...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a38...HEAD)
+
+**Closed issues:**
+
+- threads can only be started once [\#50](https://github.com/OpenVoiceOS/ovos-audio/issues/50)
+
+**Merged pull requests:**
+
+- refactor/code\_cleanup [\#59](https://github.com/OpenVoiceOS/ovos-audio/pull/59) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a38](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a38) (2024-03-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a37...V0.0.2a38)
 
 **Merged pull requests:**
 
