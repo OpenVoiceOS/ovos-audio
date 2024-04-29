@@ -4,6 +4,7 @@ import json
 import os
 import os.path
 import time
+import json
 from hashlib import md5
 from os.path import exists
 from queue import Queue
@@ -326,10 +327,16 @@ class PlaybackService(Thread):
         Load TTS modules if not yet loaded or if configuration has changed.
         Optionally pre-loads fallback TTS if configured
         """
-        config = self.config.get("tts", {})
+        config = Configuration().get("tts", {})
+        tts_m = config.get("module", "")
+        ftts_m = config.get("fallback_module", "")
+        _tts_hash = hash(json.dumps(config.get(tts_m, {}),
+                                    sort_keys=True))
+        _ftts_hash = hash(json.dumps(config.get(ftts_m, {}),
+                                     sort_keys=True))
 
         # update TTS object if configuration has changed
-        if not self._tts_hash or self._tts_hash != config.get("module", ""):
+        if not self._tts_hash or self._tts_hash != _tts_hash:
             with self.lock:
                 if self.tts:
                     self.tts.shutdown()
@@ -337,7 +344,7 @@ class PlaybackService(Thread):
                 LOG.info("(re)loading TTS engine")
                 self.tts = TTSFactory.create(config)
                 self.tts.init(self.bus, self.playback_thread)
-                self._tts_hash = config.get("module", "")
+                self._tts_hash = _tts_hash
 
         # if fallback TTS is the same as main TTS dont load it
         if config.get("module", "") == config.get("fallback_module", "") or not config.get("fallback_module", ""):
@@ -349,14 +356,14 @@ class PlaybackService(Thread):
             return
 
         if not self._fallback_tts_hash or \
-                self._fallback_tts_hash != config.get("fallback_module", ""):
+                self._fallback_tts_hash != ftts_m:
             with self.lock:
                 if self.fallback_tts:
                     self.fallback_tts.shutdown()
                 # Create new tts instance
                 LOG.info("(re)loading fallback TTS engine")
                 self._get_tts_fallback()
-                self._fallback_tts_hash = config.get("fallback_module", "")
+                self._fallback_tts_hash = _ftts_hash
 
     def execute_tts(self, utterance, ident, listen=False, message: Message = None):
         """Mute mic and start speaking the utterance using selected tts backend.
