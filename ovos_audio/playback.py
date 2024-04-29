@@ -1,6 +1,7 @@
 import random
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
+from ovos_config import Configuration
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.sound import play_audio
@@ -55,8 +56,12 @@ class PlaybackThread(Thread):
     def begin_audio(self, message=None):
         """Perform beginning of speech actions."""
         if self.bus:
-            if not self.tts.config.get("pulse_duck", False):
-                self.bus.emit(Message("ovos.common_play.duck"))
+            cfg = Configuration().get("tts", {})
+            if not cfg.get("pulse_duck"):  # OS is configured to use pulseaudio modules directly
+                if cfg.get("ocp_cork", False):
+                    self.bus.emit(Message("ovos.common_play.cork"))
+                elif cfg.get("ocp_duck", False):
+                    self.bus.emit(Message("ovos.common_play.duck"))
             message = message or Message("speak")
             self.bus.emit(message.forward("recognizer_loop:audio_output_start"))
         else:
@@ -70,8 +75,12 @@ class PlaybackThread(Thread):
             listen (bool): True if listening event should be emitted
         """
         if self.bus:
-            if not self.tts.config.get("pulse_duck", False):
-                self.bus.emit(Message("ovos.common_play.unduck"))
+            cfg = Configuration().get("tts", {})
+            if not cfg.get("pulse_duck"):  # OS is configured to use pulseaudio modules directly
+                if cfg.get("ocp_cork", False):
+                    self.bus.emit(Message("ovos.common_play.uncork"))
+                elif cfg.get("ocp_duck", False):
+                    self.bus.emit(Message("ovos.common_play.unduck"))
             # Send end of speech signals to the system
             message = message or Message("speak")
             self.bus.emit(message.forward("recognizer_loop:audio_output_end"))
