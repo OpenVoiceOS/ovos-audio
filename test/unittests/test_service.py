@@ -222,6 +222,22 @@ class TestService(unittest.TestCase):
 
         service.shutdown()
 
+    @mock.patch("ovos_audio.audio.Configuration")
+    def test_load_backends(self, mock_config):
+        mock_config.return_value = {}
+        service = AudioService(self.emitter)
+        service_names = set([s.name for s in service.service])
+        self.assertEqual(service_names,
+                         {"ovos_common_play", "ovos_vlc", "ovos_simple"},
+                         service_names)
+        service.shutdown()
+
+        service = AudioService(self.emitter, disable_ocp=True)
+        service_names = [s.name for s in service.service]
+        self.assertEqual(service_names, {"ovos_vlc", "ovos_simple"},
+                         service_names)
+        service.shutdown()
+
 
 if __name__ == "__main__":
     unittest.main()
