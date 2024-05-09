@@ -1,4 +1,5 @@
 ovos-utils~=0.0, >=0.0.38
 ovos-bus-client~=0.0, >=0.0.8
 ovos-config~=0.0,>=0.0.13a7
-ovos-plugin-manager~=0.0, >=0.0.26a16
+#ovos-plugin-manager~=0.0, >=0.0.26a16
+ovos-plugin-manager@git+https://github.com/openvoiceos/ovos-plugin-manager@FIX_OvosUtils0.0.xCompat
