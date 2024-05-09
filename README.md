@@ -20,16 +20,11 @@ under mycroft.conf
 {
 
   // Text to Speech parameters
-  // Override: REMOTE
   "tts": {
-    "pulse_duck": false,
-    "module": "ovos-tts-plugin-mimic3-server",
+    "module": "ovos-tts-plugin-server",
     "fallback_module": "ovos-tts-plugin-mimic",
     "ovos-tts-plugin-mimic": {
         "voice": "ap"
-    },
-    "ovos-tts-plugin-mimic3-server": {
-        "voice": "en_UK/apope_low"
     }
   },
 
@@ -42,15 +37,31 @@ under mycroft.conf
   },
 
   // Mechanism used to play WAV audio files
-  // Override: SYSTEM
   "play_wav_cmdline": "paplay %1 --stream-name=mycroft-voice",
 
   // Mechanism used to play MP3 audio files
-  // Override: SYSTEM
   "play_mp3_cmdline": "mpg123 %1",
 
   // Mechanism used to play OGG audio files
-  // Override: SYSTEM
   "play_ogg_cmdline": "ogg123 -q %1"
 }
 ```
+
+## Using Legacy AudioService
+
+The legacy audio service supports audio playback via the old mycroft api ([@mycroft](https://github.com/MycroftAI/mycroft-core/blob/dev/mycroft/skills/audioservice.py#L43) [@ovos](https://github.com/OpenVoiceOS/ovos-bus-client/blob/dev/ovos_bus_client/apis/ocp.py#L51))
+
+by default OCP acts as a translation layer for this api and no action is needed, but if you want to disable ocp this api remains available
+
+> **NOTE:** once ovos-media is released OCP and this api will be disabled by default and deprecated!
+
+```javascript
+{
+    "enable_old_audioservice": true,
+    "disable_ocp": true
+}
+```
+
+legacy plugins:
+- [vlc](https://github.com/OpenVoiceOS/ovos-vlc-plugin)
+- [simple](https://github.com/OpenVoiceOS/ovos-audio-plugin-simple) (no https suuport)

@@ -54,7 +54,7 @@ class PlaybackService(Thread):
     def __init__(self, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
                  started_hook=on_started, watchdog=lambda: None,
-                 bus=None, disable_ocp=False, validate_source=True):
+                 bus=None, disable_ocp=None, validate_source=True):
         super(PlaybackService, self).__init__()
 
         LOG.info("Starting Audio Service")
@@ -97,6 +97,8 @@ class PlaybackService(Thread):
 
         self.audio = None
         self.audio_enabled = self.config.get("enable_old_audioservice", True)  # TODO default to False soon
+        if disable_ocp is None:
+            disable_ocp = self.config.get("disable_ocp", False)  # TODO default to True soon
         if self.audio_enabled:
             try:
                 self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
