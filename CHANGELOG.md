@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a42...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a43...HEAD)
+
+**Merged pull requests:**
+
+- Add test case to validate backend plugin load [\#62](https://github.com/OpenVoiceOS/ovos-audio/pull/62) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.0.2a43](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a43) (2024-05-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a42...V0.0.2a43)
 
 **Implemented enhancements:**
 
