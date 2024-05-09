@@ -63,5 +63,13 @@ by default OCP acts as a translation layer for this api and no action is needed,
 ```
 
 legacy plugins:
+- [ocp](https://github.com/OpenVoiceOS/ovos-ocp-audio-plugin)
 - [vlc](https://github.com/OpenVoiceOS/ovos-vlc-plugin)
 - [simple](https://github.com/OpenVoiceOS/ovos-audio-plugin-simple) (no https support)
+
+**OCP technical details:**
+
+- OCP was developed for mycroft-core under this legacy system
+- it will pose as a legacy plugin and translate the received bus events to the OCP api
+- this does **NOT** bring support for old Mycroft CommonPlay skills, that is related to skills service not ovos-audio
+- this brings support for OCP skills to OVOS until ovos-media is finished
