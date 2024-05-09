@@ -58,7 +58,21 @@ by default OCP acts as a translation layer for this api and no action is needed,
 ```javascript
 {
     "enable_old_audioservice": true,
-    "disable_ocp": true
+    "disable_ocp": true,
+    "Audio": {
+        "default-backend": "vlc",
+        "backends": {
+          "simple": {
+            "type": "ovos_audio_simple",
+            "active": true
+          },
+          "vlc": {
+            "type": "ovos_vlc",
+            "active": true
+          }
+        }
+    }
+  },
 }
 ```
 
@@ -70,8 +84,8 @@ legacy plugins:
 **OCP technical details:**
 
 - OCP was developed for mycroft-core under this legacy system
-- OCP will pose as a legacy plugin and translate the received bus events to the OCP api
-- OCP is the default audio plugin, unless disabled in config
+- OCP will pose as a legacy plugin and translate the received bus events to the [OCP api](https://github.com/OpenVoiceOS/ovos-bus-client/blob/dev/ovos_bus_client/apis/ocp.py#L228)
+- OCP is **always** the default audio plugin, unless you set `"disable_ocp": true` in config
 - OCP uses the legacy api internally, to delegate playback when GUI is not available (or configured to do so)
 - this does **NOT** bring support for old Mycroft CommonPlay skills, that is related to skills service not ovos-audio
 - this brings support for [OCP skills](https://openvoiceos.github.io/ovos-technical-manual/OCP_skills) to OVOS until [ovos-media](https://github.com/OpenVoiceOS/ovos-media) is finished
