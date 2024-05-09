@@ -72,4 +72,4 @@ legacy plugins:
 - OCP was developed for mycroft-core under this legacy system
 - it will pose as a legacy plugin and translate the received bus events to the OCP api
 - this does **NOT** bring support for old Mycroft CommonPlay skills, that is related to skills service not ovos-audio
-- this brings support for OCP skills to OVOS until ovos-media is finished
+- this brings support for [OCP skills](https://openvoiceos.github.io/ovos-technical-manual/OCP_skills) to OVOS until ovos-media is finished
