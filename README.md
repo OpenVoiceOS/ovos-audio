@@ -10,7 +10,7 @@ Handles TTS generation and sounds playback
 plugins.
 
 Without `extras`, you will also need to manually install,
-and possibly configure TTS and Audio Backend modules as described below.
+and possibly configure TTS modules as described below.
 
 # Configuration
 
@@ -64,4 +64,4 @@ by default OCP acts as a translation layer for this api and no action is needed,
 
 legacy plugins:
 - [vlc](https://github.com/OpenVoiceOS/ovos-vlc-plugin)
-- [simple](https://github.com/OpenVoiceOS/ovos-audio-plugin-simple) (no https suuport)
+- [simple](https://github.com/OpenVoiceOS/ovos-audio-plugin-simple) (no https support)
