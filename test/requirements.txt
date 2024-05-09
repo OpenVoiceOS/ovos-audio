@@ -5,3 +5,5 @@ pytest-cov==2.8.1
 cov-core==1.15.0
 sphinx==2.2.1
 sphinx-rtd-theme==0.4.3
+ovos-audio-plugin-simple~=0.0.1
+ovos-plugin-vlc~=0.0.1
