@@ -257,7 +257,6 @@ class TestLegacy(unittest.TestCase):
 
         messages = []
 
-        # TODO - need OPM bugfix to pass
         utt = Message('mycroft.audio.service.queue',
                       {"tracks": ['http://fake4.mp3', 'http://fake5.mp3']},
                       {})
@@ -281,6 +280,120 @@ class TestLegacy(unittest.TestCase):
                           'http://fake4.mp3',
                           'http://fake5.mp3'])
         self.assertEqual(self.core.default._idx, 1)
+
+    def test_play_pause_resume(self):
+
+        messages = []
+
+        def new_msg(msg):
+            nonlocal messages
+            m = Message.deserialize(msg)
+            messages.append(m)
+            print(len(messages), msg)
+
+        def wait_for_n_messages(n):
+            nonlocal messages
+            t = time.time()
+            while len(messages) < n:
+                sleep(0.1)
+                if time.time() - t > 10:
+                    raise RuntimeError("did not get the number of expected messages under 10 seconds")
+
+        self.core.bus.on("message", new_msg)
+
+        utt = Message('mycroft.audio.service.play',
+                      {"tracks": ["http://fake.mp3"]},
+                      {})
+        self.core.bus.emit(utt)
+
+        # confirm all expected messages are sent
+        expected_messages = [
+            'mycroft.audio.service.play',
+            "ovos.common_play.media.state",  # LOADING_MEDIA
+            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
+            "ovos.common_play.simple.play",  # call simple plugin
+            "ovos.common_play.player.state",  # PLAYING
+            "ovos.common_play.media.state",  # LOADED_MEDIA
+            "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
+        ]
+        wait_for_n_messages(len(expected_messages))
+
+        self.assertEqual(len(expected_messages), len(messages))
+
+        for idx, m in enumerate(messages):
+            self.assertEqual(m.msg_type, expected_messages[idx])
+
+        state = messages[4]
+        self.assertEqual(state.data["state"], PlayerState.PLAYING)
+        state = messages[5]
+        self.assertEqual(state.data["state"], MediaState.LOADED_MEDIA)
+        state = messages[6]
+        self.assertEqual(state.data["state"], TrackState.PLAYING_AUDIOSERVICE)
+
+        messages = []
+        utt = Message('mycroft.audio.service.pause',
+                      {},
+                      {})
+        self.core.bus.emit(utt)
+
+        # confirm all expected messages are sent
+        expected_messages = [
+            'mycroft.audio.service.pause',
+            "ovos.common_play.player.state",  # PAUSED
+        ]
+        wait_for_n_messages(len(expected_messages))
+
+        self.assertEqual(len(expected_messages), len(messages))
+
+        for idx, m in enumerate(messages):
+            self.assertEqual(m.msg_type, expected_messages[idx])
+
+        state = messages[-1]
+        self.assertEqual(state.data["state"], PlayerState.PAUSED)
+
+        messages = []
+        utt = Message('mycroft.audio.service.resume',
+                      {},
+                      {})
+        self.core.bus.emit(utt)
+
+        # confirm all expected messages are sent
+        expected_messages = [
+            'mycroft.audio.service.resume',
+            "ovos.common_play.player.state",  # PAUSED
+            "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
+        ]
+        wait_for_n_messages(len(expected_messages))
+
+        self.assertEqual(len(expected_messages), len(messages))
+
+        for idx, m in enumerate(messages):
+            self.assertEqual(m.msg_type, expected_messages[idx])
+
+        state = messages[-2]
+        self.assertEqual(state.data["state"], PlayerState.PLAYING)
+
+        messages = []
+
+        self.core.track_start(None)  # end of track
+
+        # confirm all expected messages are sent
+        expected_messages = [
+            "mycroft.audio.queue_end",
+            "ovos.common_play.player.state",  # PAUSED
+            "ovos.common_play.media.state",  # PLAYING_AUDIOSERVICE
+        ]
+        wait_for_n_messages(len(expected_messages))
+
+        self.assertEqual(len(expected_messages), len(messages))
+
+        for idx, m in enumerate(messages):
+            self.assertEqual(m.msg_type, expected_messages[idx])
+
+        state = messages[-2]
+        self.assertEqual(state.data["state"], PlayerState.STOPPED)
+        state = messages[-1]
+        self.assertEqual(state.data["state"], MediaState.END_OF_MEDIA)
 
 
 if __name__ == "__main__":

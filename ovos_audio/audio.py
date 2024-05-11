@@ -128,7 +128,7 @@ class AudioService:
             LOG.info(f'Found audio service plugin: {plugin_name}')
             s = setup_audio_service(plugin_module, config=self.config, bus=self.bus)
             if not s:
-                LOG.info(f"{plugin_name} not loaded! config: {self.config}")
+                LOG.debug(f"{plugin_name} not loaded! config: {self.config}")
                 continue
             if isinstance(s, RemoteAudioBackend):
                 remote += s
