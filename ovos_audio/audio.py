@@ -101,7 +101,6 @@ class AudioService:
             else:
                 local += s
 
-
         # Sort services so local services are checked first
         self.service = local + remote
 
@@ -163,11 +162,13 @@ class AudioService:
             LOG.debug('New track coming up!')
             self.bus.emit(Message('mycroft.audio.playing_track',
                                   data={'track': track}))
+            self.current.ocp_start()
         else:
             # If no track is about to start last track of the queue has been
             # played.
             LOG.debug('End of playlist!')
             self.bus.emit(Message('mycroft.audio.queue_end'))
+            self.current.ocp_stop()
 
     def _pause(self, message=None):
         """
@@ -181,6 +182,7 @@ class AudioService:
             return
         if self.current:
             self.current.pause()
+            self.current.ocp_pause()
 
     def _resume(self, message=None):
         """
@@ -193,6 +195,7 @@ class AudioService:
             return
         if self.current:
             self.current.resume()
+            self.current.ocp_resume()
 
     def _next(self, message=None):
         """
@@ -227,6 +230,7 @@ class AudioService:
         if self.current:
             name = self.current.name
             if self.current.stop():
+                self.current.ocp_stop()
                 if message:
                     msg = message.reply("mycroft.stop.handled",
                                         {"by": "audio:" + name})
@@ -345,10 +349,17 @@ class AudioService:
                 return
         if not selected_service.supports_mime_hints:
             tracks = [t[0] if isinstance(t, list) else t for t in tracks]
-        selected_service.clear_list()
-        selected_service.add_list(tracks)
-        selected_service.play(repeat)
+
         self.current = selected_service
+        self.current.clear_list()
+        self.current.add_list(tracks)
+
+        try:
+            self.current.play(repeat)
+            self.current.ocp_start()
+        except Exception as e:
+            LOG.exception(f"failed to play with {self.current}")
+            self.current.ocp_error()
         self.play_start_time = time.monotonic()
 
     def _is_message_for_service(self, message):
@@ -390,7 +401,7 @@ class AudioService:
                     if ('utterance' in message.data and
                             s.name in message.data['utterance']):
                         prefered_service = s
-                        LOG.debug(s.name + ' would be prefered')
+                        LOG.debug(s.name + ' would be preferred')
                         break
                 except Exception as e:
                     LOG.error(f"failed to parse audio service name: {s}")
