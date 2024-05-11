@@ -1,1 +1,2 @@
 ovos-tts-plugin-server
+ovos_audio_plugin_simple>=0.0.2a7
