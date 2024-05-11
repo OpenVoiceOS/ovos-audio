@@ -57,7 +57,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.play',
-            "ovos.common_play.media.state",  # LOADED_MEDIA
+            "ovos.common_play.media.state",  # LOADING_MEDIA
             "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
             "ovos.common_play.simple.play",  # call simple plugin
             "ovos.common_play.player.state",  # PLAYING
@@ -72,7 +72,7 @@ class TestLegacy(unittest.TestCase):
             self.assertEqual(m.msg_type, expected_messages[idx])
 
         state = messages[1]
-        self.assertEqual(state.data["state"], MediaState.LOADED_MEDIA)
+        self.assertEqual(state.data["state"], MediaState.LOADING_MEDIA)
         state = messages[2]
         self.assertEqual(state.data["state"], TrackState.QUEUED_AUDIOSERVICE)
         state = messages[4]
