@@ -46,7 +46,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt install python3-dev swig
+          sudo apt install python3-dev swig sox mpg123
           python -m pip install build wheel
       - name: Install repo
         run: |

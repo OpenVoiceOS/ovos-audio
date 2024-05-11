@@ -26,6 +26,39 @@ try:
 except ImportError:
     OCPAudioBackend = None
 
+try:
+    from ovos_utils.ocp import MediaState
+except ImportError:
+    LOG.warning("Please update to ovos-utils~=0.1.")
+    from enum import IntEnum
+
+
+    class MediaState(IntEnum):
+        # https://doc.qt.io/qt-5/qmediaplayer.html#MediaStatus-enum
+        # The status of the media cannot be determined.
+        UNKNOWN = 0
+        # There is no current media. PlayerState == STOPPED
+        NO_MEDIA = 1
+        # The current media is being loaded. The player may be in any state.
+        LOADING_MEDIA = 2
+        # The current media has been loaded. PlayerState== STOPPED
+        LOADED_MEDIA = 3
+        # Playback of the current media has stalled due to
+        # insufficient buffering or some other temporary interruption.
+        # PlayerState != STOPPED
+        STALLED_MEDIA = 4
+        # The player is buffering data but has enough data buffered
+        # for playback to continue for the immediate future.
+        # PlayerState != STOPPED
+        BUFFERING_MEDIA = 5
+        # The player has fully buffered the current media. PlayerState != STOPPED
+        BUFFERED_MEDIA = 6
+        # Playback has reached the end of the current media. PlayerState == STOPPED
+        END_OF_MEDIA = 7
+        # The current media cannot be played. PlayerState == STOPPED
+        INVALID_MEDIA = 8
+
+
 MINUTES = 60  # Seconds in a minute
 
 
@@ -92,15 +125,15 @@ class AudioService:
         local = []
         remote = []
         for plugin_name, plugin_module in found_plugins.items():
-            LOG.info(f'Loading audio service plugin: {plugin_name}')
+            LOG.info(f'Found audio service plugin: {plugin_name}')
             s = setup_audio_service(plugin_module, config=self.config, bus=self.bus)
             if not s:
+                LOG.debug(f"{plugin_name} not loaded! config: {self.config}")
                 continue
             if isinstance(s, RemoteAudioBackend):
                 remote += s
             else:
                 local += s
-
 
         # Sort services so local services are checked first
         self.service = local + remote
@@ -163,11 +196,13 @@ class AudioService:
             LOG.debug('New track coming up!')
             self.bus.emit(Message('mycroft.audio.playing_track',
                                   data={'track': track}))
+            self.current.ocp_start()
         else:
             # If no track is about to start last track of the queue has been
             # played.
             LOG.debug('End of playlist!')
             self.bus.emit(Message('mycroft.audio.queue_end'))
+            self.current.ocp_stop()
 
     def _pause(self, message=None):
         """
@@ -181,6 +216,7 @@ class AudioService:
             return
         if self.current:
             self.current.pause()
+            self.current.ocp_pause()
 
     def _resume(self, message=None):
         """
@@ -193,6 +229,7 @@ class AudioService:
             return
         if self.current:
             self.current.resume()
+            self.current.ocp_resume()
 
     def _next(self, message=None):
         """
@@ -227,6 +264,7 @@ class AudioService:
         if self.current:
             name = self.current.name
             if self.current.stop():
+                self.current.ocp_stop()
                 if message:
                     msg = message.reply("mycroft.stop.handled",
                                         {"by": "audio:" + name})
@@ -342,13 +380,22 @@ class AudioService:
                     break
             else:
                 LOG.info('No service found for uri_type: ' + uri_type)
+                self.bus.emit(Message("ovos.common_play.media.state",
+                                      {"state": MediaState.INVALID_MEDIA}))
                 return
         if not selected_service.supports_mime_hints:
             tracks = [t[0] if isinstance(t, list) else t for t in tracks]
-        selected_service.clear_list()
-        selected_service.add_list(tracks)
-        selected_service.play(repeat)
+
         self.current = selected_service
+        self.current.clear_list()
+        self.current.add_list(tracks)
+
+        try:
+            self.current.play(repeat)
+            self.current.ocp_start()
+        except Exception as e:
+            LOG.exception(f"failed to play with {self.current}")
+            self.current.ocp_error()
         self.play_start_time = time.monotonic()
 
     def _is_message_for_service(self, message):
@@ -390,7 +437,7 @@ class AudioService:
                     if ('utterance' in message.data and
                             s.name in message.data['utterance']):
                         prefered_service = s
-                        LOG.debug(s.name + ' would be prefered')
+                        LOG.debug(s.name + ' would be preferred')
                         break
                 except Exception as e:
                     LOG.error(f"failed to parse audio service name: {s}")
