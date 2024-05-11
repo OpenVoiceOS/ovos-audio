@@ -25,6 +25,10 @@ class TestLegacy(unittest.TestCase):
     def setUp(self):
         self.core = AudioService(FakeBus(), disable_ocp=True, autoload=False)
         self.core.config['default-backend'] = "simple"
+        self.core.config['backends'] = {"simple": {
+            "type": "ovos_simple",
+            "active": True
+        }}
         self.core.load_services()
         # simple plugin
         self.core.bus.remove_all_listeners('ovos.common_play.simple.play')

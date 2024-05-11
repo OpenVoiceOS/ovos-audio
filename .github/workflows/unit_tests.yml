@@ -50,7 +50,7 @@ jobs:
           python -m pip install build wheel
       - name: Install repo
         run: |
-          pip install .
+          pip install . --pre
       - name: Install test dependencies
         run: |
           pip install -r test/requirements.txt

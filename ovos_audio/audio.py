@@ -20,11 +20,44 @@ from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
 from ovos_audio.utils import validate_message_context
-from ovos_utils.ocp import MediaState
+
 try:
     from ovos_plugin_common_play import OCPAudioBackend
 except ImportError:
     OCPAudioBackend = None
+
+try:
+    from ovos_utils.ocp import MediaState
+except ImportError:
+    LOG.warning("Please update to ovos-utils~=0.1.")
+    from enum import IntEnum
+
+
+    class MediaState(IntEnum):
+        # https://doc.qt.io/qt-5/qmediaplayer.html#MediaStatus-enum
+        # The status of the media cannot be determined.
+        UNKNOWN = 0
+        # There is no current media. PlayerState == STOPPED
+        NO_MEDIA = 1
+        # The current media is being loaded. The player may be in any state.
+        LOADING_MEDIA = 2
+        # The current media has been loaded. PlayerState== STOPPED
+        LOADED_MEDIA = 3
+        # Playback of the current media has stalled due to
+        # insufficient buffering or some other temporary interruption.
+        # PlayerState != STOPPED
+        STALLED_MEDIA = 4
+        # The player is buffering data but has enough data buffered
+        # for playback to continue for the immediate future.
+        # PlayerState != STOPPED
+        BUFFERING_MEDIA = 5
+        # The player has fully buffered the current media. PlayerState != STOPPED
+        BUFFERED_MEDIA = 6
+        # Playback has reached the end of the current media. PlayerState == STOPPED
+        END_OF_MEDIA = 7
+        # The current media cannot be played. PlayerState == STOPPED
+        INVALID_MEDIA = 8
+
 
 MINUTES = 60  # Seconds in a minute
 
