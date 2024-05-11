@@ -20,7 +20,7 @@ from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
 from ovos_audio.utils import validate_message_context
-
+from ovos_utils.ocp import MediaState
 try:
     from ovos_plugin_common_play import OCPAudioBackend
 except ImportError:
@@ -92,9 +92,10 @@ class AudioService:
         local = []
         remote = []
         for plugin_name, plugin_module in found_plugins.items():
-            LOG.info(f'Loading audio service plugin: {plugin_name}')
+            LOG.info(f'Found audio service plugin: {plugin_name}')
             s = setup_audio_service(plugin_module, config=self.config, bus=self.bus)
             if not s:
+                LOG.info(f"{plugin_name} not loaded! config: {self.config}")
                 continue
             if isinstance(s, RemoteAudioBackend):
                 remote += s
@@ -346,6 +347,8 @@ class AudioService:
                     break
             else:
                 LOG.info('No service found for uri_type: ' + uri_type)
+                self.bus.emit(Message("ovos.common_play.media.state",
+                                      {"state": MediaState.INVALID_MEDIA}))
                 return
         if not selected_service.supports_mime_hints:
             tracks = [t[0] if isinstance(t, list) else t for t in tracks]
