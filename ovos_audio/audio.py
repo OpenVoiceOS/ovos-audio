@@ -292,7 +292,7 @@ class AudioService:
         if not self._is_message_for_service(message):
             return
 
-        def restore_volume():
+        def restore_volume(msg=message):
             LOG.debug('restoring volume')
             self.current.restore_volume()
 
