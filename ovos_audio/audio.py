@@ -303,7 +303,7 @@ class AudioService:
         """
         if not self._is_message_for_service(message):
             return
-        if self.current:
+        if self.current and self.volume_is_low:
             LOG.debug('lowering volume')
             self.current.lower_volume()
             self.volume_is_low = True
@@ -312,11 +312,10 @@ class AudioService:
         """Triggered when mycroft is done speaking and restores the volume."""
         if not self._is_message_for_service(message):
             return
-        current = self.current
-        if current:
+        if self.current and not self.volume_is_low:
             LOG.debug('restoring volume')
             self.volume_is_low = False
-            current.restore_volume()
+            self.current.restore_volume()
 
     def _restore_volume_after_record(self, message=None):
         """
@@ -331,8 +330,9 @@ class AudioService:
             return
 
         def restore_volume(msg=message):
-            LOG.debug('restoring volume')
-            self.current.restore_volume()
+            if self.volume_is_low:
+                LOG.debug('restoring volume')
+                self.current.restore_volume()
 
         if self.current:
             self.bus.on('recognizer_loop:speech.recognition.unknown',
