@@ -303,7 +303,7 @@ class AudioService:
         """
         if not self._is_message_for_service(message):
             return
-        if self.current and self.volume_is_low:
+        if self.current and not self.volume_is_low:
             LOG.debug('lowering volume')
             self.current.lower_volume()
             self.volume_is_low = True
@@ -312,7 +312,7 @@ class AudioService:
         """Triggered when mycroft is done speaking and restores the volume."""
         if not self._is_message_for_service(message):
             return
-        if self.current and not self.volume_is_low:
+        if self.current and self.volume_is_low:
             LOG.debug('restoring volume')
             self.volume_is_low = False
             self.current.restore_volume()
