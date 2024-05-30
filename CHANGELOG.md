@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a46...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a47...HEAD)
+
+**Closed issues:**
+
+- \[PYPI\] Flesh out readme and add long\_descrition [\#47](https://github.com/OpenVoiceOS/ovos-audio/issues/47)
+
+**Merged pull requests:**
+
+- Replace relative path in `setup.py` with absolute path [\#69](https://github.com/OpenVoiceOS/ovos-audio/pull/69) ([NeonDaniel](https://github.com/NeonDaniel))
+
+## [V0.0.2a47](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a47) (2024-05-23)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a46...V0.0.2a47)
 
 **Fixed bugs:**
 
