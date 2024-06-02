@@ -449,8 +449,8 @@ class PlaybackService(Thread):
         """ helper to resolve sound files full path"""
         if uri is None:
             return None
-        if uri.startswith("snd/"):
-            local_uri = f"{os.path.dirname(__file__)}/res/{uri}"
+        if uri.startswith("snd/") or uri.startswith("snd\\"):
+            local_uri = os.path.join(os.path.dirname(__file__), "res", uri)
             if os.path.isfile(local_uri):
                 return local_uri
         audio_file = resolve_resource_file(uri)
