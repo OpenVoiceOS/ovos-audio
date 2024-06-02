@@ -2,7 +2,19 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a47...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a48...HEAD)
+
+**Fixed bugs:**
+
+- fix: allow for Windows paths [\#71](https://github.com/OpenVoiceOS/ovos-audio/pull/71) ([mikejgray](https://github.com/mikejgray))
+
+**Closed issues:**
+
+- Support for Windows [\#70](https://github.com/OpenVoiceOS/ovos-audio/issues/70)
+
+## [V0.0.2a48](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a48) (2024-05-30)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a47...V0.0.2a48)
 
 **Closed issues:**
 
