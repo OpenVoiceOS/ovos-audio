@@ -13,12 +13,12 @@
 # limitations under the License.
 #
 import time
-
-from ovos_utils.log import deprecated
-from ovos_utils.signal import check_for_signal
+from functools import wraps
 
 from ovos_bus_client.send_func import send
 from ovos_config import Configuration
+from ovos_utils.log import deprecated, LOG
+from ovos_utils.signal import check_for_signal
 
 
 def validate_message_context(message, native_sources=None):
@@ -33,6 +33,23 @@ def validate_message_context(message, native_sources=None):
         return False
     # broadcast for everyone
     return True
+
+
+def require_native_source():
+    def _decorator(func):
+        @wraps(func)
+        def func_wrapper(self, message):
+            validated = message is None or \
+                        not self.validate_source or \
+                        validate_message_context(message, self.native_sources)
+            if validated:
+                return func(self, message)
+            LOG.debug(f"ignoring '{message.msg_type}' message, not from a native audio source")
+            return None
+
+        return func_wrapper
+
+    return _decorator
 
 
 # NOTE: nothing imports these from here, utils accidentally dragged while isolating ovos-audio

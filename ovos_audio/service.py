@@ -27,7 +27,7 @@ from ovos_audio.audio import AudioService
 from ovos_audio.playback import PlaybackThread
 from ovos_audio.transformers import DialogTransformersService
 from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing, validate_message_context
+from ovos_audio.utils import report_timing, require_native_source
 
 
 def on_ready():
@@ -67,7 +67,7 @@ class PlaybackService(Thread):
 
         self.config = Configuration()
         self.native_sources = self.config["Audio"].get("native_sources",
-                                                       ["debug_cli", "audio"]) or []
+                                                       ["debug_cli", "audio"])
         self.tts = None
         self._tts_hash = None
         self.lock = Lock()
@@ -103,7 +103,9 @@ class PlaybackService(Thread):
         LOG.debug(f"legacy audio service enabled: {self.audio_enabled}")
         if self.audio_enabled:
             try:
-                self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
+                self.audio = AudioService(self.bus, disable_ocp=disable_ocp,
+                                          validate_source=validate_source,
+                                          native_sources=self.native_sources)
             except Exception as e:
                 LOG.exception(e)
 
@@ -285,6 +287,7 @@ class PlaybackService(Thread):
                       {'utterance': utterance,
                        'tts': self.tts.plugin_id})
 
+    @require_native_source()
     def handle_speak(self, message):
         """Handle "speak" message
 
@@ -294,9 +297,6 @@ class PlaybackService(Thread):
         # if the message is targeted and audio is not the target don't
         # don't synthesise speech
         message.context = message.context or {}
-        if self.validate_source and not validate_message_context(message, self.native_sources):
-            LOG.debug("ignoring speak from non-native source, playback handled directly by client")
-            return
 
         # Get conversation ID
         if 'ident' in message.context:
@@ -477,12 +477,10 @@ class PlaybackService(Thread):
             f.write(bindata)
         return audio_file
 
+    @require_native_source()
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
-        if self.validate_source and not validate_message_context(message):
-            LOG.debug("ignoring playback, message is not from a native source")
-            return
         viseme = message.data.get("viseme")
         audio_file = message.data.get("uri") or \
                      message.data.get("filename")  # backwards compat
@@ -501,12 +499,9 @@ class PlaybackService(Thread):
         # a sound does not have a tts_id, assign that to "sounds"
         TTS.queue.put((str(audio_file), viseme, listen, "sounds", message))
 
+    @require_native_source()
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
-        if self.validate_source and not validate_message_context(message):
-            LOG.debug("ignoring playback, message is not from a native source")
-            return
-
         audio_file = message.data.get("uri")
         hex_audio = message.data.get("binary_data")
         audio_ext = message.data.get("audio_ext")
