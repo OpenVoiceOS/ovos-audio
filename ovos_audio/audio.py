@@ -99,6 +99,7 @@ class AudioService:
                 LOG.info('OCP - OVOS Common Play set as default backend')
                 try:
                     s.player.validate_source = self.validate_source
+                    s.player.native_sources = self.native_sources
                 except:
                     pass  # handle older OCP plugin versions
                 self.default = s
