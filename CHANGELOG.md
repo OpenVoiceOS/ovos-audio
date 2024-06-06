@@ -2,7 +2,17 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a48...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a49...HEAD)
+
+**Fixed bugs:**
+
+- voice directory not automatically recreated if deleted [\#68](https://github.com/OpenVoiceOS/ovos-audio/issues/68)
+- Changing mycroft.conf breaks audio output [\#52](https://github.com/OpenVoiceOS/ovos-audio/issues/52)
+- fix/bump\_ocp [\#72](https://github.com/OpenVoiceOS/ovos-audio/pull/72) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a49](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a49) (2024-06-02)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a48...V0.0.2a49)
 
 **Fixed bugs:**
 
