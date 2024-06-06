@@ -10,21 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 from threading import Lock
 
-import time
 from ovos_bus_client.message import Message
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins, find_audio_service_plugins, setup_audio_service
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
-from ovos_audio.utils import validate_message_context
 
-try:
-    from ovos_plugin_common_play import OCPAudioBackend
-except ImportError:
-    OCPAudioBackend = None
+from ovos_audio.utils import require_native_source
 
 try:
     from ovos_utils.ocp import MediaState
@@ -58,7 +54,6 @@ except ImportError:
         # The current media cannot be played. PlayerState == STOPPED
         INVALID_MEDIA = 8
 
-
 MINUTES = 60  # Seconds in a minute
 
 
@@ -68,7 +63,8 @@ class AudioService:
         to be played.
     """
 
-    def __init__(self, bus, autoload=True, disable_ocp=False, validate_source=True):
+    def __init__(self, bus, autoload=True, disable_ocp=False,
+                 validate_source=True, native_sources=None):
         """
             Args:
                 bus: Mycroft messagebus
@@ -84,19 +80,36 @@ class AudioService:
         self.volume_is_low = False
         self.disable_ocp = disable_ocp
         self.validate_source = validate_source
+        self.native_sources = native_sources or self.config.get("native_sources",
+                                                                ["debug_cli", "audio"])
 
         self._loaded = MonotonicEvent()
         if autoload:
             self.load_services()
 
     def find_ocp(self):
+        try:
+            from ovos_plugin_common_play import OCPAudioBackend
+        except ImportError:
+            LOG.debug("classic OCP not installed")
+            return False
+
         for s in self.service:
-            if OCPAudioBackend is not None and isinstance(s, OCPAudioBackend):
+            if isinstance(s, OCPAudioBackend):
                 LOG.info('OCP - OVOS Common Play set as default backend')
+                try:
+                    s.player.validate_source = self.validate_source
+                    s.player.native_sources = self.native_sources
+                except:
+                    pass  # handle older OCP plugin versions
                 self.default = s
                 return True
+        LOG.debug("classic OCP not found")
 
     def find_default(self):
+        if not self.service:
+            LOG.error("No audio player plugins found!")
+            return False
         # Find default backend
         default_name = self.config.get('default-backend', '')
         if self.disable_ocp and default_name == "OCP":
@@ -109,8 +122,8 @@ class AudioService:
                 LOG.info('Found ' + self.default.name)
                 return True
         else:
-            self.default = None
-            LOG.info('no default found')
+            self.default = self.service[0]
+            LOG.info(f'preferred audio player not configured, defaulting to {self.default}')
 
     def load_services(self):
         """Method for loading services.
@@ -143,6 +156,7 @@ class AudioService:
             s.set_track_start_callback(self.track_start)
 
         if self.disable_ocp:
+            LOG.debug("disable_ocp flag is set!")
             # default to classic audio only service
             self.find_default()
         else:
@@ -204,6 +218,7 @@ class AudioService:
             self.bus.emit(Message('mycroft.audio.queue_end'))
             self.current.ocp_stop()
 
+    @require_native_source()
     def _pause(self, message=None):
         """
             Handler for mycroft.audio.service.pause. Pauses the current audio
@@ -212,12 +227,11 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             self.current.pause()
             self.current.ocp_pause()
 
+    @require_native_source()
     def _resume(self, message=None):
         """
             Handler for mycroft.audio.service.resume.
@@ -225,12 +239,11 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             self.current.resume()
             self.current.ocp_resume()
 
+    @require_native_source()
     def _next(self, message=None):
         """
             Handler for mycroft.audio.service.next. Skips current track and
@@ -239,11 +252,10 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             self.current.next()
 
+    @require_native_source()
     def _prev(self, message=None):
         """
             Handler for mycroft.audio.service.prev. Starts playing the previous
@@ -252,15 +264,12 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             self.current.previous()
 
+    @require_native_source()
     def _perform_stop(self, message=None):
         """Stop audioservice if active."""
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             name = self.current.name
             if self.current.stop():
@@ -275,6 +284,7 @@ class AudioService:
 
         self.current = None
 
+    @require_native_source()
     def _stop(self, message=None):
         """
             Handler for mycroft.stop. Stops any playing service.
@@ -282,8 +292,6 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if time.monotonic() - self.play_start_time > 1:
             LOG.debug('stopping all playing services')
             with self.service_lock:
@@ -294,6 +302,7 @@ class AudioService:
                     LOG.error("failed to stop!")
         LOG.info('END Stop')
 
+    @require_native_source()
     def _lower_volume(self, message=None):
         """
             Is triggered when mycroft starts to speak and reduces the volume.
@@ -301,22 +310,20 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if self.current and not self.volume_is_low:
             LOG.debug('lowering volume')
             self.current.lower_volume()
             self.volume_is_low = True
 
+    @require_native_source()
     def _restore_volume(self, message=None):
         """Triggered when mycroft is done speaking and restores the volume."""
-        if not self._is_message_for_service(message):
-            return
         if self.current and self.volume_is_low:
             LOG.debug('restoring volume')
             self.volume_is_low = False
             self.current.restore_volume()
 
+    @require_native_source()
     def _restore_volume_after_record(self, message=None):
         """
             Restores the volume when Mycroft is done recording.
@@ -326,11 +333,9 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
 
         def restore_volume(msg=message):
-            if self.volume_is_low:
+            if self.volume_is_low and self.current:
                 LOG.debug('restoring volume')
                 self.current.restore_volume()
 
@@ -398,14 +403,8 @@ class AudioService:
             self.current.ocp_error()
         self.play_start_time = time.monotonic()
 
-    def _is_message_for_service(self, message):
-        if not message or not self.validate_source:
-            return True
-        return validate_message_context(message)
-
+    @require_native_source()
     def _queue(self, message):
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             with self.service_lock:
                 try:
@@ -417,6 +416,7 @@ class AudioService:
         else:
             self._play(message)
 
+    @require_native_source()
     def _play(self, message):
         """
             Handler for mycroft.audio.service.play. Starts playback of a
@@ -426,8 +426,6 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         with self.service_lock:
             tracks = message.data['tracks']
             repeat = message.data.get('repeat', False)
@@ -449,6 +447,7 @@ class AudioService:
             except Exception as e:
                 LOG.exception(e)
 
+    @require_native_source()
     def _track_info(self, message):
         """
             Returns track info on the message bus.
@@ -456,8 +455,6 @@ class AudioService:
             Args:
                 message: message bus message, not used but required
         """
-        if not self._is_message_for_service(message):
-            return
         if self.current:
             track_info = self.current.track_info()
         else:
@@ -465,10 +462,9 @@ class AudioService:
         self.bus.emit(message.reply('mycroft.audio.service.track_info_reply',
                                     data=track_info))
 
+    @require_native_source()
     def _list_backends(self, message):
         """ Return a dict of available backends. """
-        if not self._is_message_for_service(message):
-            return
         data = {}
         for s in self.service:
             info = {
@@ -479,28 +475,27 @@ class AudioService:
             data[s.name] = info
         self.bus.emit(message.response(data))
 
+    @require_native_source()
     def _get_track_length(self, message):
         """
         getting the duration of the audio in milliseconds
         """
-        if not self._is_message_for_service(message):
-            return
         dur = None
         if self.current:
             dur = self.current.get_track_length()
         self.bus.emit(message.response({"length": dur}))
 
+    @require_native_source()
     def _get_track_position(self, message):
         """
         get current position in milliseconds
         """
-        if not self._is_message_for_service(message):
-            return
         pos = None
         if self.current:
             pos = self.current.get_track_position()
         self.bus.emit(message.response({"position": pos}))
 
+    @require_native_source()
     def _set_track_position(self, message):
         """
             Handle message bus command to go to position (in milliseconds)
@@ -508,12 +503,11 @@ class AudioService:
             Args:
                 message: message bus message
         """
-        if not self._is_message_for_service(message):
-            return
         milliseconds = message.data.get("position")
         if milliseconds and self.current:
             self.current.set_track_position(milliseconds)
 
+    @require_native_source()
     def _seek_forward(self, message):
         """
             Handle message bus command to skip X seconds
@@ -521,12 +515,11 @@ class AudioService:
             Args:
                 message: message bus message
         """
-        if not self._is_message_for_service(message):
-            return
         seconds = message.data.get("seconds", 1)
         if self.current:
             self.current.seek_forward(seconds)
 
+    @require_native_source()
     def _seek_backward(self, message):
         """
             Handle message bus command to rewind X seconds
@@ -534,8 +527,6 @@ class AudioService:
             Args:
                 message: message bus message
         """
-        if not self._is_message_for_service(message):
-            return
         seconds = message.data.get("seconds", 1)
         if self.current:
             self.current.seek_backward(seconds)
