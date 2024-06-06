@@ -107,6 +107,9 @@ class AudioService:
         LOG.debug("classic OCP not found")
 
     def find_default(self):
+        if not self.service:
+            LOG.error("No audio player plugins found!")
+            return False
         # Find default backend
         default_name = self.config.get('default-backend', '')
         if self.disable_ocp and default_name == "OCP":
@@ -119,8 +122,8 @@ class AudioService:
                 LOG.info('Found ' + self.default.name)
                 return True
         else:
-            self.default = None
-            LOG.info('no default found')
+            self.default = self.service[0]
+            LOG.info(f'preferred audio player not configured, defaulting to {self.default}')
 
     def load_services(self):
         """Method for loading services.

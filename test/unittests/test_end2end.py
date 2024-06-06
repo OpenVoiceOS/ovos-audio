@@ -23,7 +23,9 @@ from ovos_audio.service import AudioService
 
 class TestLegacy(unittest.TestCase):
     def setUp(self):
-        self.core = AudioService(FakeBus(), disable_ocp=True, autoload=False)
+        self.core = AudioService(FakeBus(), disable_ocp=True,
+                                 autoload=False,
+                                 validate_source=True)
         self.core.config['default-backend'] = "simple"
         self.core.config['backends'] = {"simple": {
             "type": "ovos_simple",
@@ -394,6 +396,37 @@ class TestLegacy(unittest.TestCase):
         self.assertEqual(state.data["state"], PlayerState.STOPPED)
         state = messages[-1]
         self.assertEqual(state.data["state"], MediaState.END_OF_MEDIA)
+
+    def test_sources(self):
+
+        called = False
+
+        def play(*args, **kwargs):
+            nonlocal called
+            called = True
+
+        self.core.play = play
+
+        utt = Message('mycroft.audio.service.play',
+                      {"tracks": ["http://fake.mp3"]},
+                      {"destination": "audio"})  # native source
+        self.core._play(utt)
+
+        self.assertTrue(called)
+
+        called = False
+        utt = Message('mycroft.audio.service.play',
+                      {"tracks": ["http://fake.mp3"]},
+                      {}) # missing destination
+        self.core._play(utt)
+        self.assertTrue(called)
+
+        called = False
+        utt = Message('mycroft.audio.service.play',
+                      {"tracks": ["http://fake.mp3"]},
+                      {"destination": "hive"})  # external source
+        self.core._play(utt)
+        self.assertFalse(called)
 
 
 if __name__ == "__main__":
