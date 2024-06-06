@@ -38,7 +38,7 @@ def validate_message_context(message, native_sources=None):
 def require_native_source():
     def _decorator(func):
         @wraps(func)
-        def func_wrapper(self, message):
+        def func_wrapper(self, message=None):
             validated = message is None or \
                         not self.validate_source or \
                         validate_message_context(message, self.native_sources)
