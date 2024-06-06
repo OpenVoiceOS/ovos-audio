@@ -94,7 +94,10 @@ class AudioService:
         for s in self.service:
             if isinstance(s, OCPAudioBackend):
                 LOG.info('OCP - OVOS Common Play set as default backend')
-                s.player.validate_source = self.validate_source
+                try:
+                    s.player.validate_source = self.validate_source
+                except:
+                    pass  # handle older OCP plugin versions
                 self.default = s
                 return True
         LOG.debug("classic OCP not found")
