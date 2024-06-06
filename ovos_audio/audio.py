@@ -10,21 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 from threading import Lock
 
-import time
 from ovos_bus_client.message import Message
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins, find_audio_service_plugins, setup_audio_service
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
-from ovos_audio.utils import validate_message_context
 
-try:
-    from ovos_plugin_common_play import OCPAudioBackend
-except ImportError:
-    OCPAudioBackend = None
+from ovos_audio.utils import validate_message_context
 
 try:
     from ovos_utils.ocp import MediaState
@@ -58,7 +54,6 @@ except ImportError:
         # The current media cannot be played. PlayerState == STOPPED
         INVALID_MEDIA = 8
 
-
 MINUTES = 60  # Seconds in a minute
 
 
@@ -90,11 +85,19 @@ class AudioService:
             self.load_services()
 
     def find_ocp(self):
+        try:
+            from ovos_plugin_common_play import OCPAudioBackend
+        except ImportError:
+            LOG.debug("classic OCP not installed")
+            return False
+
         for s in self.service:
-            if OCPAudioBackend is not None and isinstance(s, OCPAudioBackend):
+            if isinstance(s, OCPAudioBackend):
                 LOG.info('OCP - OVOS Common Play set as default backend')
+                s.player.validate_source = self.validate_source
                 self.default = s
                 return True
+        LOG.debug("classic OCP not found")
 
     def find_default(self):
         # Find default backend
@@ -143,6 +146,7 @@ class AudioService:
             s.set_track_start_callback(self.track_start)
 
         if self.disable_ocp:
+            LOG.debug("disable_ocp flag is set!")
             # default to classic audio only service
             self.find_default()
         else:
@@ -330,7 +334,7 @@ class AudioService:
             return
 
         def restore_volume(msg=message):
-            if self.volume_is_low:
+            if self.volume_is_low and self.current:
                 LOG.debug('restoring volume')
                 self.current.restore_volume()
 

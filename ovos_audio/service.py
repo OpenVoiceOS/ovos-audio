@@ -100,6 +100,7 @@ class PlaybackService(Thread):
         if disable_ocp is None:
             disable_ocp = self.config.get("disable_ocp", False)  # TODO default to True soon
         self.disable_ocp = disable_ocp
+        LOG.debug(f"legacy audio service enabled: {self.audio_enabled}")
         if self.audio_enabled:
             try:
                 self.audio = AudioService(self.bus, disable_ocp=disable_ocp, validate_source=validate_source)
