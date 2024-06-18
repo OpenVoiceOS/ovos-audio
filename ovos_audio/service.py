@@ -1,6 +1,5 @@
 import base64
 import binascii
-import json
 import os
 import os.path
 import time
@@ -62,6 +61,7 @@ class PlaybackService(Thread):
                                       on_stopping=stopping_hook,
                                       on_alive=alive_hook,
                                       on_started=started_hook)
+        self.playback_lock = Lock()
         self.status = ProcessStatus('audio', callback_map=callbacks)
         self.status.set_started()
 
@@ -293,40 +293,42 @@ class PlaybackService(Thread):
 
         Parse sentences and invoke text to speech service.
         """
+        # NOTE: lock is needed to avoid race conditions,
+        # dont allow queuing until TTS synth finishes
+        with self.playback_lock:
+            # if the message is targeted and audio is not the target don't
+            # don't synthesise speech
+            message.context = message.context or {}
 
-        # if the message is targeted and audio is not the target don't
-        # don't synthesise speech
-        message.context = message.context or {}
+            # Get conversation ID
+            if 'ident' in message.context:
+                LOG.warning("'ident' context metadata is deprecated, use session_id instead")
 
-        # Get conversation ID
-        if 'ident' in message.context:
-            LOG.warning("'ident' context metadata is deprecated, use session_id instead")
+            sess = SessionManager.get(message)
 
-        sess = SessionManager.get(message)
+            stopwatch = Stopwatch()
+            stopwatch.start()
 
-        stopwatch = Stopwatch()
-        stopwatch.start()
+            utterance = message.data['utterance']
 
-        utterance = message.data['utterance']
+            # allow dialog transformers to rewrite speech
+            skill_id = message.data.get("meta", {}).get("skill") or message.context.get("skill_id")
+            if skill_id and skill_id not in self.dialog_transform.blacklisted_skills:
+                utt2, message.context = self.dialog_transform.transform(dialog=utterance,
+                                                                        context=message.context,
+                                                                        sess=sess)
+                if utterance != utt2:
+                    LOG.debug(f"original dialog: {utterance}")
+                    LOG.info(f"dialog transformed to: {utt2}")
+                    utterance = utt2
 
-        # allow dialog transformers to rewrite speech
-        skill_id = message.data.get("meta", {}).get("skill") or message.context.get("skill_id")
-        if skill_id and skill_id not in self.dialog_transform.blacklisted_skills:
-            utt2, message.context = self.dialog_transform.transform(dialog=utterance,
-                                                                    context=message.context,
-                                                                    sess=sess)
-            if utterance != utt2:
-                LOG.debug(f"original dialog: {utterance}")
-                LOG.info(f"dialog transformed to: {utt2}")
-                utterance = utt2
+            listen = message.data.get('expect_response', False)
+            self.execute_tts(utterance, sess.session_id, listen, message)
 
-        listen = message.data.get('expect_response', False)
-        self.execute_tts(utterance, sess.session_id, listen, message)
-
-        stopwatch.stop()
-        report_timing(sess.session_id, stopwatch,
-                      {'utterance': utterance,
-                       'tts': self.tts.plugin_id})
+            stopwatch.stop()
+            report_timing(sess.session_id, stopwatch,
+                          {'utterance': utterance,
+                           'tts': self.tts.plugin_id})
 
     def _maybe_reload_tts(self):
         """
@@ -481,23 +483,24 @@ class PlaybackService(Thread):
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
-        viseme = message.data.get("viseme")
-        audio_file = message.data.get("uri") or \
-                     message.data.get("filename")  # backwards compat
-        hex_audio = message.data.get("binary_data")
-        audio_ext = message.data.get("audio_ext")
-        if hex_audio:
-            audio_file = self._path_from_hexdata(hex_audio, audio_ext)
+        with self.playback_lock:
+            viseme = message.data.get("viseme")
+            audio_file = message.data.get("uri") or \
+                         message.data.get("filename")  # backwards compat
+            hex_audio = message.data.get("binary_data")
+            audio_ext = message.data.get("audio_ext")
+            if hex_audio:
+                audio_file = self._path_from_hexdata(hex_audio, audio_ext)
 
-        if not audio_file:
-            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
-        audio_file = self._resolve_sound_uri(audio_file)
+            if not audio_file:
+                raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
+            audio_file = self._resolve_sound_uri(audio_file)
 
-        listen = message.data.get("listen", False)
+            listen = message.data.get("listen", False)
 
-        # expected queue contents: (data, visemes, listen, tts_id, message)
-        # a sound does not have a tts_id, assign that to "sounds"
-        TTS.queue.put((str(audio_file), viseme, listen, "sounds", message))
+            # expected queue contents: (data, visemes, listen, tts_id, message)
+            # a sound does not have a tts_id, assign that to "sounds"
+            TTS.queue.put((str(audio_file), viseme, listen, "sounds", message))
 
     @require_native_source()
     def handle_instant_play(self, message):
