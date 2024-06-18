@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a49...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a50...HEAD)
+
+**Fixed bugs:**
+
+- playback queue race condition [\#73](https://github.com/OpenVoiceOS/ovos-audio/issues/73)
+- fix/playback\_order [\#74](https://github.com/OpenVoiceOS/ovos-audio/pull/74) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a50](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a50) (2024-06-06)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a49...V0.0.2a50)
 
 **Fixed bugs:**
 
