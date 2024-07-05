@@ -530,16 +530,7 @@ class PlaybackService(Thread):
             elif muted:
                 self.bus.emit(Message("mycroft.volume.unmute"))
 
-        if self.audio:
-            if self.audio.current and not duck_pulse_handled:
-                self.audio.current.lower_volume()
-
         play_audio(audio_file).wait()
-
-        # return to previous state
-        if self.audio:
-            if self.audio.current and not duck_pulse_handled:
-                self.audio.current.restore_volume()
 
         if ensure_volume:
             if volume_changed:
