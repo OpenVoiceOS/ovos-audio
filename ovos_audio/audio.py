@@ -78,6 +78,7 @@ class AudioService:
         self.current = None
         self.play_start_time = 0
         self.volume_is_low = False
+        self.volume_is_speaking = False
         self.disable_ocp = disable_ocp
         self.validate_source = validate_source
         self.native_sources = native_sources or self.config.get("native_sources",
@@ -173,19 +174,18 @@ class AudioService:
         self.bus.on('mycroft.audio.service.prev', self._prev)
         self.bus.on('mycroft.audio.service.track_info', self._track_info)
         self.bus.on('mycroft.audio.service.list_backends', self._list_backends)
-        self.bus.on('mycroft.audio.service.set_track_position',
-                    self._set_track_position)
-        self.bus.on('mycroft.audio.service.get_track_position',
-                    self._get_track_position)
-        self.bus.on('mycroft.audio.service.get_track_length',
-                    self._get_track_length)
+        self.bus.on('mycroft.audio.service.set_track_position', self._set_track_position)
+        self.bus.on('mycroft.audio.service.get_track_position', self._get_track_position)
+        self.bus.on('mycroft.audio.service.get_track_length', self._get_track_length)
         self.bus.on('mycroft.audio.service.seek_forward', self._seek_forward)
         self.bus.on('mycroft.audio.service.seek_backward', self._seek_backward)
-        self.bus.on('recognizer_loop:audio_output_start', self._lower_volume)
-        self.bus.on('recognizer_loop:record_begin', self._lower_volume)
-        self.bus.on('recognizer_loop:audio_output_end', self._restore_volume)
-        self.bus.on('recognizer_loop:record_end',
-                    self._restore_volume_after_record)
+
+        # audio ducking events
+        self.bus.on('recognizer_loop:audio_output_start', self._lower_volume_on_speak)
+        self.bus.on('recognizer_loop:audio_output_end', self._restore_volume_on_speak)
+        self.bus.on('recognizer_loop:record_begin', self._lower_volume_on_record)
+        self.bus.on('recognizer_loop:record_end', self._restore_volume_after_record)
+        self.bus.on('ovos.utterance.handled', self._restore_volume_on_handled)
 
         self._loaded.set()  # Report services loaded
 
@@ -303,9 +303,44 @@ class AudioService:
         LOG.info('END Stop')
 
     @require_native_source()
-    def _lower_volume(self, message=None):
+    def _lower_volume_on_speak(self, message=None):
         """
             Is triggered when mycroft starts to speak and reduces the volume.
+
+            Args:
+                message: message bus message, not used but required
+        """
+        self.volume_is_speaking = True
+        if self.current and not self.volume_is_low:
+            LOG.debug('lowering volume')
+            self.current.lower_volume()
+            self.volume_is_low = True
+
+    @require_native_source()
+    def _restore_volume_on_speak(self, message=None):
+        """Triggered when OVOS is done speaking and restores the volume."""
+        self.volume_is_speaking = False
+        if self.current and self.volume_is_low:
+            LOG.debug('restoring volume')
+            self.volume_is_low = False
+            self.current.restore_volume()
+
+    @require_native_source()
+    def _restore_volume_on_handled(self, message=None):
+        """Triggered when OVOS is done handling an utterance
+        (speech might still be happening)"""
+        if self.current and self.volume_is_low and not self.volume_is_speaking:
+            # if speech is not happening, restore volume
+            # intent has been handled and
+            # no more speak messages are coming -> vol won't be restored otherwise
+            LOG.debug('restoring volume')
+            self.volume_is_low = False
+            self.current.restore_volume()
+
+    @require_native_source()
+    def _lower_volume_on_record(self, message=None):
+        """
+            Is triggered when OVOS starts to record audio and reduces the volume.
 
             Args:
                 message: message bus message, not used but required
@@ -316,17 +351,9 @@ class AudioService:
             self.volume_is_low = True
 
     @require_native_source()
-    def _restore_volume(self, message=None):
-        """Triggered when mycroft is done speaking and restores the volume."""
-        if self.current and self.volume_is_low:
-            LOG.debug('restoring volume')
-            self.volume_is_low = False
-            self.current.restore_volume()
-
-    @require_native_source()
     def _restore_volume_after_record(self, message=None):
         """
-            Restores the volume when Mycroft is done recording.
+            Restores the volume when OVOS is done recording.
             If no utterance detected, restore immediately.
             If no response is made in reasonable time, then also restore.
 
@@ -369,18 +396,20 @@ class AudioService:
         else:
             uri_type = tracks[0][0].split(':')[0]
 
+        LOG.debug(f"track uri type: {uri_type}")
+
         # check if user requested a particular service
         if prefered_service and uri_type in prefered_service.supported_uris():
             selected_service = prefered_service
         # check if default supports the uri
         elif self.default and uri_type in self.default.supported_uris():
-            LOG.debug("Using default backend ({})".format(self.default.name))
+            LOG.debug(f"Using default backend ({self.default.name})")
             selected_service = self.default
         else:  # Check if any other service can play the media
             LOG.debug("Searching the services")
             for s in self.service:
                 if uri_type in s.supported_uris():
-                    LOG.debug("Service {} supports URI {}".format(s, uri_type))
+                    LOG.debug(f"Service {s.name} supports URI {uri_type}")
                     selected_service = s
                     break
             else:
@@ -391,6 +420,7 @@ class AudioService:
         if not selected_service.supports_mime_hints:
             tracks = [t[0] if isinstance(t, list) else t for t in tracks]
 
+        LOG.info(f"Selected player: {selected_service.name}")
         self.current = selected_service
         self.current.clear_list()
         self.current.add_list(tracks)
@@ -548,20 +578,13 @@ class AudioService:
         self.bus.remove('mycroft.audio.service.next', self._next)
         self.bus.remove('mycroft.audio.service.prev', self._prev)
         self.bus.remove('mycroft.audio.service.track_info', self._track_info)
-        self.bus.remove('mycroft.audio.service.get_track_position',
-                        self._get_track_position)
-        self.bus.remove('mycroft.audio.service.set_track_position',
-                        self._set_track_position)
-        self.bus.remove('mycroft.audio.service.get_track_length',
-                        self._get_track_length)
-        self.bus.remove('mycroft.audio.service.seek_forward',
-                        self._seek_forward)
-        self.bus.remove('mycroft.audio.service.seek_backward',
-                        self._seek_backward)
-        self.bus.remove('recognizer_loop:audio_output_start',
-                        self._lower_volume)
-        self.bus.remove('recognizer_loop:record_begin', self._lower_volume)
-        self.bus.remove('recognizer_loop:audio_output_end',
-                        self._restore_volume)
-        self.bus.remove('recognizer_loop:record_end',
-                        self._restore_volume_after_record)
+        self.bus.remove('mycroft.audio.service.get_track_position', self._get_track_position)
+        self.bus.remove('mycroft.audio.service.set_track_position', self._set_track_position)
+        self.bus.remove('mycroft.audio.service.get_track_length', self._get_track_length)
+        self.bus.remove('mycroft.audio.service.seek_forward', self._seek_forward)
+        self.bus.remove('mycroft.audio.service.seek_backward', self._seek_backward)
+        self.bus.remove('recognizer_loop:audio_output_start', self._lower_volume_on_speak)
+        self.bus.remove('recognizer_loop:record_begin', self._lower_volume_on_record)
+        self.bus.remove('recognizer_loop:audio_output_end', self._restore_volume_on_speak)
+        self.bus.remove('recognizer_loop:record_end', self._restore_volume_after_record)
+        self.bus.remove('ovos.utterance.handled', self._restore_volume_on_handled)
