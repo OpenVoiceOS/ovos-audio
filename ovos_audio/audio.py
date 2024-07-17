@@ -74,6 +74,7 @@ class AudioService:
         self.service_lock = Lock()
 
         self.default = None
+        self.ocp = None
         self.service = []
         self.current = None
         self.play_start_time = 0
@@ -94,7 +95,8 @@ class AudioService:
         except ImportError:
             LOG.debug("classic OCP not installed")
             return False
-        ocp_config = Configuration().get("Audio", {}).get("OCP", {})
+        # config from legacy location in default mycroft.conf
+        ocp_config = Configuration().get("Audio", {}).get("backends", {}).get("OCP", {})
         self.ocp = OCPAudioBackend(ocp_config, bus=self.bus)
         try:
             self.ocp.player.validate_source = self.validate_source
@@ -148,6 +150,12 @@ class AudioService:
         for s in self.service:
             s.set_track_start_callback(self.track_start)
 
+        # load OCP
+        # NOTE: this will be replace by ovos-media in a future release
+        # and can be disabled in config
+        self.find_ocp()
+
+        # load audio playback plugins (vlc, mpv, spotify ...)
         self.find_default()
 
         # Setup event handlers
