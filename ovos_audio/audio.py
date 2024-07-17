@@ -282,6 +282,10 @@ class AudioService:
                                   {"by": "audio:" + name})
                 self.bus.emit(msg)
 
+            # ensure we don't leave the volume ducked
+            self.current.restore_volume()
+            self.volume_is_low = False
+
         self.current = None
 
     @require_native_source()
