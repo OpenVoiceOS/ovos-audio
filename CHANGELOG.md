@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a51...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a52...HEAD)
+
+**Fixed bugs:**
+
+- Wrong volume after ducking when restarting ocp [\#77](https://github.com/OpenVoiceOS/ovos-audio/issues/77)
+- fix/ducking [\#78](https://github.com/OpenVoiceOS/ovos-audio/pull/78) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a52](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a52) (2024-07-05)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a51...V0.0.2a52)
 
 **Fixed bugs:**
 
