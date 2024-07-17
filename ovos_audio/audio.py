@@ -94,18 +94,13 @@ class AudioService:
         except ImportError:
             LOG.debug("classic OCP not installed")
             return False
-
-        for s in self.service:
-            if isinstance(s, OCPAudioBackend):
-                LOG.info('OCP - OVOS Common Play set as default backend')
-                try:
-                    s.player.validate_source = self.validate_source
-                    s.player.native_sources = self.native_sources
-                except:
-                    pass  # handle older OCP plugin versions
-                self.default = s
-                return True
-        LOG.debug("classic OCP not found")
+        ocp_config = Configuration().get("Audio", {}).get("OCP", {})
+        self.ocp = OCPAudioBackend(ocp_config, bus=self.bus)
+        try:
+            self.ocp.player.validate_source = self.validate_source
+            self.ocp.player.native_sources = self.native_sources
+        except:
+            pass  # handle older OCP plugin versions
 
     def find_default(self):
         if not self.service:
@@ -113,9 +108,6 @@ class AudioService:
             return False
         # Find default backend
         default_name = self.config.get('default-backend', '')
-        if self.disable_ocp and default_name == "OCP":
-            LOG.warning("default backend set to OCP, but OCP is disabled")
-            default_name = ""
         LOG.info('Finding default audio backend...')
         for s in self.service:
             if s.name == default_name:
@@ -133,7 +125,7 @@ class AudioService:
         for the subsystem.
         """
         found_plugins = find_audio_service_plugins()
-        if 'ovos_common_play' in found_plugins and self.disable_ocp:
+        if 'ovos_common_play' in found_plugins:
             found_plugins.pop('ovos_common_play')
 
         local = []
@@ -156,13 +148,7 @@ class AudioService:
         for s in self.service:
             s.set_track_start_callback(self.track_start)
 
-        if self.disable_ocp:
-            LOG.debug("disable_ocp flag is set!")
-            # default to classic audio only service
-            self.find_default()
-        else:
-            # default to OCP, fallback to classic audio only service
-            self.find_ocp() or self.find_default()
+        self.find_default()
 
         # Setup event handlers
         self.bus.on('mycroft.audio.service.play', self._play)
