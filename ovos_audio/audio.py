@@ -90,6 +90,11 @@ class AudioService:
             self.load_services()
 
     def find_ocp(self):
+        if self.disable_ocp:
+            LOG.info("classic OCP is disabled in config, OCP bus api not available!")
+            # NOTE: ovos-core should detect this and use the classic audio service api automatically
+            return
+
         try:
             from ovos_plugin_common_play import OCPAudioBackend
         except ImportError:
