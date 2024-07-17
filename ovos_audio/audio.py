@@ -74,6 +74,7 @@ class AudioService:
         self.service_lock = Lock()
 
         self.default = None
+        self.ocp = None
         self.service = []
         self.current = None
         self.play_start_time = 0
@@ -89,23 +90,25 @@ class AudioService:
             self.load_services()
 
     def find_ocp(self):
+        if self.disable_ocp:
+            LOG.info("classic OCP is disabled in config, OCP bus api not available!")
+            # NOTE: ovos-core should detect this and use the classic audio service api automatically
+            return
+
         try:
             from ovos_plugin_common_play import OCPAudioBackend
         except ImportError:
             LOG.debug("classic OCP not installed")
             return False
-
-        for s in self.service:
-            if isinstance(s, OCPAudioBackend):
-                LOG.info('OCP - OVOS Common Play set as default backend')
-                try:
-                    s.player.validate_source = self.validate_source
-                    s.player.native_sources = self.native_sources
-                except:
-                    pass  # handle older OCP plugin versions
-                self.default = s
-                return True
-        LOG.debug("classic OCP not found")
+        # config from legacy location in default mycroft.conf
+        ocp_config = Configuration().get("Audio", {}).get("backends", {}).get("OCP", {})
+        self.ocp = OCPAudioBackend(ocp_config, bus=self.bus)
+        try:
+            self.ocp.player.validate_source = self.validate_source
+            self.ocp.player.native_sources = self.native_sources
+        except Exception as e:
+            # handle older OCP plugin versions
+            LOG.warning("old OCP version detected! please update 'ovos_plugin_common_play'")
 
     def find_default(self):
         if not self.service:
@@ -113,9 +116,6 @@ class AudioService:
             return False
         # Find default backend
         default_name = self.config.get('default-backend', '')
-        if self.disable_ocp and default_name == "OCP":
-            LOG.warning("default backend set to OCP, but OCP is disabled")
-            default_name = ""
         LOG.info('Finding default audio backend...')
         for s in self.service:
             if s.name == default_name:
@@ -133,7 +133,7 @@ class AudioService:
         for the subsystem.
         """
         found_plugins = find_audio_service_plugins()
-        if 'ovos_common_play' in found_plugins and self.disable_ocp:
+        if 'ovos_common_play' in found_plugins:
             found_plugins.pop('ovos_common_play')
 
         local = []
@@ -156,13 +156,13 @@ class AudioService:
         for s in self.service:
             s.set_track_start_callback(self.track_start)
 
-        if self.disable_ocp:
-            LOG.debug("disable_ocp flag is set!")
-            # default to classic audio only service
-            self.find_default()
-        else:
-            # default to OCP, fallback to classic audio only service
-            self.find_ocp() or self.find_default()
+        # load OCP
+        # NOTE: this will be replace by ovos-media in a future release
+        # and can be disabled in config
+        self.find_ocp()
+
+        # load audio playback plugins (vlc, mpv, spotify ...)
+        self.find_default()
 
         # Setup event handlers
         self.bus.on('mycroft.audio.service.play', self._play)
