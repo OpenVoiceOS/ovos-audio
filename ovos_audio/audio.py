@@ -106,8 +106,9 @@ class AudioService:
         try:
             self.ocp.player.validate_source = self.validate_source
             self.ocp.player.native_sources = self.native_sources
-        except:
-            pass  # handle older OCP plugin versions
+        except Exception as e:
+            # handle older OCP plugin versions
+            LOG.warning("old OCP version detected! please update 'ovos_plugin_common_play'")
 
     def find_default(self):
         if not self.service:
