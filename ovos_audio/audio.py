@@ -205,17 +205,19 @@ class AudioService:
         """Callback method called from the services to indicate start of
         playback of a track or end of playlist.
         """
+        from ovos_bus_client.message import dig_for_message
+        m = dig_for_message() or Message("")
         if track:
             # Inform about the track about to start.
             LOG.debug('New track coming up!')
-            self.bus.emit(Message('mycroft.audio.playing_track',
+            self.bus.emit(m.forward('mycroft.audio.playing_track',
                                   data={'track': track}))
             self.current.ocp_start()
         else:
             # If no track is about to start last track of the queue has been
             # played.
-            LOG.debug('End of playlist!')
-            self.bus.emit(Message('mycroft.audio.queue_end'))
+            LOG.debug(f'End of track! {self.current} finished playback')
+            self.bus.emit(m.forward('mycroft.audio.queue_end'))
             self.current.ocp_stop()
 
     @require_native_source()
