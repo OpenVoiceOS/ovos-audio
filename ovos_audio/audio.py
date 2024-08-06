@@ -14,8 +14,10 @@ import time
 from threading import Lock
 
 from ovos_bus_client.message import Message
+from ovos_bus_client.message import dig_for_message
 from ovos_config.config import Configuration
-from ovos_plugin_manager.audio import load_audio_service_plugins as load_plugins, find_audio_service_plugins, setup_audio_service
+from ovos_plugin_manager.audio import find_audio_service_plugins, \
+    setup_audio_service
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
@@ -205,13 +207,12 @@ class AudioService:
         """Callback method called from the services to indicate start of
         playback of a track or end of playlist.
         """
-        from ovos_bus_client.message import dig_for_message
         m = dig_for_message() or Message("")
         if track:
             # Inform about the track about to start.
             LOG.debug('New track coming up!')
             self.bus.emit(m.forward('mycroft.audio.playing_track',
-                                  data={'track': track}))
+                                    data={'track': track}))
             self.current.ocp_start()
         else:
             # If no track is about to start last track of the queue has been
