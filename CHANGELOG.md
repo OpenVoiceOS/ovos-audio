@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a54...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a55...HEAD)
+
+**Fixed bugs:**
+
+- better logs, keep message.context [\#85](https://github.com/OpenVoiceOS/ovos-audio/pull/85) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a55](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a55) (2024-07-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a54...V0.0.2a55)
 
 **Fixed bugs:**
 
