@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/OpenVoiceOS/ovos-audio/tree/HEAD)
+## [V0.0.2a56](https://github.com/OpenVoiceOS/ovos-audio/tree/V0.0.2a56) (2024-08-06)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a55...HEAD)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/V0.0.2a55...V0.0.2a56)
 
 **Fixed bugs:**
 
