@@ -1,4 +1,4 @@
 ovos-utils~=0.0, >=0.0.38
 ovos-bus-client~=0.0, >=0.0.8
 ovos-config~=0.0,>=0.0.13
-ovos-plugin-manager~=0.0, >=0.0.26
+ovos-plugin-manager~=0.2
