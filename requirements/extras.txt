@@ -1,2 +1,10 @@
-ovos-tts-plugin-server
-ovos_audio_plugin_simple>=0.0.2a7
+ovos-tts-plugin-server>=0.0.2, <1.0.0
+ovos_audio_plugin_simple>=0.1.0, <1.0.0
+ovos_plugin_common_play>=0.0.7, <1.0.0
+
+# OCP plugins
+ovos-ocp-youtube-plugin~=0.0, >=0.0.1
+ovos-ocp-m3u-plugin>=0.0.1,<1.0.0
+ovos-ocp-rss-plugin>=0.0.2,<1.0.0
+ovos-ocp-files-plugin~=0.13
+ovos-ocp-news-plugin>=0.0.3,<1.0.0
