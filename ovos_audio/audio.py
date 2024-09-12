@@ -12,7 +12,7 @@
 
 import time
 from threading import Lock
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 from ovos_audio.utils import require_native_source
 from ovos_bus_client.message import Message
@@ -386,7 +386,7 @@ class AudioService:
         else:
             LOG.debug("No audio service to restore volume of")
 
-    def _extract(self, tracks: List[Union[str, Tuple[str, str]]]) -> List[str]:
+    def _extract(self, tracks: Union[List[str], List[Tuple[str, str]]]) -> List[str]:
         """convert uris into real streams that can be played, eg. handle youtube urls"""
         xtracted = []
         xtract = load_stream_extractors()  # @lru_cache, its a lazy loaded singleton
@@ -397,7 +397,8 @@ class AudioService:
                 xtracted.append(xtract.extract_stream(t[0], video=False)["uri"])
         return xtracted
 
-    def play(self, tracks, prefered_service, repeat=False):
+    def play(self, tracks: Union[List[str], List[Tuple[str, str]]],
+             prefered_service: Optional[str], repeat: bool =False):
         """
             play starts playing the audio on the prefered service if it
             supports the uri. If not the next best backend is found.
