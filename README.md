@@ -49,7 +49,7 @@ under mycroft.conf
 
 The legacy audio service supports audio playback via the old mycroft api ([@mycroft](https://github.com/MycroftAI/mycroft-core/blob/dev/mycroft/skills/audioservice.py#L43) [@ovos](https://github.com/OpenVoiceOS/ovos-bus-client/blob/dev/ovos_bus_client/apis/ocp.py#L51))
 
-by default OCP delegates to the legacy audio service when necessary and no action is needed, but if you want to disable ocp this api remains available as the solve media playback provider
+by default OCP delegates to the legacy audio service when necessary and no action is needed, but if you want to disable ocp this api can be used as the sole media playback provider
 
 > **NOTE:** once ovos-media is released OCP and this api will be disabled by default and deprecated!
 
