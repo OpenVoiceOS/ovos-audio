@@ -94,6 +94,17 @@ class TestLegacy(unittest.TestCase):
 
         url = "https://www.youtube.com/watch?v=zc-R6ahuB-8&pp=ygULT3BlblZvaWNlT1M%3D"
 
+        def x_t(u):
+            extracted = []
+            for t in u:
+                if "youtube.com" in t:
+                    t = f"https://NOT-{t}"
+                extracted.append(t)
+            return extracted
+
+        real_x_t = self.core._extract
+
+        self.core._extract = x_t
         messages = []
 
         def new_msg(msg):
@@ -136,6 +147,9 @@ class TestLegacy(unittest.TestCase):
 
         # confirm stream has been extracted
         self.assertNotEqual(self.core.current._now_playing, url)
+
+
+        self.core._extract = real_x_t
 
     def test_uri_error(self):
 
