@@ -87,6 +87,55 @@ class TestLegacy(unittest.TestCase):
         self.assertEqual(state.data["state"], MediaState.LOADED_MEDIA)
         state = messages[6]
         self.assertEqual(state.data["state"], TrackState.PLAYING_AUDIOSERVICE)
+        # confirm stream has been loaded into plugin
+        self.assertEqual(self.core.current._now_playing, "http://fake.mp3")
+
+    def test_youtube(self):
+
+        url = "https://www.youtube.com/watch?v=zc-R6ahuB-8&pp=ygULT3BlblZvaWNlT1M%3D"
+
+        messages = []
+
+        def new_msg(msg):
+            nonlocal messages
+            m = Message.deserialize(msg)
+            messages.append(m)
+            print(len(messages), msg)
+
+        def wait_for_n_messages(n):
+            nonlocal messages
+            t = time.time()
+            while len(messages) < n:
+                sleep(0.1)
+                if time.time() - t > 10:
+                    raise RuntimeError("did not get the number of expected messages under 10 seconds")
+
+        self.core.bus.on("message", new_msg)
+
+        utt = Message('mycroft.audio.service.play',
+                      {"tracks": [url]},
+                      {})
+        self.core.bus.emit(utt)
+
+        # confirm all expected messages are sent
+        expected_messages = [
+            'mycroft.audio.service.play',
+            "ovos.common_play.media.state",  # LOADING_MEDIA
+            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
+            "ovos.common_play.simple.play",  # call simple plugin
+            "ovos.common_play.player.state",  # PLAYING
+            "ovos.common_play.media.state",  # LOADED_MEDIA
+            "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
+        ]
+        wait_for_n_messages(len(expected_messages))
+
+        self.assertEqual(len(expected_messages), len(messages))
+
+        for idx, m in enumerate(messages):
+            self.assertEqual(m.msg_type, expected_messages[idx])
+
+        # confirm stream has been extracted
+        self.assertNotEqual(self.core.current._now_playing, url)
 
     def test_uri_error(self):
 

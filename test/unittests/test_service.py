@@ -17,6 +17,7 @@ import unittest.mock as mock
 from ovos_bus_client import Message
 from ovos_audio.audio import AudioService
 
+from ovos_utils.fakebus import FakeBus
 from .services.working import WorkingBackend
 """Tests for Audioservice class"""
 
@@ -56,6 +57,16 @@ def setup_mock_backends(mock_load_services, emitter):
     second_backend = WorkingBackend({}, emitter, 'second')
     mock_load_services.return_value = [backend, second_backend]
     return backend, second_backend
+
+
+class TestStreamExtract(unittest.TestCase):
+
+    def test_xtract(self):
+        """Test shutdown of audio backend."""
+        url = "https://www.youtube.com/watch?v=zc-R6ahuB-8&pp=ygULT3BlblZvaWNlT1M%3D"
+        service = AudioService(FakeBus())
+        a = service._extract([url])
+        self.assertNotEqual(a[0], url)
 
 
 @unittest.skip("TODO - the mocks no longer apply, rewrite tests")
