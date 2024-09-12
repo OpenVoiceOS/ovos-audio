@@ -17,7 +17,7 @@ under mycroft.conf
 ```javascript
 {
 
-  // Text to Speech parameters
+  // Text to Speech parametersJarbasAl-patch-1
   "tts": {
     "module": "ovos-tts-plugin-server",
     "fallback_module": "ovos-tts-plugin-mimic",
@@ -86,7 +86,5 @@ legacy plugins:
 - OCP was developed for mycroft-core under the legacy audio service system
 - OCP is **always** the default audio plugin, unless you set `"disable_ocp": true` in config
 - OCP uses the legacy api internally, to delegate playback when GUI is not available (or when configured to do so)
-- brings support for [OCP skills](https://openvoiceos.github.io/ovos-technical-manual/OCP_skills) to OVOS until [ovos-media](https://github.com/OpenVoiceOS/ovos-media) is finished
 - does **NOT** bring support for old Mycroft CommonPlay skills, that is achieved by using the `"ocp_legacy"` pipeline with ovos-core
 - [ovos-media](https://github.com/OpenVoiceOS/ovos-media) will fully replace OCP in **ovos-audio 1.0.0**
-- (**DEPRECATED**) in `mycroft-core`/`ovos-core 0.0.7` OCP used to pose as a legacy plugin and translated the received bus events to the [OCP api](https://github.com/OpenVoiceOS/ovos-bus-client/blob/dev/ovos_bus_client/apis/ocp.py#L228)
