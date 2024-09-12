@@ -1,13 +1,16 @@
 # Changelog
 
-## [0.2.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.2.0a1) (2024-09-11)
+## [0.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.2.1a1) (2024-09-12)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.1.0...0.2.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.2.0...0.2.1a1)
+
+**Fixed bugs:**
+
+- OCP extractors failing when OCP is set to legacy audio service [\#81](https://github.com/OpenVoiceOS/ovos-audio/issues/81)
 
 **Merged pull requests:**
 
-- feat:extras\_requirements [\#95](https://github.com/OpenVoiceOS/ovos-audio/pull/95) ([JarbasAl](https://github.com/JarbasAl))
-- chore:semver\_versioning [\#94](https://github.com/OpenVoiceOS/ovos-audio/pull/94) ([JarbasAl](https://github.com/JarbasAl))
+- fix:stream extraction [\#97](https://github.com/OpenVoiceOS/ovos-audio/pull/97) ([JarbasAl](https://github.com/JarbasAl))
 
 
 

@@ -12,17 +12,18 @@
 
 import time
 from threading import Lock
+from typing import List, Tuple, Union, Optional
 
+from ovos_audio.utils import require_native_source
 from ovos_bus_client.message import Message
 from ovos_bus_client.message import dig_for_message
 from ovos_config.config import Configuration
 from ovos_plugin_manager.audio import find_audio_service_plugins, \
     setup_audio_service
+from ovos_plugin_manager.ocp import load_stream_extractors
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
-
-from ovos_audio.utils import require_native_source
 
 try:
     from ovos_utils.ocp import MediaState
@@ -385,7 +386,19 @@ class AudioService:
         else:
             LOG.debug("No audio service to restore volume of")
 
-    def play(self, tracks, prefered_service, repeat=False):
+    def _extract(self, tracks: Union[List[str], List[Tuple[str, str]]]) -> List[str]:
+        """convert uris into real streams that can be played, eg. handle youtube urls"""
+        xtracted = []
+        xtract = load_stream_extractors()  # @lru_cache, its a lazy loaded singleton
+        for t in tracks:
+            if isinstance(t, str):
+                xtracted.append(xtract.extract_stream(t, video=False)["uri"])
+            else:  # (uri, mime)
+                xtracted.append(xtract.extract_stream(t[0], video=False)["uri"])
+        return xtracted
+
+    def play(self, tracks: Union[List[str], List[Tuple[str, str]]],
+             prefered_service: Optional[str], repeat: bool =False):
         """
             play starts playing the audio on the prefered service if it
             supports the uri. If not the next best backend is found.
@@ -404,6 +417,8 @@ class AudioService:
             uri_type = tracks[0][0].split(':')[0]
 
         LOG.debug(f"track uri type: {uri_type}")
+
+        tracks = self._extract(tracks)  # ensure playable streams
 
         # check if user requested a particular service
         if prefered_service and uri_type in prefered_service.supported_uris():
