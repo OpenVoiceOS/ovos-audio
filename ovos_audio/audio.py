@@ -392,9 +392,9 @@ class AudioService:
         xtract = load_stream_extractors()  # @lru_cache, its a lazy loaded singleton
         for t in tracks:
             if isinstance(t, str):
-                xtracted.append(xtract.extract_stream(t, video=False))
+                xtracted.append(xtract.extract_stream(t, video=False)["uri"])
             else:  # (uri, mime)
-                xtracted.append(xtract.extract_stream(t[0], video=False))
+                xtracted.append(xtract.extract_stream(t[0], video=False)["uri"])
         return xtracted
 
     def play(self, tracks, prefered_service, repeat=False):
