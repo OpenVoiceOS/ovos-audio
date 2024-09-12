@@ -17,7 +17,7 @@ under mycroft.conf
 ```javascript
 {
 
-  // Text to Speech parametersJarbasAl-patch-1
+  // Text to Speech parameters
   "tts": {
     "module": "ovos-tts-plugin-server",
     "fallback_module": "ovos-tts-plugin-mimic",
