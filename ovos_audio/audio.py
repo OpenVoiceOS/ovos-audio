@@ -12,7 +12,7 @@
 
 import time
 from threading import Lock
-
+from typing import List, Tuple
 from ovos_bus_client.message import Message
 from ovos_bus_client.message import dig_for_message
 from ovos_config.config import Configuration
