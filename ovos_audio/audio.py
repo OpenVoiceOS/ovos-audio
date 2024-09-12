@@ -385,6 +385,17 @@ class AudioService:
         else:
             LOG.debug("No audio service to restore volume of")
 
+    def _extract(self, tracks: List[Union[str, Tuple[str,str]]]) -> List[str]:
+        """convert uris into real streams that can be played, eg. handle youtube urls"""
+        xtracted = []
+        xtract = load_stream_extractors() # @lru_cache, its a lazy loaded singleton
+        for t in tracks:
+            if isinstance(t, str):
+                xtracted.append(xtract.extract_stream(t, video=False))
+            else: # (uri, mime)
+                xtracted.append(xtract.extract_stream(t[0], video=False))
+        return xtracted
+
     def play(self, tracks, prefered_service, repeat=False):
         """
             play starts playing the audio on the prefered service if it
@@ -404,6 +415,8 @@ class AudioService:
             uri_type = tracks[0][0].split(':')[0]
 
         LOG.debug(f"track uri type: {uri_type}")
+
+        tracks = self._extract(tracks) # ensure playable streams
 
         # check if user requested a particular service
         if prefered_service and uri_type in prefered_service.supported_uris():
