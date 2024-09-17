@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.2.3a1) (2024-09-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.2.2a1...0.2.3a1)
+
+**Merged pull requests:**
+
+- fix:extras [\#102](https://github.com/OpenVoiceOS/ovos-audio/pull/102) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.2.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.2.2a1) (2024-09-12)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.2.1...0.2.2a1)
