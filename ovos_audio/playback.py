@@ -32,7 +32,10 @@ class PlaybackThread(Thread):
         self._now_playing = None
         self._started = Event()
         self.tts_transform = TTSTransformersService(self.bus)
-        self.g2p: Optional[Grapheme2PhonemePlugin] = OVOSG2PFactory.create()
+        try:
+            self.g2p: Optional[Grapheme2PhonemePlugin] = OVOSG2PFactory.create()
+        except:  # not mission critical
+            self.g2p = None
 
     @property
     def is_running(self):
