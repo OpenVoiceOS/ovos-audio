@@ -7,7 +7,7 @@ from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_message_lang
 from ovos_config import Configuration
-from ovos_plugin_manager.g2p import OVOSG2PFactory, find_g2p_plugins
+from ovos_plugin_manager.g2p import OVOSG2PFactory
 from ovos_plugin_manager.templates.g2p import OutOfVocabulary, Grapheme2PhonemePlugin
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG, log_deprecation
