@@ -1,15 +1,16 @@
 import base64
-import binascii
+import json
 import os
 import os.path
-import time
-import json
 from hashlib import md5
 from os.path import exists
 from queue import Queue
 from tempfile import gettempdir
 from threading import Thread, Lock
+from typing import Optional
 
+import binascii
+import time
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
@@ -53,7 +54,9 @@ class PlaybackService(Thread):
     def __init__(self, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
                  started_hook=on_started, watchdog=lambda: None,
-                 bus=None, disable_ocp=None, validate_source=True):
+                 bus=None, disable_ocp=None, validate_source=True,
+                 tts: Optional[TTS] = None,
+                 disable_fallback: bool = False):
         super(PlaybackService, self).__init__()
 
         LOG.info("Starting Audio Service")
@@ -68,10 +71,12 @@ class PlaybackService(Thread):
         self.config = Configuration()
         self.native_sources = self.config["Audio"].get("native_sources",
                                                        ["debug_cli", "audio"])
-        self.tts = None
+        self.tts: TTS = tts
         self._tts_hash = None
         self.lock = Lock()
-        self.fallback_tts = None
+        self.disable_reload = tts is not None
+        self.disable_fallback = disable_fallback
+        self.fallback_tts: Optional[TTS] = None
         self._fallback_tts_hash = None
         self._last_stop_signal = 0
         self.validate_source = validate_source
@@ -90,7 +95,8 @@ class PlaybackService(Thread):
 
         try:
             self._maybe_reload_tts()
-            Configuration.set_config_watcher(self._maybe_reload_tts)
+            if not self.disable_reload:
+                Configuration.set_config_watcher(self._maybe_reload_tts)
         except Exception as e:
             LOG.exception(e)
             self.status.set_error(e)
@@ -273,6 +279,7 @@ class PlaybackService(Thread):
         stopwatch = Stopwatch()
         stopwatch.start()
         utterance = message.data['utterance']
+        listen = message.data.get("listen", False)
 
         ctxt = self.tts._get_ctxt({"message": message})
         wav, _ = self.tts.synth(utterance, ctxt)
@@ -280,7 +287,10 @@ class PlaybackService(Thread):
             audio = f.read()
 
         b64_audio = base64.b64encode(audio)
-        self.bus.emit(message.response({"audio": b64_audio}))
+        self.bus.emit(message.response({"audio": b64_audio,
+                                        "listen": listen,
+                                        'tts_id': self.tts.plugin_id,
+                                        "utterance": utterance}))
 
         stopwatch.stop()
         report_timing(sess.session_id, stopwatch,
@@ -326,15 +336,20 @@ class PlaybackService(Thread):
             self.execute_tts(utterance, sess.session_id, listen, message)
 
             stopwatch.stop()
+            plugin_id = self.tts.plugin_id if self.tts else ""
             report_timing(sess.session_id, stopwatch,
                           {'utterance': utterance,
-                           'tts': self.tts.plugin_id})
+                           'tts': plugin_id})
 
     def _maybe_reload_tts(self):
         """
         Load TTS modules if not yet loaded or if configuration has changed.
         Optionally pre-loads fallback TTS if configured
         """
+        if self.disable_reload:
+            LOG.debug("skipping TTS reload")
+            return
+
         config = Configuration().get("tts", {})
         tts_m = config.get("module", "")
         ftts_m = config.get("fallback_module", "")
@@ -353,6 +368,10 @@ class PlaybackService(Thread):
                 self.tts = TTSFactory.create(config)
                 self.tts.init(self.bus, self.playback_thread)
                 self._tts_hash = _tts_hash
+
+        if self.disable_fallback:
+            LOG.debug("skipping fallback TTS reload")
+            return
 
         # if fallback TTS is the same as main TTS dont load it
         if config.get("module", "") == config.get("fallback_module", "") or not config.get("fallback_module", ""):
@@ -391,7 +410,7 @@ class PlaybackService(Thread):
                 if self._tts_hash != self._fallback_tts_hash:
                     self.execute_fallback_tts(utterance, ident, listen, message)
 
-    def _get_tts_fallback(self):
+    def _get_tts_fallback(self) -> Optional[TTS]:
         """Lazily initializes the fallback TTS if needed."""
         if not self.fallback_tts:
             config = Configuration()
@@ -428,7 +447,7 @@ class PlaybackService(Thread):
             LOG.exception(f"TTS FAILURE! utterance : {utterance}")
 
     @property
-    def is_speaking(self):
+    def is_speaking(self) -> bool:
         return self.tts.playback is not None and \
             self.tts.playback._now_playing is not None
 
@@ -443,12 +462,13 @@ class PlaybackService(Thread):
         """
         # check PlaybackThread
         if self.is_speaking:
+            LOG.debug("Stopping TTS")
             self._last_stop_signal = time.time()
-            self.tts.playback.clear()  # Clear here to get instant stop
+            self.tts.playback.stop()  # Clear here to get instant stop
             self.bus.emit(message.forward("mycroft.stop.handled", {"by": "TTS"}))
 
     @staticmethod
-    def _resolve_sound_uri(uri: str):
+    def _resolve_sound_uri(uri: str) -> Optional[str]:
         """ helper to resolve sound files full path"""
         if uri is None:
             return None
@@ -462,7 +482,7 @@ class PlaybackService(Thread):
         return audio_file
 
     @staticmethod
-    def _path_from_hexdata(hex_audio, audio_ext=None):
+    def _path_from_hexdata(hex_audio, audio_ext=None) -> str:
         """ hex_audio contains hex string encoded bytes
          audio_ext if not provided assumed to be wav
 
