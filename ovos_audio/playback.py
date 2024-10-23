@@ -1,12 +1,17 @@
 import random
+from queue import Empty
+from threading import Thread, Event
+from typing import Optional
+
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
+from ovos_bus_client.util import get_message_lang
 from ovos_config import Configuration
+from ovos_plugin_manager.g2p import OVOSG2PFactory
+from ovos_plugin_manager.templates.g2p import OutOfVocabulary, Grapheme2PhonemePlugin
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.sound import play_audio
-from queue import Empty
-from threading import Thread, Event
 from time import time
 
 
@@ -27,6 +32,13 @@ class PlaybackThread(Thread):
         self._now_playing = None
         self._started = Event()
         self.tts_transform = TTSTransformersService(self.bus)
+        self.g2p = None
+        if Configuration().get("g2p", {}).get("module"):
+            LOG.debug("Loading Grapheme2Phoneme plugin for mouth movements")
+            try:
+                self.g2p: Optional[Grapheme2PhonemePlugin] = OVOSG2PFactory.create()
+            except:  # not mission critical
+                pass
 
     @property
     def is_running(self):
@@ -117,6 +129,16 @@ class PlaybackThread(Thread):
             data, message.context = self.tts_transform.transform(data, message.context)
 
             self.p = play_audio(data)
+
+            if not visemes and self.g2p is not None:
+                try:
+                    visemes = self.g2p.utterance2visemes(message.data["utterance"],
+                                                        get_message_lang(message))
+                except OutOfVocabulary:
+                    pass
+                except:
+                    # this one is unplanned, let devs know all the info so they can fix it
+                    LOG.exception(f"Unexpected failure in G2P plugin: {self.g2p}")
             if visemes:
                 self.show_visemes(visemes)
             if self.p:
@@ -155,30 +177,7 @@ class PlaybackThread(Thread):
         while not self._terminated:
             self._do_playback.wait()
             try:
-                # HACK: we do these check to account for direct usages of TTS.queue singletons
-                speech_data = self.queue.get(timeout=2)
-                if len(speech_data) == 5 and isinstance(speech_data[-1], Message):
-                    data, visemes, listen, tts_id, message = speech_data
-                else:
-                    log_deprecation(
-                        "Direct modification of TTS.queue is not recommended!\n"
-                        "expected=(data, visemes, listen, tts_id, message)",
-                        "0.1.0")
-                    if len(speech_data) == 6:
-                        # old ovos backwards compat
-                        _, data, visemes, ident, listen, tts_id = speech_data
-                    elif len(speech_data) == 5:
-                        # mycroft style
-                        tts_id = None
-                        _, data, visemes, ident, listen = speech_data
-                    else:
-                        # old mycroft style  TODO can this be deprecated? its very very old
-                        listen = False
-                        tts_id = None
-                        _, data, visemes, ident = speech_data
-
-                    message = Message("speak", context={"session": {"session_id": ident}})
-
+                data, visemes, listen, tts_id, message = self.queue.get(timeout=2)
                 self._now_playing = (data, visemes, listen, tts_id, message)
                 self._play()
             except Empty:
