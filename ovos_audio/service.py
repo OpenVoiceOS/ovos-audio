@@ -557,9 +557,9 @@ class PlaybackService(Thread):
         Stop any playing audio and make sure threads are joined correctly.
         """
         self.status.set_stopping()
-        if self.tts.playback:
-            self.tts.playback.shutdown()
-            self.tts.playback.join()
+        if self.playback_thread:
+            self.playback_thread.shutdown()
+            self.playback_thread.join()
         if self.audio:
             self.audio.shutdown()
 
