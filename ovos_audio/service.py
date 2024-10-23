@@ -463,9 +463,8 @@ class PlaybackService(Thread):
         """
         # check PlaybackThread
         if self.is_speaking:
-            LOG.debug("Stopping TTS")
             self._last_stop_signal = time.time()
-            self.tts.playback.stop()  # Clear here to get instant stop
+            self.tts.playback.clear()  # Clear here to get instant stop
             self.bus.emit(message.forward("mycroft.stop.handled", {"by": "TTS"}))
 
     @staticmethod
