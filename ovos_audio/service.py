@@ -71,7 +71,7 @@ class PlaybackService(Thread):
         self.config = Configuration()
         self.native_sources = self.config["Audio"].get("native_sources",
                                                        ["debug_cli", "audio"])
-        self.tts: TTS = tts
+        self.tts: Optional[TTS] = tts
         self._tts_hash = None
         self.lock = Lock()
         self.disable_reload = tts is not None
