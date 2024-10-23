@@ -283,10 +283,11 @@ class PlaybackService(Thread):
 
         ctxt = self.tts._get_ctxt({"message": message})
         wav, _ = self.tts.synth(utterance, ctxt)
-        with open(wav, "rb") as f:
+        # cast to str() to get a path, as it is a AudioFile object from tts cache
+        with open(str(wav), "rb") as f:
             audio = f.read()
 
-        b64_audio = base64.b64encode(audio)
+        b64_audio = base64.b64encode(audio).decode("utf-8")
         self.bus.emit(message.response({"audio": b64_audio,
                                         "listen": listen,
                                         'tts_id': self.tts.plugin_id,
