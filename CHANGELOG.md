@@ -1,12 +1,12 @@
 # Changelog
 
-## [0.3.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.3.0a1) (2024-10-23)
+## [0.3.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.3.1a1) (2024-11-05)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.2.5...0.3.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.3.0...0.3.1a1)
 
 **Merged pull requests:**
 
-- feat:g2p [\#109](https://github.com/OpenVoiceOS/ovos-audio/pull/109) ([JarbasAl](https://github.com/JarbasAl))
+- fix: allow latest bus client version [\#111](https://github.com/OpenVoiceOS/ovos-audio/pull/111) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
