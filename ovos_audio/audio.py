@@ -14,7 +14,6 @@ import time
 from threading import Lock
 from typing import List, Tuple, Union, Optional
 
-from ovos_audio.utils import require_native_source
 from ovos_bus_client.message import Message
 from ovos_bus_client.message import dig_for_message
 from ovos_config.config import Configuration
@@ -23,39 +22,10 @@ from ovos_plugin_manager.audio import find_audio_service_plugins, \
 from ovos_plugin_manager.ocp import load_stream_extractors
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
 from ovos_utils.log import LOG
+from ovos_utils.ocp import MediaState
 from ovos_utils.process_utils import MonotonicEvent
 
-try:
-    from ovos_utils.ocp import MediaState
-except ImportError:
-    LOG.warning("Please update to ovos-utils~=0.1.")
-    from enum import IntEnum
-
-
-    class MediaState(IntEnum):
-        # https://doc.qt.io/qt-5/qmediaplayer.html#MediaStatus-enum
-        # The status of the media cannot be determined.
-        UNKNOWN = 0
-        # There is no current media. PlayerState == STOPPED
-        NO_MEDIA = 1
-        # The current media is being loaded. The player may be in any state.
-        LOADING_MEDIA = 2
-        # The current media has been loaded. PlayerState== STOPPED
-        LOADED_MEDIA = 3
-        # Playback of the current media has stalled due to
-        # insufficient buffering or some other temporary interruption.
-        # PlayerState != STOPPED
-        STALLED_MEDIA = 4
-        # The player is buffering data but has enough data buffered
-        # for playback to continue for the immediate future.
-        # PlayerState != STOPPED
-        BUFFERING_MEDIA = 5
-        # The player has fully buffered the current media. PlayerState != STOPPED
-        BUFFERED_MEDIA = 6
-        # Playback has reached the end of the current media. PlayerState == STOPPED
-        END_OF_MEDIA = 7
-        # The current media cannot be played. PlayerState == STOPPED
-        INVALID_MEDIA = 8
+from ovos_audio.utils import require_native_source
 
 MINUTES = 60  # Seconds in a minute
 
@@ -66,8 +36,7 @@ class AudioService:
         to be played.
     """
 
-    def __init__(self, bus, autoload=True, disable_ocp=False,
-                 validate_source=True, native_sources=None):
+    def __init__(self, bus, autoload=True, validate_source=True, native_sources=None):
         """
             Args:
                 bus: Mycroft messagebus
@@ -77,13 +46,13 @@ class AudioService:
         self.service_lock = Lock()
 
         self.default = None
-        self.ocp = None
+
         self.service = []
         self.current = None
         self.play_start_time = 0
         self.volume_is_low = False
         self.volume_is_speaking = False
-        self.disable_ocp = disable_ocp
+
         self.validate_source = validate_source
         self.native_sources = native_sources or self.config.get("native_sources",
                                                                 ["debug_cli", "audio"])
@@ -91,27 +60,6 @@ class AudioService:
         self._loaded = MonotonicEvent()
         if autoload:
             self.load_services()
-
-    def find_ocp(self):
-        if self.disable_ocp:
-            LOG.info("classic OCP is disabled in config, OCP bus api not available!")
-            # NOTE: ovos-core should detect this and use the classic audio service api automatically
-            return
-
-        try:
-            from ovos_plugin_common_play import OCPAudioBackend
-        except ImportError:
-            LOG.debug("classic OCP not installed")
-            return False
-        # config from legacy location in default mycroft.conf
-        ocp_config = Configuration().get("Audio", {}).get("backends", {}).get("OCP", {})
-        self.ocp = OCPAudioBackend(ocp_config, bus=self.bus)
-        try:
-            self.ocp.player.validate_source = self.validate_source
-            self.ocp.player.native_sources = self.native_sources
-        except Exception as e:
-            # handle older OCP plugin versions
-            LOG.warning("old OCP version detected! please update 'ovos_plugin_common_play'")
 
     def find_default(self):
         if not self.service:
@@ -158,11 +106,6 @@ class AudioService:
         # Register end of track callback
         for s in self.service:
             s.set_track_start_callback(self.track_start)
-
-        # load OCP
-        # NOTE: this will be replace by ovos-media in a future release
-        # and can be disabled in config
-        self.find_ocp()
 
         # load audio playback plugins (vlc, mpv, spotify ...)
         self.find_default()
@@ -276,7 +219,12 @@ class AudioService:
         """Stop audioservice if active."""
         if self.current:
             name = self.current.name
-            if self.current.stop():
+            try:
+                stopped = self.current.stop()
+            except Exception as e:
+                LOG.error(f"Failed to stop {name}: {e}")
+                stopped = False
+            if stopped:
                 self.current.ocp_stop()
                 if message:
                     msg = message.reply("mycroft.stop.handled",
@@ -287,7 +235,11 @@ class AudioService:
                 self.bus.emit(msg)
 
             # ensure we don't leave the volume ducked
-            self.current.restore_volume()
+            try:
+                self.current.restore_volume()
+            except Exception as e:
+                LOG.error(f"Failed to restore_volume {name}: {e}")
+
             self.volume_is_low = False
 
         self.current = None
@@ -398,7 +350,7 @@ class AudioService:
         return xtracted
 
     def play(self, tracks: Union[List[str], List[Tuple[str, str]]],
-             prefered_service: Optional[str], repeat: bool =False):
+             prefered_service: Optional[str], repeat: bool = False):
         """
             play starts playing the audio on the prefered service if it
             supports the uri. If not the next best backend is found.
