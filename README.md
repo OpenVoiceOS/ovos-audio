@@ -4,11 +4,17 @@ The "mouth" of the OVOS assistant!
 
 Handles TTS generation and sounds playback
 
+
+_________
+
 ## Install
 
 `pip install ovos-audio[extras]` to install this package and the default plugins.
 
 Without `extras`, you will also need to manually install, and possibly configure TTS modules as described below.
+
+
+_________
 
 # Configuration
 
@@ -44,6 +50,35 @@ under mycroft.conf
   "play_ogg_cmdline": "ogg123 -q %1"
 }
 ```
+_________
+
+## 🤖 Persona Support  
+
+This project supports **dialog-transformer plugins** to customize the style or tone of the generated speech.  
+
+By using [OpenAI Persona Plugin](https://github.com/OpenVoiceOS/ovos-solver-plugin-openai-persona), you can rewrite text dynamically based on specific personas, such as simplifying explanations or mimicking a specific tone.  
+
+#### Example Usage:
+- **Persona:** `"rewrite the text as if you were explaining it to a 5-year-old"`  
+- **Input:** `"Quantum mechanics is a branch of physics that describes the behavior of particles at the smallest scales."`  
+- **Output:** `"Quantum mechanics is like a special kind of science that helps us understand really tiny things."`  
+
+Examples of `persona` Values:
+- `"rewrite the text as if it was an angry old man speaking"`  
+- `"Add more 'dude'ness to it"`  
+- `"Explain it like you're teaching a child"`  
+
+To enable the OpenAI Persona Plugin, add the following to your `mycroft.conf`:  
+
+```json
+"dialog_transformers": {
+    "ovos-dialog-transformer-openai-plugin": {
+        "rewrite_prompt": "rewrite the text as if you were explaining it to a 5-year-old"
+    }
+}
+```
+
+_____
 
 ## Using Legacy AudioService
 
