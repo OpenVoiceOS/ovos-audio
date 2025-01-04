@@ -14,7 +14,7 @@
 #
 import time
 from functools import wraps
-
+import warnings
 from ovos_bus_client.send_func import send
 from ovos_config import Configuration
 from ovos_utils.log import deprecated, LOG
@@ -60,6 +60,11 @@ def is_speaking():
     Returns:
         bool: True while still speaking
     """
+    warnings.warn(
+        "file signals have been deprecated",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return check_for_signal("isSpeaking", -1)
 
 
@@ -72,6 +77,11 @@ def wait_while_speaking():
     briefly to ensure that any preceeding request to speak has time to
     begin.
     """
+    warnings.warn(
+        "file signals have been deprecated",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     time.sleep(0.3)  # Wait briefly in for any queued speech to begin
     while is_speaking():
         time.sleep(0.1)
@@ -84,10 +94,13 @@ def stop_speaking():
 
     TODO: Skills should only be able to stop speech they've initiated
     """
+    warnings.warn(
+        "file signals have been deprecated",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     if is_speaking():
-
         send('mycroft.audio.speech.stop')
-
         # Block until stopped
         while check_for_signal("isSpeaking", -1):
             time.sleep(0.25)

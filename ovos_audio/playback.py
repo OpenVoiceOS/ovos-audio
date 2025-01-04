@@ -10,7 +10,7 @@ from ovos_config import Configuration
 from ovos_plugin_manager.g2p import OVOSG2PFactory
 from ovos_plugin_manager.templates.g2p import OutOfVocabulary, Grapheme2PhonemePlugin
 from ovos_plugin_manager.templates.tts import TTS
-from ovos_utils.log import LOG, log_deprecation
+from ovos_utils.log import LOG
 from ovos_utils.sound import play_audio
 from time import time
 
