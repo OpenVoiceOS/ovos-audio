@@ -266,10 +266,7 @@ class PlaybackService(Thread):
     def run(self):
         self.status.set_alive()
         if self.audio_enabled:
-            LOG.info("Legacy AudioService enabled")
-            if not self.disable_ocp:
-                LOG.warning("OCP has moved to ovos-media, if you already migrated to ovos-media "
-                            'set "disable_ocp": true in mycroft.conf')
+            LOG.info("Classic AudioService enabled")
             if self.audio.wait_for_load():
                 if len(self.audio.service) == 0:
                     LOG.warning('No audio backends loaded! '
