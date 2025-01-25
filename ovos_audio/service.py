@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import warnings
 import os.path
 from hashlib import md5
 from os.path import exists
@@ -183,6 +184,11 @@ class PlaybackService(Thread):
           "active": True,
           "plugin_name": 'Ovos Common Play'}]
         """
+        warnings.warn(
+            "'get_audio_options' is deprecated and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         opts = []
         return opts
 
@@ -245,6 +251,11 @@ class PlaybackService(Thread):
         "configs" - {backend_name: backend_cfg}}
         "options" - {lang: [list_of_valid_ui_metadata]}
         """
+        warnings.warn(
+            "'handle_opm_audio_query' is deprecated and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         data = {
             "plugins": [],
             "configs": {},
