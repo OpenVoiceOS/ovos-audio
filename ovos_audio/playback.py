@@ -1,7 +1,7 @@
 import random
 from queue import Empty
 from threading import Thread, Event
-from typing import Optional
+from typing import Optional, List
 
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
@@ -119,6 +119,17 @@ class PlaybackThread(Thread):
         except ImportError:
             LOG.warning("failed to curate TTS cache. please update ovos-plugin-manager")
         self.blink(0.2)
+
+    def put(self, wav: str,
+            visemes: Optional[List[str]]=None,
+            listen:bool = False,
+            tts_id: Optional[str] = None,
+            message: Optional[Message] = None):
+        message = message or Message("")
+        # queue audio for playback
+        self.queue.put(
+            (wav, visemes, listen, tts_id, message)
+        )
 
     def _play(self):
         try:
