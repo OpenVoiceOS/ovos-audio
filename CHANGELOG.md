@@ -1,20 +1,12 @@
 # Changelog
 
-## [0.3.2a2](https://github.com/OpenVoiceOS/ovos-audio/tree/0.3.2a2) (2025-01-04)
+## [0.4.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.0a1) (2025-02-27)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.3.2a1...0.3.2a2)
-
-**Merged pull requests:**
-
-- chore: add warnings [\#116](https://github.com/OpenVoiceOS/ovos-audio/pull/116) ([JarbasAl](https://github.com/JarbasAl))
-
-## [0.3.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.3.2a1) (2024-11-25)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.3.1...0.3.2a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.3.2...0.4.0a1)
 
 **Merged pull requests:**
 
-- Update ovos-config requirement from \<1.0.0,\>=0.0.12 to \>=0.0.12,\<2.0.0 in /requirements [\#113](https://github.com/OpenVoiceOS/ovos-audio/pull/113) ([dependabot[bot]](https://github.com/apps/dependabot))
+- feat:add dialog normalizer to extras [\#119](https://github.com/OpenVoiceOS/ovos-audio/pull/119) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
