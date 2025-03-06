@@ -19,7 +19,7 @@ from ovos_audio.service import PlaybackService
 from ovos_config import Configuration
 from ovos_utils.messagebus import Message, FakeBus
 from ovos_utils.process_utils import ProcessState
-
+from ovos_bus_client.session import SessionManager, Session
 """Tests for speech dispatch service."""
 
 tts_mock = mock.Mock()
@@ -184,28 +184,21 @@ class TestSpeech(unittest.TestCase):
         bus = mock.Mock()
         speech = PlaybackService(bus=bus)
         speech.execute_tts = mock.Mock()
-        speech.native_sources = ["A"]
 
-        msg = Message("speak", {"utterance": "hello world"},
-                      context={"session": {"session_id": "123"}})
+        msg = Message("speak", {"utterance": "hello world"})
 
         # test message.context.destination
-        msg.context["destination"] = "B"  # not native source, ignore
+        msg.context["session"] = Session().serialize() # not default
         speech.handle_speak(msg)
         self.assertFalse(speech.execute_tts.called)
         self.assertFalse(mock_timing.called)
 
-        msg.context["destination"] = "A"  # native source
+        msg.context["session"] = Session("default").serialize() # default
         speech.handle_speak(msg)
         self.assertTrue(speech.execute_tts.called)
         self.assertTrue(mock_timing.called)
-        self.assertEqual(mock_timing.call_args[0][0], "123")
+        self.assertEqual(mock_timing.call_args[0][0], "default")
 
-        msg.context.pop("destination")  # multi cast
-        speech.handle_speak(msg)
-        self.assertTrue(speech.execute_tts.called)
-        self.assertTrue(mock_timing.called)
-        self.assertEqual(mock_timing.call_args[0][0], "123")
 
     @mock.patch('ovos_audio.service.get_tts_lang_configs')
     @mock.patch('ovos_audio.service.get_tts_supported_langs')

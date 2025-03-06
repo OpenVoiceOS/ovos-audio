@@ -28,7 +28,7 @@ from ovos_audio.audio import AudioService
 from ovos_audio.playback import PlaybackThread
 from ovos_audio.transformers import DialogTransformersService
 from ovos_audio.tts import TTSFactory
-from ovos_audio.utils import report_timing, require_native_source
+from ovos_audio.utils import report_timing, require_default_session
 
 
 def on_ready():
@@ -70,8 +70,6 @@ class PlaybackService(Thread):
         self.status.set_started()
 
         self.config = Configuration()
-        self.native_sources = self.config["Audio"].get("native_sources",
-                                                       ["debug_cli", "audio"])
         self.tts: Optional[TTS] = tts
         self._tts_hash = None
         self.lock = Lock()
@@ -111,8 +109,7 @@ class PlaybackService(Thread):
         if self.audio_enabled:
             try:
                 self.audio = AudioService(self.bus, disable_ocp=disable_ocp,
-                                          validate_source=validate_source,
-                                          native_sources=self.native_sources)
+                                          validate_source=validate_source)
             except Exception as e:
                 LOG.exception(e)
 
@@ -309,7 +306,7 @@ class PlaybackService(Thread):
                       {'utterance': utterance,
                        'tts': self.tts.plugin_id})
 
-    @require_native_source()
+    @require_default_session()
     def handle_speak(self, message):
         """Handle "speak" message
 
@@ -510,7 +507,7 @@ class PlaybackService(Thread):
             f.write(bindata)
         return audio_file
 
-    @require_native_source()
+    @require_default_session()
     def handle_queue_audio(self, message):
         """ Queue a sound file to play in speech thread
          ensures it doesnt play over TTS """
@@ -533,7 +530,7 @@ class PlaybackService(Thread):
             # a sound does not have a tts_id, assign that to "sounds"
             TTS.queue.put((str(audio_file), viseme, listen, "sounds", message))
 
-    @require_native_source()
+    @require_default_session()
     def handle_instant_play(self, message):
         """ play a sound file immediately (may play over TTS) """
         audio_file = message.data.get("uri")

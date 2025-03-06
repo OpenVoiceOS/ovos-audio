@@ -1,0 +1,37 @@
+name: Run CodeCov
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON: "3.11"
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: "3.11"
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt install python3-dev swig sox mpg123
+        python -m pip install build wheel
+    - name: Install test dependencies
+      run: |
+          pip install -r test/requirements.txt
+    - name: Install repo
+      run: |
+          pip install .[extras]
+    - name: Generate coverage report
+      run: |
+        pytest --cov=ovos_audio --cov-report xml test/unittests
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: OpenVoiceOS/ovos-audio

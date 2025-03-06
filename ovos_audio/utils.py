@@ -19,29 +19,16 @@ from ovos_bus_client.send_func import send
 from ovos_config import Configuration
 from ovos_utils.log import deprecated, LOG
 from ovos_utils.signal import check_for_signal
+from ovos_bus_client.session import SessionManager, Session
 
 
-def validate_message_context(message, native_sources=None):
-    destination = message.context.get("destination")
-    if destination:
-        native_sources = native_sources or Configuration()["Audio"].get(
-            "native_sources", ["debug_cli", "audio"]) or []
-        if any(s in destination for s in native_sources):
-            # request from device
-            return True
-        # external request, do not handle
-        return False
-    # broadcast for everyone
-    return True
-
-
-def require_native_source():
+def require_default_session():
     def _decorator(func):
         @wraps(func)
         def func_wrapper(self, message=None):
             validated = message is None or \
                         not self.validate_source or \
-                        validate_message_context(message, self.native_sources)
+                        SessionManager.get(message).session_id == "default"
             if validated:
                 return func(self, message)
             LOG.debug(f"ignoring '{message.msg_type}' message, not from a native audio source")
