@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.0a1) (2025-03-06)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.1a1...1.0.0a1)
+
+**Breaking changes:**
+
+- refactor!:drop "native source" and use session\_id instead [\#121](https://github.com/OpenVoiceOS/ovos-audio/pull/121) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [0.4.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.1a1) (2025-03-06)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.0...0.4.1a1)
