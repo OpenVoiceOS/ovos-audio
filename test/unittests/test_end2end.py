@@ -20,6 +20,7 @@ from ovos_utils.ocp import MediaState, TrackState, PlayerState
 
 from ovos_audio.service import AudioService
 
+from ovos_bus_client.session import SessionManager, Session
 
 class TestLegacy(unittest.TestCase):
     def setUp(self):
@@ -471,23 +472,16 @@ class TestLegacy(unittest.TestCase):
         self.core.play = play
 
         utt = Message('mycroft.audio.service.play',
-                      {"tracks": ["http://fake.mp3"]},
-                      {"destination": "audio"})  # native source
+                      {"tracks": ["http://fake.mp3"]})
+        utt.context["session"] = Session("default").serialize()
         self.core._play(utt)
 
         self.assertTrue(called)
 
         called = False
         utt = Message('mycroft.audio.service.play',
-                      {"tracks": ["http://fake.mp3"]},
-                      {}) # missing destination
-        self.core._play(utt)
-        self.assertTrue(called)
-
-        called = False
-        utt = Message('mycroft.audio.service.play',
-                      {"tracks": ["http://fake.mp3"]},
-                      {"destination": "hive"})  # external source
+                      {"tracks": ["http://fake.mp3"]})
+        utt.context["session"] = Session("123").serialize()
         self.core._play(utt)
         self.assertFalse(called)
 
