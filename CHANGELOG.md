@@ -1,12 +1,12 @@
 # Changelog
 
-## [0.4.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.0a1) (2025-02-27)
+## [0.4.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.1a1) (2025-03-06)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.3.2...0.4.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.0...0.4.1a1)
 
 **Merged pull requests:**
 
-- feat:add dialog normalizer to extras [\#119](https://github.com/OpenVoiceOS/ovos-audio/pull/119) ([JarbasAl](https://github.com/JarbasAl))
+- fix:automations [\#122](https://github.com/OpenVoiceOS/ovos-audio/pull/122) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
