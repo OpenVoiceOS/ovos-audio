@@ -1,7 +1,7 @@
-coveralls==1.8.2
-flake8==3.7.9
-pytest==5.2.4
-pytest-cov==2.8.1
-cov-core==1.15.0
+coveralls>=1.8.2
+flake8>=3.7.9
+pytest>=5.2.4
+pytest-cov>=2.8.1
+cov-core>=1.15.0
 ovos_audio_plugin_simple>=0.0.2a7
 ovos-utils>=0.1.0a16

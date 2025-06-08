@@ -1,12 +1,28 @@
 # Changelog
 
-## [0.4.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.0a1) (2025-02-27)
+## [1.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.1a1) (2025-06-08)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.3.2...0.4.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.0a1...1.0.1a1)
 
 **Merged pull requests:**
 
-- feat:add dialog normalizer to extras [\#119](https://github.com/OpenVoiceOS/ovos-audio/pull/119) ([JarbasAl](https://github.com/JarbasAl))
+- fix: opm 1.X.X compat [\#126](https://github.com/OpenVoiceOS/ovos-audio/pull/126) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.0a1) (2025-03-06)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.1a1...1.0.0a1)
+
+**Breaking changes:**
+
+- refactor!:drop "native source" and use session\_id instead [\#121](https://github.com/OpenVoiceOS/ovos-audio/pull/121) ([JarbasAl](https://github.com/JarbasAl))
+
+## [0.4.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.1a1) (2025-03-06)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.0...0.4.1a1)
+
+**Merged pull requests:**
+
+- fix:automations [\#122](https://github.com/OpenVoiceOS/ovos-audio/pull/122) ([JarbasAl](https://github.com/JarbasAl))
 
 
 
