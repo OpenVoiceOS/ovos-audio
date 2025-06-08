@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.1a1) (2025-06-08)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.0a1...1.0.1a1)
+
+**Merged pull requests:**
+
+- fix: opm 1.X.X compat [\#126](https://github.com/OpenVoiceOS/ovos-audio/pull/126) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.0a1) (2025-03-06)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.1a1...1.0.0a1)
