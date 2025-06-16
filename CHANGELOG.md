@@ -1,28 +1,16 @@
 # Changelog
 
-## [1.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.1a1) (2025-06-08)
+## [1.0.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a1) (2025-06-16)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.0a1...1.0.1a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.1...1.0.2a1)
 
-**Merged pull requests:**
+**Closed issues:**
 
-- fix: opm 1.X.X compat [\#126](https://github.com/OpenVoiceOS/ovos-audio/pull/126) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.0a1) (2025-03-06)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.1a1...1.0.0a1)
-
-**Breaking changes:**
-
-- refactor!:drop "native source" and use session\_id instead [\#121](https://github.com/OpenVoiceOS/ovos-audio/pull/121) ([JarbasAl](https://github.com/JarbasAl))
-
-## [0.4.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.1a1) (2025-03-06)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.0...0.4.1a1)
+-  IndexError: list index out of range [\#82](https://github.com/OpenVoiceOS/ovos-audio/issues/82)
 
 **Merged pull requests:**
 
-- fix:automations [\#122](https://github.com/OpenVoiceOS/ovos-audio/pull/122) ([JarbasAl](https://github.com/JarbasAl))
+- Update ovos-config requirement from \<2.0.0,\>=0.0.12 to \>=0.0.12,\<3.0.0 in /requirements [\#128](https://github.com/OpenVoiceOS/ovos-audio/pull/128) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 
 
