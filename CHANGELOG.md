@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.0a1) (2025-10-07)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.2a2...1.1.0a1)
+
+**Merged pull requests:**
+
+- feat: per utterance playback start event [\#132](https://github.com/OpenVoiceOS/ovos-audio/pull/132) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.0.2a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a2) (2025-07-07)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.2a1...1.0.2a2)
