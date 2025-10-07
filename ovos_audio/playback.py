@@ -130,7 +130,8 @@ class PlaybackThread(Thread):
 
             # emit info for GUI to render text feedback real time if wanted
             # send full message.data and message.context
-            self.bus.emit(message.forward("recognizer_loop:utterance_start", message.data))
+            if self.bus:
+                self.bus.emit(message.forward("recognizer_loop:utterance_start", message.data))
 
             self.p = play_audio(data)
 
