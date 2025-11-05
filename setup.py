@@ -59,7 +59,7 @@ with open(os.path.join(BASEDIR, "README.md"), "r") as f:
     long_description = f.read()
 
 setup(
-    name="ovos-audio",
+    name="ovos_audio",
     version=get_version(),
     license="Apache-2.0",
     url="https://github.com/OpenVoiceOS/ovos-audio",

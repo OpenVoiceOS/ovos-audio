@@ -128,12 +128,17 @@ class PlaybackThread(Thread):
 
             data, message.context = self.tts_transform.transform(data, message.context)
 
+            # emit info for GUI to render text feedback real time if wanted
+            # send full message.data and message.context
+            if self.bus:
+                self.bus.emit(message.forward("recognizer_loop:utterance_start", message.data))
+
             self.p = play_audio(data)
 
             if not visemes and self.g2p is not None:
                 try:
                     visemes = self.g2p.utterance2visemes(message.data["utterance"],
-                                                        get_message_lang(message))
+                                                         get_message_lang(message))
                 except OutOfVocabulary:
                     pass
                 except:
