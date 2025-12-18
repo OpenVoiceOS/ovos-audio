@@ -1,40 +1,12 @@
 # Changelog
 
-## [1.1.0a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.0a2) (2025-11-05)
+## [1.1.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.1a1) (2025-12-18)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.0a1...1.1.0a2)
-
-**Merged pull requests:**
-
-- Update requirements.txt [\#134](https://github.com/OpenVoiceOS/ovos-audio/pull/134) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.1.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.0a1) (2025-10-07)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.2a2...1.1.0a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.0...1.1.1a1)
 
 **Merged pull requests:**
 
-- feat: per utterance playback start event [\#132](https://github.com/OpenVoiceOS/ovos-audio/pull/132) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.0.2a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a2) (2025-07-07)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.2a1...1.0.2a2)
-
-**Merged pull requests:**
-
-- Update extras.txt [\#130](https://github.com/OpenVoiceOS/ovos-audio/pull/130) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.0.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a1) (2025-06-16)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.1...1.0.2a1)
-
-**Closed issues:**
-
--  IndexError: list index out of range [\#82](https://github.com/OpenVoiceOS/ovos-audio/issues/82)
-
-**Merged pull requests:**
-
-- Update ovos-config requirement from \<2.0.0,\>=0.0.12 to \>=0.0.12,\<3.0.0 in /requirements [\#128](https://github.com/OpenVoiceOS/ovos-audio/pull/128) ([dependabot[bot]](https://github.com/apps/dependabot))
+- chore: Configure Renovate [\#136](https://github.com/OpenVoiceOS/ovos-audio/pull/136) ([renovate[bot]](https://github.com/apps/renovate))
 
 
 
