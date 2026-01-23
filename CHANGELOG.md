@@ -1,20 +1,13 @@
 # Changelog
 
-## [1.1.1a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.1a2) (2025-12-19)
+## [1.1.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.2a1) (2026-01-23)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.1a1...1.1.1a2)
-
-**Merged pull requests:**
-
-- chore\(deps\): update dependency python to 3.14 [\#137](https://github.com/OpenVoiceOS/ovos-audio/pull/137) ([renovate[bot]](https://github.com/apps/renovate))
-
-## [1.1.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.1a1) (2025-12-18)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.0...1.1.1a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.1...1.1.2a1)
 
 **Merged pull requests:**
 
-- chore: Configure Renovate [\#136](https://github.com/OpenVoiceOS/ovos-audio/pull/136) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update actions/setup-python action to v6 [\#142](https://github.com/OpenVoiceOS/ovos-audio/pull/142) ([renovate[bot]](https://github.com/apps/renovate))
+- chore\(deps\): update actions/checkout action to v6 [\#141](https://github.com/OpenVoiceOS/ovos-audio/pull/141) ([renovate[bot]](https://github.com/apps/renovate))
 
 
 
