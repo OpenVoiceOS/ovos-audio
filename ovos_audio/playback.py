@@ -131,8 +131,11 @@ class PlaybackThread(Thread):
             # emit info for GUI to render text feedback real time if wanted
             # send full message.data and message.context
             if self.bus:
-                duration = get_sound_duration(data.replace('file://', ''))
-                message.data["duration"] = duration
+                try:
+                    duration = get_sound_duration(data.replace('file://', ''))
+                    message.data["duration"] = duration
+                except Exception:
+                    pass
                 self.bus.emit(message.forward("recognizer_loop:utterance_start", message.data))
 
             self.p = play_audio(data)
