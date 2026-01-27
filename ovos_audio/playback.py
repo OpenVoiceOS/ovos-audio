@@ -135,7 +135,7 @@ class PlaybackThread(Thread):
                     duration = get_sound_duration(data.replace('file://', ''))
                     message.data["duration"] = duration
                 except Exception:
-                    pass
+                    LOG.warning("Error while getting utterance audio duration")
                 self.bus.emit(message.forward("recognizer_loop:utterance_start", message.data))
 
             self.p = play_audio(data)
