@@ -11,7 +11,7 @@ from ovos_plugin_manager.g2p import OVOSG2PFactory
 from ovos_plugin_manager.templates.g2p import OutOfVocabulary, Grapheme2PhonemePlugin
 from ovos_plugin_manager.templates.tts import TTS
 from ovos_utils.log import LOG
-from ovos_utils.sound import play_audio
+from ovos_utils.sound import play_audio, get_sound_duration
 from time import time
 
 
@@ -131,6 +131,8 @@ class PlaybackThread(Thread):
             # emit info for GUI to render text feedback real time if wanted
             # send full message.data and message.context
             if self.bus:
+                duration = get_sound_duration(data.replace('file://', ''))
+                message.data["duration"] = duration
                 self.bus.emit(message.forward("recognizer_loop:utterance_start", message.data))
 
             self.p = play_audio(data)
