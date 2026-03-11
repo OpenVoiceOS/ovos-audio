@@ -83,21 +83,23 @@ def _full_mock_init_context():
     """Returns a context manager stack that mocks everything PlaybackService.__init__ touches."""
     from contextlib import ExitStack
     stack = ExitStack()
-    stack.enter_context(patch("ovos_audio.service.Configuration", return_value={}))
-    stack.enter_context(patch("ovos_audio.service.MessageBusClient",
-                              return_value=MagicMock()))
-    stack.enter_context(patch("ovos_audio.service.ProcessStatus",
-                              return_value=MagicMock()))
-    stack.enter_context(patch("ovos_audio.service.StatusCallbackMap",
-                              return_value=MagicMock()))
-    stack.enter_context(patch("ovos_audio.service.DialogTransformersService",
-                              return_value=MagicMock()))
-    stack.enter_context(patch("ovos_audio.service.PlaybackThread",
-                              return_value=MagicMock()))
-    stack.enter_context(patch("ovos_audio.service.ServiceInstaller",
-                              return_value=MagicMock()))
-    stack.enter_context(patch("ovos_audio.service.AudioService",
-                              return_value=MagicMock()))
+    try:
+        stack.enter_context(patch("ovos_audio.service.Configuration", return_value={}))
+        stack.enter_context(patch("ovos_audio.service.MessageBusClient",
+                                  return_value=MagicMock()))
+        stack.enter_context(patch("ovos_audio.service.ProcessStatus",
+                                  return_value=MagicMock()))
+        stack.enter_context(patch("ovos_audio.service.StatusCallbackMap",
+                                  return_value=MagicMock()))
+        stack.enter_context(patch("ovos_audio.service.DialogTransformersService",
+                                  return_value=MagicMock()))
+        stack.enter_context(patch("ovos_audio.service.PlaybackThread",
+                                  return_value=MagicMock()))
+        stack.enter_context(patch("ovos_audio.service.AudioService",
+                                  return_value=MagicMock()))
+    except Exception:
+        stack.close()
+        raise
     return stack
 
 
