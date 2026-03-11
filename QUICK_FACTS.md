@@ -6,7 +6,7 @@ ovos-core audio daemon client
 | Feature | Details |
 |---------|---------|
 | Package Name | `ovos-audio` |
-| Version | `1.1.1a2` |
+| Version | `1.1.2a1` |
 | License | Apache-2.0 |
 | Repository | [https://github.com/OpenVoiceOS/ovos-audio](https://github.com/OpenVoiceOS/ovos-audio) |
 | Python Support | >=3.9 |

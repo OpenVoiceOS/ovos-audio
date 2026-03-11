@@ -392,7 +392,7 @@ class PlaybackService(Thread):
             return
 
         if not self._fallback_tts_hash or \
-                self._fallback_tts_hash != ftts_m:
+                self._fallback_tts_hash != _ftts_hash:
             with self.lock:
                 if self.fallback_tts:
                     self.fallback_tts.shutdown()

@@ -8,7 +8,7 @@ Coverage targets (playback.py):
 """
 import queue
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch, call, ANY
 
 from ovos_bus_client.message import Message
 
@@ -140,9 +140,10 @@ class TestPlayMethod(unittest.TestCase):
 
     def test_play_calls_on_end_when_queue_empty(self):
         t, mock_proc = self._setup_thread_for_play(listen=True)
+        expected_msg = t._now_playing[4]  # capture before _play() clears _now_playing
         with patch("ovos_audio.playback.play_audio", return_value=mock_proc):
             t._play()
-        t.on_end.assert_called_once_with(True, t._now_playing[4] if t._now_playing else unittest.mock.ANY)
+        t.on_end.assert_called_once_with(True, expected_msg)
 
     def test_play_clears_now_playing(self):
         t, mock_proc = self._setup_thread_for_play()
@@ -233,5 +234,3 @@ class TestRunExceptionPaths(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-import unittest.mock  # ensure import for the mock reference in test_play_calls_on_end

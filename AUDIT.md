@@ -22,7 +22,7 @@
 ## Technical Debt & Issues
 - **Transitional Architecture**: Currently in a transitional state between the legacy OCP (OpenVoiceOS Common Play) system and the upcoming `ovos-media` stack.
 - **Legacy Support**: Maintains significant code for legacy audio service support, which is deprecated but still default in some configurations.
-- **Dependency Pining**: Dependencies in `pyproject.toml` use loose upper bounds (e.g., `<3.0.0`), which might lead to breaking changes if sub-dependencies don't follow semver strictly.
+- **Dependency Pinning**: Dependencies in `pyproject.toml` use loose upper bounds (e.g., `<3.0.0`), which might lead to breaking changes if sub-dependencies don't follow semver strictly.
 - **Dynamic Versioning**: Uses `ovos_audio.version` for dynamic versioning, which is standard but requires manual updates to `version.py`.
 
 ## Next Steps

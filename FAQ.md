@@ -34,7 +34,7 @@ pip install ovos-audio
 ```
 Or for development:
 ```bash
-uv pip install -e ovos-audio/
+uv pip install -e .
 ```
 
 ## Where do I report bugs?
@@ -42,7 +42,7 @@ Open an issue on the GitHub repository. Ensure you are targeting the `dev` branc
 
 ## How do I run tests?
 ```bash
-uv run pytest ovos-audio/test/ --cov=ovos_audio
+uv run pytest test/ --cov=ovos_audio
 ```
 
 ## How do I contribute?
