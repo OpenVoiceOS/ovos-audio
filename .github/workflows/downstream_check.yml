@@ -1,0 +1,14 @@
+name: Downstream Check
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  downstream_check:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/downstream-check.yml@dev
+    with:
+      package_name: 'ovos-audio'
+      pr_comment: true

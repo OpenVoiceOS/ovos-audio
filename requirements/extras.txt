@@ -4,6 +4,7 @@ ovos-dialog-normalizer-plugin>=0.0.1, <1.0.0
 # TTS Plugins
 ovos-tts-plugin-server>=0.0.2, <1.0.0
 ovos-tts-plugin-piper>=0.2.4, <1.0.0
+phoonnx>=0.5.4, <1.0.0
 
 # Media Playback plugins
 ovos_audio_plugin_simple>=0.1.0, <1.0.0

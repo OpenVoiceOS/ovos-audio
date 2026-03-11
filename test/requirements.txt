@@ -1,3 +1,4 @@
+ovoscope>0.10.0
 coveralls>=1.8.2
 flake8>=3.7.9
 pytest>=5.2.4
