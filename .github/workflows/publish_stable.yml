@@ -7,7 +7,7 @@ on:
 jobs:
   publish_stable:
     if: github.actor != 'github-actions[bot]'
-    uses: TigreGotico/gh-automations/.github/workflows/publish-stable.yml@master
+    uses: OpenVoiceOS/gh-automations/.github/workflows/publish-stable.yml@dev
     secrets: inherit
     with:
       branch: 'master'

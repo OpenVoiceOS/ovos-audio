@@ -9,7 +9,7 @@ on:
 jobs:
   publish_alpha:
     if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
-    uses: TigreGotico/gh-automations/.github/workflows/publish-alpha.yml@master
+    uses: OpenVoiceOS/gh-automations/.github/workflows/publish-alpha.yml@dev
     secrets: inherit
     with:
       branch: 'dev'
@@ -20,4 +20,3 @@ jobs:
       changelog_max_issues: 100
       publish_pypi: true
       notify_matrix: true
-

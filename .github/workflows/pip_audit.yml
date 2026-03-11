@@ -1,0 +1,14 @@
+name: Pip Audit
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  pip_audit:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/pip-audit.yml@dev
+    with:
+      system_deps: 'swig'
+      pr_comment: true

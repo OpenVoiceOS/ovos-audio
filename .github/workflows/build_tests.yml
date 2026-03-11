@@ -12,3 +12,4 @@ jobs:
     secrets: inherit
     with:
       test_path: 'test/unittests'
+      system_deps: 'swig sox mpg123'
