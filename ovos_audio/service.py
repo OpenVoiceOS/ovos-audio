@@ -29,7 +29,6 @@ from ovos_audio.playback import PlaybackThread
 from ovos_audio.transformers import DialogTransformersService
 from ovos_audio.tts import TTSFactory
 from ovos_audio.utils import report_timing, require_default_session
-from ovos_utils.skill_installer import ServiceInstaller
 
 
 def on_ready():
@@ -100,8 +99,6 @@ class PlaybackService(Thread):
         except Exception as e:
             LOG.exception(e)
             self.status.set_error(e)
-
-        self.pip_installer = ServiceInstaller(self.bus, service_name="ovos_audio")
 
         self.audio = None
         self.audio_enabled = self.config.get("enable_old_audioservice", True)  # TODO default to False soon
@@ -588,7 +585,6 @@ class PlaybackService(Thread):
         Stop any playing audio and make sure threads are joined correctly.
         """
         self.status.set_stopping()
-        self.pip_installer.shutdown()
         if self.playback_thread:
             self.playback_thread.shutdown()
             self.playback_thread.join()
