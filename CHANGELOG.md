@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.0a1) (2026-03-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.2a1...1.2.0a1)
+
+**Merged pull requests:**
+
+- feat: migrate to pyproject.toml and extend test coverage to 98% [\#147](https://github.com/OpenVoiceOS/ovos-audio/pull/147) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.1.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.2a1) (2026-01-23)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.1...1.1.2a1)
