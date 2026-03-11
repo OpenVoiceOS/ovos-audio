@@ -22,6 +22,13 @@ Homepage = "https://github.com/OpenVoiceOS/ovos-audio"
 Repository = "https://github.com/OpenVoiceOS/ovos-audio"
 
 [project.optional-dependencies]
+test = [
+    "ovoscope>0.10.0",
+    "pytest>=5.2.4",
+    "pytest-cov>=2.8.1",
+    "cov-core>=1.15.0",
+    "ovos_audio_plugin_simple>=0.1.0, <1.0.0",
+]
 extras = [
     "ovos-dialog-normalizer-plugin>=0.0.1, <1.0.0",
     "ovos-tts-plugin-server>=0.0.2, <1.0.0",
