@@ -19,10 +19,13 @@ from time import sleep
 
 from os.path import exists
 
-from ovos_utils.signal import create_signal, check_for_signal
-from ovos_utils.file_utils import get_temp_path
-from ovos_audio.utils import wait_while_speaking, is_speaking, stop_speaking
-"""Tests for public audio service utils."""
+try:
+    from ovos_utils.signal import create_signal, check_for_signal
+    from ovos_utils.file_utils import get_temp_path
+    from ovos_audio.utils import wait_while_speaking, is_speaking, stop_speaking
+    _SIGNAL_API_AVAILABLE = True
+except (ImportError, AttributeError):
+    _SIGNAL_API_AVAILABLE = False
 
 
 done_waiting = False
@@ -34,6 +37,7 @@ def wait_while_speaking_thread():
     done_waiting = True
 
 
+@unittest.skipUnless(_SIGNAL_API_AVAILABLE, "ovos_utils.signal removed in ovos-utils>=0.8.5")
 class TestInterface(unittest.TestCase):
     def setUp(self):
         if exists(get_temp_path('mycroft')):
