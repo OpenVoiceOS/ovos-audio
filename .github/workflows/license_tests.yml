@@ -10,6 +10,6 @@ on:
 
 jobs:
   license_tests:
-    uses: TigreGotico/gh-automations/.github/workflows/license-check.yml@master
+    uses: OpenVoiceOS/gh-automations/.github/workflows/license-check.yml@dev
     with:
       system_deps: 'swig'
