@@ -22,6 +22,16 @@ from ovos_audio.service import AudioService
 
 from ovos_bus_client.session import SessionManager, Session
 
+
+def _simple_plugin_available() -> bool:
+    try:
+        from ovos_plugin_manager.audio import find_audio_service_plugins
+        return "ovos_simple" in find_audio_service_plugins()
+    except Exception:
+        return False
+
+
+@unittest.skipUnless(_simple_plugin_available(), "ovos_simple audio plugin not installed")
 class TestLegacy(unittest.TestCase):
     def setUp(self):
         self.core = AudioService(FakeBus(), disable_ocp=True,
