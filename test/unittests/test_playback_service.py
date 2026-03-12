@@ -11,6 +11,7 @@ import os
 import tempfile
 import unittest
 import warnings
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 
@@ -132,6 +133,70 @@ class TestResolveSoundUri(unittest.TestCase):
             self.assertEqual(result, path)
         finally:
             os.unlink(path)
+
+    def test_packaged_sound_is_resolved_when_local_copy_is_missing(self):
+        from ovos_audio.service import PlaybackService
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = base / "ovos_dinkum_listener" / "res" / "snd" / "_dinkum_only.wav"
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b"FAKE")
+
+            with patch("ovos_audio.service.files",
+                       side_effect=lambda package: base / package), \
+                 patch("ovos_audio.service.resolve_resource_file") as resolve:
+                result = PlaybackService._resolve_sound_uri("snd/_dinkum_only.wav")
+
+        self.assertEqual(result, str(target))
+        resolve.assert_not_called()
+
+    def test_end_listening_alias_reuses_start_listening(self):
+        from ovos_audio.service import PlaybackService
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = base / "ovos_dinkum_listener" / "res" / "snd" / "start_listening.wav"
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b"FAKE")
+
+            with patch("ovos_audio.service.files",
+                       side_effect=lambda package: base / package), \
+                 patch("ovos_audio.service.resolve_resource_file") as resolve:
+                result = PlaybackService._resolve_sound_uri("snd/end_listening.wav")
+
+        self.assertEqual(result, str(target))
+        resolve.assert_not_called()
+
+    def test_cancel_alias_reuses_error_sound(self):
+        from ovos_audio.service import PlaybackService
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = base / "ovos_dinkum_listener" / "res" / "snd" / "error.mp3"
+            target.parent.mkdir(parents=True)
+            target.write_bytes(b"FAKE")
+
+            with patch("ovos_audio.service.files",
+                       side_effect=lambda package: base / package), \
+                 patch("ovos_audio.service.resolve_resource_file") as resolve:
+                result = PlaybackService._resolve_sound_uri("snd/cancel.mp3")
+
+        self.assertEqual(result, str(target))
+        resolve.assert_not_called()
+
+    def test_packaged_sound_miss_falls_through_to_resource_lookup(self):
+        from ovos_audio.service import PlaybackService
+        with tempfile.TemporaryDirectory() as td, \
+                tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            path = f.name
+            base = Path(td)
+
+            with patch("ovos_audio.service.files",
+                       side_effect=lambda package: base / package), \
+                 patch("ovos_audio.service.resolve_resource_file",
+                       return_value=path):
+                result = PlaybackService._resolve_sound_uri("snd/nonexistent.wav")
+
+        self.assertEqual(result, path)
+        os.unlink(path)
 
 
 class TestPathFromHexdata(unittest.TestCase):

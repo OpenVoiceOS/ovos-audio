@@ -3,6 +3,7 @@ import json
 import os
 import warnings
 import os.path
+from importlib.resources import files
 from hashlib import md5
 from os.path import exists
 from queue import Queue
@@ -29,6 +30,12 @@ from ovos_audio.playback import PlaybackThread
 from ovos_audio.transformers import DialogTransformersService
 from ovos_audio.tts import TTSFactory
 from ovos_audio.utils import report_timing, require_default_session
+
+_DEFAULT_SOUND_PACKAGES = ("ovos_audio", "ovos_dinkum_listener")
+_DEFAULT_SOUND_ALIASES = {
+    "snd/end_listening.wav": "snd/start_listening.wav",
+    "snd/cancel.mp3": "snd/error.mp3",
+}
 
 
 def on_ready():
@@ -476,14 +483,39 @@ class PlaybackService(Thread):
             self.bus.emit(message.forward("mycroft.stop.handled", {"by": "TTS"}))
 
     @staticmethod
+    def _resolve_packaged_sound_uri(uri: str) -> Optional[str]:
+        """Resolve bundled OVOS sounds from installed package resources."""
+        normalized_uri = uri.replace("\\", "/")
+        candidates = [normalized_uri]
+        alias = _DEFAULT_SOUND_ALIASES.get(normalized_uri)
+        if alias and alias not in candidates:
+            candidates.append(alias)
+
+        for candidate in candidates:
+            resource_parts = ("res", *candidate.split("/"))
+            for package in _DEFAULT_SOUND_PACKAGES:
+                try:
+                    resource = files(package).joinpath(*resource_parts)
+                except Exception:
+                    continue
+                if resource.is_file():
+                    return str(resource)
+        return None
+
+    @staticmethod
     def _resolve_sound_uri(uri: str) -> Optional[str]:
         """ helper to resolve sound files full path"""
         if uri is None:
             return None
         if uri.startswith("snd/") or uri.startswith("snd\\"):
-            local_uri = os.path.join(os.path.dirname(__file__), "res", uri)
+            normalized_uri = uri.replace("\\", "/")
+            local_uri = os.path.join(os.path.dirname(__file__), "res",
+                                     normalized_uri)
             if os.path.isfile(local_uri):
                 return local_uri
+            packaged_uri = PlaybackService._resolve_packaged_sound_uri(uri)
+            if packaged_uri:
+                return packaged_uri
         audio_file = resolve_resource_file(uri)
         if audio_file is None or not exists(audio_file):
             raise FileNotFoundError(f"{audio_file} does not exist")
