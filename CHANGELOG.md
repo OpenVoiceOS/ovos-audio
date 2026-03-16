@@ -1,21 +1,12 @@
 # Changelog
 
-## [1.2.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.0a1) (2026-03-11)
+## [1.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.1a1) (2026-03-16)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.2a1...1.2.0a1)
-
-**Merged pull requests:**
-
-- feat: migrate to pyproject.toml and extend test coverage to 98% [\#147](https://github.com/OpenVoiceOS/ovos-audio/pull/147) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.1.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.2a1) (2026-01-23)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.1...1.1.2a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.0...1.2.1a1)
 
 **Merged pull requests:**
 
-- chore\(deps\): update actions/setup-python action to v6 [\#142](https://github.com/OpenVoiceOS/ovos-audio/pull/142) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update actions/checkout action to v6 [\#141](https://github.com/OpenVoiceOS/ovos-audio/pull/141) ([renovate[bot]](https://github.com/apps/renovate))
+- Update phoonnx requirement from \<1.0.0,\>=0.5.4 to \>=0.5.4,\<2.0.0 in /requirements [\#151](https://github.com/OpenVoiceOS/ovos-audio/pull/151) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 
 
