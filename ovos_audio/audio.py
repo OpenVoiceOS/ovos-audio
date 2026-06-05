@@ -168,6 +168,9 @@ class AudioService:
         self.bus.on('mycroft.audio.service.pause', self._pause)
         self.bus.on('mycroft.audio.service.resume', self._resume)
         self.bus.on('mycroft.audio.service.stop', self._stop)
+        # OVOS-STOP-1 §5.3: media playback is user-visible activity — cease on
+        # the universal stop broadcast (alongside the legacy stop topic).
+        self.bus.on('ovos.stop', self._stop)
         self.bus.on('mycroft.audio.service.next', self._next)
         self.bus.on('mycroft.audio.service.prev', self._prev)
         self.bus.on('mycroft.audio.service.track_info', self._track_info)
