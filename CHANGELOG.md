@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.2a1) (2026-06-06)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.1a1...1.2.2a1)
+
+**Merged pull requests:**
+
+- fix\(deps\): allow ovos-bus-client 2.x \(widen cap to \<3.0.0\) [\#159](https://github.com/OpenVoiceOS/ovos-audio/pull/159) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.1a1) (2026-03-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.0...1.2.1a1)
