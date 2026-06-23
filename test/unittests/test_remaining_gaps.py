@@ -235,36 +235,6 @@ class TestHandleInstantPlayNoUri(unittest.TestCase):
 
 
 # ===========================================================================
-# audio.py:107-109 — OCP player.validate_source exception
-# ===========================================================================
-
-class TestFindOcpValidateSourceException(unittest.TestCase):
-
-    def test_old_ocp_version_warning_logged(self):
-        from ovos_audio.audio import AudioService
-        bus = FakeBus()
-        with patch("ovos_audio.audio.Configuration", return_value={"Audio": {}}):
-            svc = AudioService(bus, autoload=False, disable_ocp=False, validate_source=True)
-
-        mock_backend_cls = MagicMock()
-        mock_ocp = MagicMock()
-        # Setting player.validate_source raises AttributeError (old OCP version)
-        type(mock_ocp.player).validate_source = property(
-            fget=lambda self: None,
-            fset=MagicMock(side_effect=AttributeError("old OCP"))
-        )
-        mock_backend_cls.return_value = mock_ocp
-        mock_ocp_module = MagicMock()
-        mock_ocp_module.OCPAudioBackend = mock_backend_cls
-
-        with patch("ovos_audio.audio.Configuration",
-                   return_value={"Audio": {"backends": {"OCP": {}}}}), \
-             patch.dict("sys.modules", {"ovos_plugin_common_play": mock_ocp_module}):
-            # Should not raise — exception is caught
-            svc.find_ocp()
-
-
-# ===========================================================================
 # audio.py:146 — remote += s (RemoteAudioBackend)
 # ===========================================================================
 
@@ -274,7 +244,7 @@ class TestLoadServicesRemoteBackend(unittest.TestCase):
         from ovos_audio.audio import AudioService, RemoteAudioBackend
         bus = FakeBus()
         with patch("ovos_audio.audio.Configuration", return_value={"Audio": {}}):
-            svc = AudioService(bus, autoload=False, disable_ocp=True, validate_source=False)
+            svc = AudioService(bus, autoload=False, validate_source=False)
 
         # Create a proper RemoteAudioBackend mock instance
         remote_instance = MagicMock(spec=RemoteAudioBackend)
@@ -285,7 +255,6 @@ class TestLoadServicesRemoteBackend(unittest.TestCase):
                    return_value={"my_remote": MagicMock()}), \
              patch("ovos_audio.audio.setup_audio_service",
                    return_value=[remote_instance]), \
-             patch.object(svc, "find_ocp"), \
              patch.object(svc, "find_default"):
             svc.load_services()
         # remote backend should be in service list
@@ -302,14 +271,13 @@ class TestSetTrackStartCallback(unittest.TestCase):
         from ovos_audio.audio import AudioService
         bus = FakeBus()
         with patch("ovos_audio.audio.Configuration", return_value={"Audio": {}}):
-            svc = AudioService(bus, autoload=False, disable_ocp=True, validate_source=False)
+            svc = AudioService(bus, autoload=False, validate_source=False)
 
         b1 = MagicMock()
 
         with patch("ovos_audio.audio.find_audio_service_plugins",
                    return_value={"p1": MagicMock()}), \
              patch("ovos_audio.audio.setup_audio_service", return_value=[b1]), \
-             patch.object(svc, "find_ocp"), \
              patch.object(svc, "find_default"):
             svc.load_services()
         b1.set_track_start_callback.assert_called_with(svc.track_start)

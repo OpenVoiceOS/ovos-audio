@@ -34,8 +34,7 @@ def _simple_plugin_available() -> bool:
 @unittest.skipUnless(_simple_plugin_available(), "ovos_simple audio plugin not installed")
 class TestLegacy(unittest.TestCase):
     def setUp(self):
-        self.core = AudioService(FakeBus(), disable_ocp=True,
-                                 autoload=False,
+        self.core = AudioService(FakeBus(), autoload=False,
                                  validate_source=True)
         self.core.config['default-backend'] = "simple"
         self.core.config['backends'] = {"simple": {

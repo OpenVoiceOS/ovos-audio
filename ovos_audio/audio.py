@@ -66,47 +66,29 @@ class AudioService:
         to be played.
     """
 
-    def __init__(self, bus, autoload=True, disable_ocp=False, validate_source=True):
+    def __init__(self, bus, autoload=True, validate_source=True, disable_ocp=None):
         """
             Args:
                 bus: Mycroft messagebus
+                disable_ocp: deprecated no-op. The classic OCP audio backend has
+                    been removed; media playback now lives in the OCP MediaProvider
+                    plugins / ovos-media (OVOS-OCP-1). Accepted for backward
+                    compatibility and ignored.
         """
         self.bus = bus
         self.config = Configuration().get("Audio") or {}
         self.service_lock = Lock()
 
         self.default = None
-        self.ocp = None
         self.service = []
         self.current = None
         self.play_start_time = 0
         self.volume_is_low = False
         self.volume_is_speaking = False
-        self.disable_ocp = disable_ocp
         self.validate_source = validate_source
         self._loaded = MonotonicEvent()
         if autoload:
             self.load_services()
-
-    def find_ocp(self):
-        if self.disable_ocp:
-            LOG.info("classic OCP is disabled in config, OCP bus api not available!")
-            # NOTE: ovos-core should detect this and use the classic audio service api automatically
-            return
-
-        try:
-            from ovos_plugin_common_play import OCPAudioBackend
-        except ImportError:
-            LOG.debug("classic OCP not installed")
-            return False
-        # config from legacy location in default mycroft.conf
-        ocp_config = Configuration().get("Audio", {}).get("backends", {}).get("OCP", {})
-        self.ocp = OCPAudioBackend(ocp_config, bus=self.bus)
-        try:
-            self.ocp.player.validate_source = self.validate_source
-        except Exception as e:
-            # handle older OCP plugin versions
-            LOG.warning("old OCP version detected! please update 'ovos_plugin_common_play'")
 
     def find_default(self):
         if not self.service:
@@ -153,11 +135,6 @@ class AudioService:
         # Register end of track callback
         for s in self.service:
             s.set_track_start_callback(self.track_start)
-
-        # load OCP
-        # NOTE: this will be replace by ovos-media in a future release
-        # and can be disabled in config
-        self.find_ocp()
 
         # load audio playback plugins (vlc, mpv, spotify ...)
         self.find_default()
