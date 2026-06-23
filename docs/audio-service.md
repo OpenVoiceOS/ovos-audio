@@ -86,6 +86,7 @@ Track format:
 | `mycroft.audio.service.pause` | Pause current backend |
 | `mycroft.audio.service.resume` | Resume paused backend |
 | `mycroft.audio.service.stop` | Stop playback |
+| `ovos.stop` | Stop playback on the universal stop broadcast (OVOS-STOP-1 §5.3) |
 | `mycroft.audio.service.next` | Skip to next track |
 | `mycroft.audio.service.prev` | Skip to previous track |
 | `mycroft.audio.service.track_info` | Reply with current track metadata |
