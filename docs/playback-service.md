@@ -133,9 +133,11 @@ A decorator defined in `ovos_audio.utils` that guards bus handlers: if `validate
 
 | Event | Handler | Description |
 |---|---|---|
-| `speak` | `handle_speak` | Synthesize and play TTS |
+| `speak` | `handle_speak` | Synthesize and play TTS (legacy topic) |
+| `ovos.utterance.speak` | `handle_speak` | Spec-named NL response topic (OVOS-PIPELINE-1 §9.6) |
 | `speak:b64_audio` | `handle_b64_audio` | Synthesize and return as base64 |
-| `mycroft.stop` | `handle_stop` | Stop current TTS playback |
+| `mycroft.stop` | `handle_stop` | Stop current TTS playback (legacy topic) |
+| `ovos.stop` | `handle_stop` | Universal stop broadcast (OVOS-STOP-1 §5.3) |
 | `mycroft.audio.speech.stop` | `handle_stop` | Stop current TTS playback |
 | `mycroft.audio.speak.status` | `handle_speak_status` | Reply with `{"speaking": bool}` |
 | `mycroft.audio.queue` | `handle_queue_audio` | Queue sound file in TTS thread |
@@ -151,3 +153,18 @@ A decorator defined in `ovos_audio.utils` that guards bus handlers: if `validate
 |---|---|
 | `mycroft.stop.handled` | After TTS queue is cleared on stop |
 | `mycroft.audio.is_speaking` | In reply to `mycroft.audio.speak.status` |
+
+## Spec conformance
+
+The service subscribes to **both** the spec-named topics and their legacy equivalents so
+the two co-exist during the transition:
+
+| Spec | Section | Spec topic | Legacy topic | Handler |
+|---|---|---|---|---|
+| OVOS-PIPELINE-1 | §9.6 | `ovos.utterance.speak` | `speak` | `handle_speak` |
+| OVOS-STOP-1 | §5.3 | `ovos.stop` | `mycroft.stop` | `handle_stop` |
+
+`ovos.utterance.speak` is the spec name for the natural-language response topic. `ovos.stop`
+is the universal stop broadcast: per OVOS-STOP-1 §5.3 a non-skill component with
+user-visible activity MUST cease on it. The legacy `AudioService` (media backends) mirrors
+the same `ovos.stop` subscription — see [audio-service.md](audio-service.md).

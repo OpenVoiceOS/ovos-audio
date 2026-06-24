@@ -597,11 +597,17 @@ class PlaybackService(Thread):
         """
         Configuration.set_config_update_handlers(self.bus)
         self.bus.on('mycroft.stop', self.handle_stop)
+        # OVOS-STOP-1 §5.3: a non-skill component with user-visible activity MUST
+        # cease on the universal stop broadcast (alongside the legacy mycroft.stop).
+        self.bus.on('ovos.stop', self.handle_stop)
         self.bus.on('mycroft.audio.speech.stop', self.handle_stop)
         self.bus.on('mycroft.audio.speak.status', self.handle_speak_status)
         self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
         self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
         self.bus.on('speak', self.handle_speak)
+        # OVOS-PIPELINE-1 §9.6: also consume the spec-named natural-language
+        # response topic (alongside the legacy 'speak' during the transition).
+        self.bus.on('ovos.utterance.speak', self.handle_speak)
         self.bus.on('speak:b64_audio', self.handle_b64_audio)
         self.bus.on('ovos.languages.tts', self.handle_get_languages_tts)
         self.bus.on("opm.tts.query", self.handle_opm_tts_query)
