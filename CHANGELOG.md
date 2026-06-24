@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.3.0a1) (2026-06-24)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.3a1...1.3.0a1)
+
+**Merged pull requests:**
+
+- feat: consume both bus namespaces for speak and stop \(PIPELINE-1 §9.6, STOP-1 §5.3\) [\#158](https://github.com/OpenVoiceOS/ovos-audio/pull/158) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.2.3a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.3a1) (2026-06-20)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.2a1...1.2.3a1)
