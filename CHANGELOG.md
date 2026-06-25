@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.1a1) (2026-06-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.0a1...2.0.1a1)
+
+**Merged pull requests:**
+
+- fix: media-plugin backends replace deprecated audio-plugin-\*; single-source pyproject [\#167](https://github.com/OpenVoiceOS/ovos-audio/pull/167) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.0a1) (2026-06-25)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.3.0a1...2.0.0a1)
