@@ -31,8 +31,8 @@ test = [
     "ovos-media-plugin-simple>=0.1.0a1, <1.0.0",
 ]
 extras = [
-    "ovos-dialog-normalizer-plugin>=0.0.1, <1.0.0",
-    "ovos-tts-plugin-server>=0.0.2, <1.0.0",
+    "ovos-dialog-normalizer-plugin>=0.0.3a1, <1.0.0",
+    "ovos-tts-plugin-server>=0.0.6a1, <1.0.0",
     "phoonnx>=0.5.4, <1.0.0",
     # media plugins supersede the deprecated ovos-audio-plugin-* backends and
     # expose compatible endpoints: simple + mpv replace the old simple/mpv local
