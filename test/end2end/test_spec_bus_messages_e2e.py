@@ -1,8 +1,9 @@
-"""Dual bus-message tests for ovos-audio.
+"""Spec bus-message tests for ovos-audio.
 
-ovos-audio is a *subscriber*: it listens on BOTH the legacy and the OVOS spec
-namespaces, so a deployment emitting in either namespace drives audio. Verified:
-- ``speak`` and ``ovos.utterance.speak``           → TTS    (PIPELINE-1 §9.6)
+ovos-audio subscribes on the OVOS spec namespace; the bus client's ``modernize``
+flag bridges legacy emitters onto the spec topics, so a single spec subscription
+drives audio regardless of which namespace a deployment emits on. Verified:
+- ``ovos.utterance.speak``                         → TTS    (PIPELINE-1 §9.6)
 - ``mycroft.stop`` and ``ovos.stop``               → TTS halts (STOP-1 §5.3)
 - ``mycroft.audio.service.stop`` and ``ovos.stop`` → playback stop (STOP-1 §5.3)
 """
@@ -10,22 +11,18 @@ import time
 import unittest
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 from ovos_utils.fakebus import FakeBus
 
 from ovoscope.audio import AudioServiceHarness, PlaybackServiceHarness
 
 
-class TestSpeakDualTopic(unittest.TestCase):
-    """Both ``speak`` (legacy) and ``ovos.utterance.speak`` (§9.6) drive TTS."""
-
-    def test_legacy_speak_topic_speaks(self):
-        with PlaybackServiceHarness() as h:
-            h.speak("hello legacy")
-            h.assert_spoke("hello legacy")
+class TestSpeakSpecTopic(unittest.TestCase):
+    """The spec ``ovos.utterance.speak`` (§9.6) drives TTS."""
 
     def test_spec_utterance_speak_topic_speaks(self):
         with PlaybackServiceHarness() as h:
-            h.bus.emit(Message("ovos.utterance.speak",
+            h.bus.emit(Message(SpecMessage.SPEAK,
                                {"utterance": "hello spec", "lang": "en-US"}))
             h._audio_output_end.wait(timeout=5.0)
             h.assert_spoke("hello spec")

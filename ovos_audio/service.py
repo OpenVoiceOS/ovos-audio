@@ -18,6 +18,7 @@ from ovos_config.config import Configuration
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
 from ovos_plugin_manager.tts import TTS
 from ovos_plugin_manager.tts import get_tts_supported_langs, get_tts_lang_configs, get_tts_module_configs
+from ovos_spec_tools import SpecMessage
 from ovos_utils.file_utils import resolve_resource_file
 from ovos_utils.log import LOG, deprecated
 from ovos_utils.metrics import Stopwatch
@@ -328,7 +329,7 @@ class PlaybackService(Thread):
             stopwatch = Stopwatch()
             stopwatch.start()
 
-            utterance = message.data['utterance']
+            utterance = message.data.get('utterance')
 
             # allow dialog transformers to rewrite speech
             skill_id = message.data.get("meta", {}).get("skill") or message.context.get("skill_id")
@@ -604,10 +605,10 @@ class PlaybackService(Thread):
         self.bus.on('mycroft.audio.speak.status', self.handle_speak_status)
         self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
         self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
-        self.bus.on('speak', self.handle_speak)
-        # OVOS-PIPELINE-1 §9.6: also consume the spec-named natural-language
-        # response topic (alongside the legacy 'speak' during the transition).
-        self.bus.on('ovos.utterance.speak', self.handle_speak)
+        # OVOS-PIPELINE-1 §9.6: consume the spec-named natural-language response
+        # topic. The bus client's modernize flag routes legacy 'speak' emitters
+        # to this listener, so a single spec-namespace subscription suffices.
+        self.bus.on(SpecMessage.SPEAK, self.handle_speak)
         self.bus.on('speak:b64_audio', self.handle_b64_audio)
         self.bus.on('ovos.languages.tts', self.handle_get_languages_tts)
         self.bus.on("opm.tts.query", self.handle_opm_tts_query)
