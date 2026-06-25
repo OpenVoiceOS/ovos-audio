@@ -14,8 +14,7 @@ import binascii
 import time
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
-from ovos_bus_client.util.migration import (TransitionalDeduplicator,
-                                            utterance_key)
+from ovos_bus_client.util import Deduplicator
 from ovos_config.config import Configuration
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
 from ovos_plugin_manager.tts import TTS
@@ -88,7 +87,7 @@ class PlaybackService(Thread):
         # to synthesise each utterance only once.
         # TODO: remove the dedup + the legacy "speak" subscription in the next
         #  major release, once every node emits the ovos.* topic only.
-        self._speak_dedup = TransitionalDeduplicator(window=1.0)
+        self._speak_dedup = Deduplicator(window=1.0)
 
         if not bus:
             bus = MessageBusClient()
@@ -328,9 +327,8 @@ class PlaybackService(Thread):
         # Both payload shapes overlap on utterance/lang; read defensively.
         # TODO: remove this dedup in the next major, once producers emit the
         #  ovos.* topic only.
-        if self._speak_dedup.is_duplicate(
-                utterance_key(message.data.get('utterance'),
-                              message.data.get('lang'))):
+        key = hash((message.data.get("utterance"), message.data.get("lang")))
+        if self._speak_dedup.is_duplicate(key):
             return
 
         # NOTE: lock is needed to avoid race conditions,

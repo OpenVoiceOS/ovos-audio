@@ -236,10 +236,14 @@ class TestSpeech(unittest.TestCase):
     def test_speak_dedup_window_expiry(self, mock_timing, tts_factory_mock,
                                        config_mock):
         """The same utterance outside the dedup window is processed again."""
+        from ovos_bus_client.util import Deduplicator
+        import time
         setup_mocks(config_mock, tts_factory_mock)
         bus = mock.Mock()
         speech = PlaybackService(bus=bus)
         speech.execute_tts = mock.Mock()
+        # tiny window so the entry expires before the second emit
+        speech._speak_dedup = Deduplicator(window=0.05)
         ctx = {"session": Session("default").serialize()}
 
         msg = Message("speak", {"utterance": "ping", "lang": "en-us"},
@@ -247,7 +251,7 @@ class TestSpeech(unittest.TestCase):
         speech.handle_speak(msg)
         self.assertEqual(speech.execute_tts.call_count, 1)
         # window passed -> not a duplicate anymore
-        speech._speak_dedup.reset()
+        time.sleep(0.1)
         speech.handle_speak(msg)
         self.assertEqual(speech.execute_tts.call_count, 2)
 
