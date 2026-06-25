@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.0a1) (2026-06-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.3.0a1...2.0.0a1)
+
+**Breaking changes:**
+
+- feat!: migrate audio output to OVOS spec bus namespace [\#165](https://github.com/OpenVoiceOS/ovos-audio/pull/165) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [1.3.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.3.0a1) (2026-06-24)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.3a1...1.3.0a1)
