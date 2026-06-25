@@ -199,6 +199,57 @@ class TestSpeech(unittest.TestCase):
         self.assertTrue(mock_timing.called)
         self.assertEqual(mock_timing.call_args[0][0], "default")
 
+    @mock.patch('ovos_audio.service.report_timing')
+    def test_speak_namespace_dedup(self, mock_timing, tts_factory_mock,
+                                   config_mock):
+        """bus-namespace migration: same utterance dual-emitted on both
+        topics is synthesised once; distinct utterances both process."""
+        setup_mocks(config_mock, tts_factory_mock)
+        bus = mock.Mock()
+        speech = PlaybackService(bus=bus)
+        speech.execute_tts = mock.Mock()
+
+        ctx = {"session": Session("default").serialize()}
+
+        # legacy "speak" payload shape (utterance/expect_response/meta/lang)
+        legacy = Message("speak", {"utterance": "hello world", "lang": "en-us",
+                                   "expect_response": False, "meta": {}},
+                         context=dict(ctx))
+        # new "ovos.utterance.speak" payload shape ({utterance, lang})
+        new = Message("ovos.utterance.speak",
+                      {"utterance": "hello world", "lang": "en-us"},
+                      context=dict(ctx))
+
+        speech.handle_speak(legacy)
+        speech.handle_speak(new)
+        # dual-emitted pair within the window -> real work runs exactly once
+        self.assertEqual(speech.execute_tts.call_count, 1)
+
+        # a distinct utterance is not deduped and processes
+        other = Message("ovos.utterance.speak",
+                        {"utterance": "different text", "lang": "en-us"},
+                        context=dict(ctx))
+        speech.handle_speak(other)
+        self.assertEqual(speech.execute_tts.call_count, 2)
+
+    @mock.patch('ovos_audio.service.report_timing')
+    def test_speak_dedup_window_expiry(self, mock_timing, tts_factory_mock,
+                                       config_mock):
+        """The same utterance outside the dedup window is processed again."""
+        setup_mocks(config_mock, tts_factory_mock)
+        bus = mock.Mock()
+        speech = PlaybackService(bus=bus)
+        speech.execute_tts = mock.Mock()
+        ctx = {"session": Session("default").serialize()}
+
+        msg = Message("speak", {"utterance": "ping", "lang": "en-us"},
+                      context=dict(ctx))
+        speech.handle_speak(msg)
+        self.assertEqual(speech.execute_tts.call_count, 1)
+        # window passed -> not a duplicate anymore
+        speech._speak_dedup.reset()
+        speech.handle_speak(msg)
+        self.assertEqual(speech.execute_tts.call_count, 2)
 
     @mock.patch('ovos_audio.service.get_tts_lang_configs')
     @mock.patch('ovos_audio.service.get_tts_supported_langs')

@@ -54,6 +54,8 @@ def _make_svc(tts=None, bus=None, validate_source=False):
     svc.disable_reload = False
     svc.disable_fallback = False
     svc._last_stop_signal = 0
+    from ovos_bus_client.util.migration import TransitionalDeduplicator
+    svc._speak_dedup = TransitionalDeduplicator(window=1.0)
     svc.dialog_transform = MagicMock()
     svc.dialog_transform.blacklisted_skills = []
     svc.dialog_transform.transform.side_effect = lambda dialog, context=None, sess=None: (dialog, context)
