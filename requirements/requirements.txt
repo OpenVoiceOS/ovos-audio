@@ -1,4 +1,0 @@
-ovos-utils>=0.0.38,<1.0.0
-ovos_bus_client>=2.2.0a1,<3.0.0
-ovos-config>=0.0.12,<3.0.0
-ovos-plugin-manager>=2.5.0a1,<3.0.0
