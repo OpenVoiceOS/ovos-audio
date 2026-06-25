@@ -31,6 +31,7 @@ from threading import Lock
 from unittest.mock import MagicMock, patch, call
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 from ovos_utils.fakebus import FakeBus
 
 
@@ -185,7 +186,7 @@ class TestHandleSpeak(unittest.TestCase):
 
     def test_ident_in_context_triggers_deprecation_log(self):
         svc = _make_svc()
-        msg = Message("speak", {"utterance": "hello"},
+        msg = Message(SpecMessage.SPEAK, {"utterance": "hello"},
                       context={"ident": "abc123"})
         with patch.object(svc, "execute_tts") as mock_exec, \
              patch("ovos_audio.service.report_timing"):
@@ -198,7 +199,7 @@ class TestHandleSpeak(unittest.TestCase):
         svc.dialog_transform.transform.side_effect = lambda dialog, context=None, sess=None: (
             "TRANSFORMED", context
         )
-        msg = Message("speak",
+        msg = Message(SpecMessage.SPEAK,
                       {"utterance": "original", "meta": {"skill": "my-skill"}},
                       context={})
         called_with = []
@@ -211,7 +212,7 @@ class TestHandleSpeak(unittest.TestCase):
     def test_dialog_transform_not_applied_for_blacklisted_skill(self):
         svc = _make_svc()
         svc.dialog_transform.blacklisted_skills = ["bad-skill"]
-        msg = Message("speak",
+        msg = Message(SpecMessage.SPEAK,
                       {"utterance": "original", "meta": {"skill": "bad-skill"}},
                       context={})
         called_with = []
@@ -223,7 +224,7 @@ class TestHandleSpeak(unittest.TestCase):
 
     def test_handle_speak_no_skill_id(self):
         svc = _make_svc()
-        msg = Message("speak", {"utterance": "no skill"}, context={})
+        msg = Message(SpecMessage.SPEAK, {"utterance": "no skill"}, context={})
         with patch.object(svc, "execute_tts") as mock_exec, \
              patch("ovos_audio.service.report_timing"):
             svc.handle_speak(msg)
