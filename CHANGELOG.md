@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.2a1) (2026-06-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.1a1...2.0.2a1)
+
+**Merged pull requests:**
+
+- fix: floor media-plugin chromecast/spotify to bus-client-2.x prereleases [\#169](https://github.com/OpenVoiceOS/ovos-audio/pull/169) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.1a1) (2026-06-25)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.0a1...2.0.1a1)
