@@ -24,7 +24,11 @@ Repository = "https://github.com/OpenVoiceOS/ovos-audio"
 
 [project.optional-dependencies]
 test = [
-    "ovoscope>0.10.0",
+    # ovoscope >=1.0.1a1 is the first line whose transitive ovos-core no longer
+    # caps ovos-bus-client<2.0.0; the AUDIO-1 dual-namespace e2e needs the
+    # bus-client 2.5.x spec<->legacy mirror. Floor-pinned (>=) so pip resolves
+    # the prerelease with no --pre. See test/end2end/test_b64_dual_namespace_e2e.py
+    "ovoscope>=1.0.1a1",
     "pytest>=5.2.4",
     "pytest-cov>=2.8.1",
     "cov-core>=1.15.0",
