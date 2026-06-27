@@ -309,9 +309,10 @@ class PlaybackService(Thread):
                    "listen": listen,
                    'tts_id': self.tts.plugin_id,
                    "utterance": utterance}
-        # legacy correlated reply (speak:b64_audio.response) for back-compat
-        self.bus.emit(message.response(payload))
-        # OVOS-AUDIO-1 §3.4/§4.3: spec-named synthesised-audio delivery
+        # OVOS-AUDIO-1 §3.4/§4.3: emit the spec topic only. The bus client's
+        # emit_legacy flag mirrors it onto the legacy speak:b64_audio.response
+        # (ovos-spec-tools MIGRATION_MAP), so hand-emitting the legacy reply
+        # here too would put it on the wire twice.
         self.bus.emit(message.forward(SpecMessage.AUDIO_SPEECH, payload))
         # OVOS-AUDIO-1 §3.4: re-open the remote client's input channel
         if listen:
