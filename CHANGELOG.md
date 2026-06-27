@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.1.0a1) (2026-06-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.2a1...2.1.0a1)
+
+**Merged pull requests:**
+
+- feat: adopt AUDIO-1 spec output topics \(dual-namespace\) [\#171](https://github.com/OpenVoiceOS/ovos-audio/pull/171) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.0.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.2a1) (2026-06-25)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.1a1...2.0.2a1)
