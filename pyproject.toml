@@ -12,10 +12,10 @@ requires-python = ">=3.10"
 
 dependencies = [
     "ovos-utils>=0.8.0,<1.0.0",
-    "ovos_bus_client>=2.2.0a1,<3.0.0",
+    "ovos_bus_client>=2.5.1a1,<3.0.0",
     "ovos-config>=0.0.12,<3.0.0",
     "ovos-plugin-manager>=2.5.0a1,<3.0.0",
-    "ovos-spec-tools>=0.9.0a1,<1.0.0",
+    "ovos-spec-tools>=0.17.3a1,<1.0.0",
 ]
 
 [project.urls]
@@ -24,7 +24,14 @@ Repository = "https://github.com/OpenVoiceOS/ovos-audio"
 
 [project.optional-dependencies]
 test = [
-    "ovoscope>0.10.0",
+    # ovoscope >=1.0.2a1 carries the MockTTS.__del__ fix: a GC'd mock from an
+    # earlier harness used to terminate a later harness's shared playback
+    # thread, flaking the test/end2end/ suite. The 1.0.x line is also the first
+    # whose transitive ovos-core no longer caps ovos-bus-client<2.0.0; the
+    # AUDIO-1 dual-namespace e2e needs the bus-client 2.5.x spec<->legacy mirror.
+    # Floor-pinned (>=) so pip resolves the prerelease with no --pre.
+    # See test/end2end/test_b64_dual_namespace_e2e.py
+    "ovoscope>=1.0.2a1",
     "pytest>=5.2.4",
     "pytest-cov>=2.8.1",
     "cov-core>=1.15.0",
