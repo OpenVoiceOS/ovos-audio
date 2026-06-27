@@ -691,5 +691,211 @@ class TestHandleOpmTtsQuery(unittest.TestCase):
         self.assertTrue(len(captured) > 0)
 
 
+# ---------------------------------------------------------------------------
+# OVOS-AUDIO-1 spec-topic adoption — dual namespace (legacy + spec)
+#
+# Each of the 6 adopted topics MUST work under BOTH its legacy name and its
+# spec name. These tests drive a bare PlaybackService over a real FakeBus and
+# assert the handler responds identically regardless of which topic name was
+# used to reach it.
+# ---------------------------------------------------------------------------
+
+def _wire_audio1_handlers(svc):
+    """Subscribe the 6 AUDIO-1 dual-namespace handlers on svc.bus.
+
+    Mirrors init_messagebus() for the AUDIO-1 surface without running the
+    heavy __init__. Returns the svc for chaining.
+    """
+    svc.bus.on(SpecMessage.AUDIO_STOP, svc.handle_stop)
+    svc.bus.on('mycroft.audio.speech.stop', svc.handle_stop)
+    svc.bus.on(SpecMessage.AUDIO_IS_SPEAKING, svc.handle_speak_status)
+    svc.bus.on('mycroft.audio.speak.status', svc.handle_speak_status)
+    svc.bus.on(SpecMessage.AUDIO_QUEUE, svc.handle_queue_audio)
+    svc.bus.on('mycroft.audio.queue', svc.handle_queue_audio)
+    svc.bus.on(SpecMessage.AUDIO_PLAY_SOUND, svc.handle_instant_play)
+    svc.bus.on('mycroft.audio.play_sound', svc.handle_instant_play)
+    svc.bus.on(SpecMessage.SPEAK_B64, svc.handle_b64_audio)
+    svc.bus.on('speak:b64_audio', svc.handle_b64_audio)
+    return svc
+
+
+class TestAudio1DualNamespaceRegistration(unittest.TestCase):
+    """init_messagebus subscribes BOTH the legacy and spec topic for each of
+    the 6 AUDIO-1 adoptions."""
+
+    def _registered_topics(self):
+        from ovos_audio.service import PlaybackService
+        svc = PlaybackService.__new__(PlaybackService)
+        svc.bus = MagicMock()
+        svc.dialog_transform = MagicMock()
+        with patch("ovos_audio.service.Configuration"):
+            PlaybackService.init_messagebus(svc)
+        return [c.args[0] for c in svc.bus.on.call_args_list]
+
+    def test_speak_b64_both_namespaces(self):
+        topics = self._registered_topics()
+        self.assertIn("speak:b64_audio", topics)
+        self.assertIn(SpecMessage.SPEAK_B64, topics)
+
+    def test_queue_both_namespaces(self):
+        topics = self._registered_topics()
+        self.assertIn("mycroft.audio.queue", topics)
+        self.assertIn(SpecMessage.AUDIO_QUEUE, topics)
+
+    def test_play_sound_both_namespaces(self):
+        topics = self._registered_topics()
+        self.assertIn("mycroft.audio.play_sound", topics)
+        self.assertIn(SpecMessage.AUDIO_PLAY_SOUND, topics)
+
+    def test_is_speaking_both_namespaces(self):
+        topics = self._registered_topics()
+        self.assertIn("mycroft.audio.speak.status", topics)
+        self.assertIn(SpecMessage.AUDIO_IS_SPEAKING, topics)
+
+    def test_stop_both_namespaces(self):
+        topics = self._registered_topics()
+        self.assertIn("mycroft.audio.speech.stop", topics)
+        self.assertIn(SpecMessage.AUDIO_STOP, topics)
+        # §6: the universal ovos.stop broadcast stays wired too
+        self.assertIn("ovos.stop", topics)
+
+
+class TestAudio1DualNamespaceBehaviour(unittest.TestCase):
+    """Driving the service over a FakeBus: BOTH the legacy and spec topic
+    invoke the handler and produce the same effect."""
+
+    def _make_wired_svc(self, tts=None):
+        svc = _make_svc(tts=tts, bus=FakeBus())
+        return _wire_audio1_handlers(svc)
+
+    # --- speak.b64 / ovos.audio.speech (§3.4, §4.3) ----------------------
+
+    def _run_b64(self, topic, listen=False):
+        svc = self._make_wired_svc()
+        raw = b"RIFF\x00WAVEfmt "
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            f.write(raw)
+            wav_path = f.name
+        svc.tts._get_ctxt.return_value = {}
+        svc.tts.synth.return_value = (wav_path, {})
+        svc.tts.plugin_id = "test-tts"
+        captured = []
+        svc.bus.on(SpecMessage.AUDIO_SPEECH, lambda m: captured.append(m))
+        svc.bus.on(SpecMessage.MIC_LISTEN, lambda m: captured.append(m))
+        try:
+            with patch("ovos_audio.service.report_timing"):
+                svc.bus.emit(Message(topic,
+                                     {"utterance": "hi", "listen": listen}))
+        finally:
+            os.unlink(wav_path)
+        return [m.msg_type for m in captured]
+
+    def test_b64_legacy_emits_spec_speech(self):
+        types = self._run_b64("speak:b64_audio")
+        self.assertIn(SpecMessage.AUDIO_SPEECH, types)
+
+    def test_b64_spec_topic_emits_spec_speech(self):
+        types = self._run_b64(SpecMessage.SPEAK_B64)
+        self.assertIn(SpecMessage.AUDIO_SPEECH, types)
+
+    def test_b64_listen_true_emits_mic_listen(self):
+        types = self._run_b64(SpecMessage.SPEAK_B64, listen=True)
+        self.assertIn(SpecMessage.AUDIO_SPEECH, types)
+        self.assertIn(SpecMessage.MIC_LISTEN, types)
+
+    # --- ovos.audio.queue (§4.1) -----------------------------------------
+
+    def _run_queue(self, topic):
+        from ovos_plugin_manager.templates.tts import TTS
+        import queue as queuemod
+        TTS.queue = queuemod.Queue()
+        svc = self._make_wired_svc()
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            path = f.name
+        try:
+            with patch("ovos_audio.service.PlaybackService._resolve_sound_uri",
+                       return_value=path):
+                svc.bus.emit(Message(topic, {"uri": path}))
+            return not TTS.queue.empty()
+        finally:
+            while not TTS.queue.empty():
+                TTS.queue.get_nowait()
+            os.unlink(path)
+
+    def test_queue_legacy_enqueues(self):
+        self.assertTrue(self._run_queue("mycroft.audio.queue"))
+
+    def test_queue_spec_topic_enqueues(self):
+        self.assertTrue(self._run_queue(SpecMessage.AUDIO_QUEUE))
+
+    # --- ovos.audio.play_sound (§4.2) ------------------------------------
+
+    def _run_play_sound(self, topic):
+        svc = self._make_wired_svc()
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            path = f.name
+        played = []
+        try:
+            with patch("ovos_audio.service.PlaybackService._resolve_sound_uri",
+                       return_value=path), \
+                 patch("ovos_audio.service.play_audio") as pa:
+                pa.return_value.wait.side_effect = lambda: played.append(True)
+                svc.bus.emit(Message(topic, {"uri": path}))
+            return bool(played)
+        finally:
+            os.unlink(path)
+
+    def test_play_sound_legacy_plays(self):
+        self.assertTrue(self._run_play_sound("mycroft.audio.play_sound"))
+
+    def test_play_sound_spec_topic_plays(self):
+        self.assertTrue(self._run_play_sound(SpecMessage.AUDIO_PLAY_SOUND))
+
+    # --- ovos.audio.is_speaking (§5.3) -----------------------------------
+
+    def _run_is_speaking(self, topic):
+        svc = self._make_wired_svc()
+        svc.tts.playback = MagicMock()
+        svc.tts.playback._now_playing = ("x",)
+        replies = []
+        svc.bus.on(SpecMessage.AUDIO_IS_SPEAKING, lambda m: replies.append(m))
+        svc.bus.on("mycroft.audio.is_speaking", lambda m: replies.append(m))
+        svc.bus.emit(Message(topic, {}))
+        return replies
+
+    def test_is_speaking_legacy_query_replies_spec(self):
+        replies = self._run_is_speaking("mycroft.audio.speak.status")
+        # only count actual answers (carry the 'speaking' field)
+        answers = [m for m in replies if "speaking" in m.data]
+        types = [m.msg_type for m in answers]
+        self.assertIn(SpecMessage.AUDIO_IS_SPEAKING, types)
+        self.assertTrue(all(m.data.get("speaking") for m in answers))
+
+    def test_is_speaking_spec_query_replies_spec(self):
+        replies = self._run_is_speaking(SpecMessage.AUDIO_IS_SPEAKING)
+        # only count actual answers (carry the 'speaking' field); the query
+        # itself is also captured on the shared spec topic but has no answer
+        answers = [m for m in replies if "speaking" in m.data]
+        types = [m.msg_type for m in answers]
+        self.assertIn(SpecMessage.AUDIO_IS_SPEAKING, types)
+        self.assertTrue(answers and all(m.data.get("speaking") for m in answers))
+
+    # --- ovos.audio.stop (§6) --------------------------------------------
+
+    def _run_stop(self, topic):
+        svc = self._make_wired_svc()
+        svc.tts.playback = MagicMock()
+        svc.tts.playback._now_playing = ("x",)
+        svc._last_stop_signal = 0
+        svc.bus.emit(Message(topic, {}))
+        return svc.tts.playback.clear.called
+
+    def test_stop_legacy_clears_playback(self):
+        self.assertTrue(self._run_stop("mycroft.audio.speech.stop"))
+
+    def test_stop_spec_topic_clears_playback(self):
+        self.assertTrue(self._run_stop(SpecMessage.AUDIO_STOP))
+
+
 if __name__ == "__main__":
     unittest.main()
