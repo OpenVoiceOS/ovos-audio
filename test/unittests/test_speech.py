@@ -20,6 +20,7 @@ from ovos_config import Configuration
 from ovos_utils.messagebus import Message, FakeBus
 from ovos_utils.process_utils import ProcessState
 from ovos_bus_client.session import SessionManager, Session
+from ovos_spec_tools import SpecMessage
 """Tests for speech dispatch service."""
 
 tts_mock = mock.Mock()
@@ -55,7 +56,7 @@ class TestSpeech(unittest.TestCase):
         bus.on.assert_any_call('mycroft.stop', speech.handle_stop)
         bus.on.assert_any_call('mycroft.audio.speech.stop',
                                speech.handle_stop)
-        bus.on.assert_any_call('speak', speech.handle_speak)
+        bus.on.assert_any_call(SpecMessage.SPEAK, speech.handle_speak)
 
         self.assertTrue(speech.status.state > ProcessState.STOPPING)
         speech.shutdown()
@@ -185,7 +186,7 @@ class TestSpeech(unittest.TestCase):
         speech = PlaybackService(bus=bus)
         speech.execute_tts = mock.Mock()
 
-        msg = Message("speak", {"utterance": "hello world"})
+        msg = Message(SpecMessage.SPEAK, {"utterance": "hello world"})
 
         # test message.context.destination
         msg.context["session"] = Session().serialize() # not default
