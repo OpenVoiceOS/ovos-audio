@@ -54,9 +54,22 @@ Only plugins with a config entry are loaded. A plugin with `"active": false` is 
 
 ### Priority Ordering
 
-Plugins are called in descending priority order (highest number first). A plugin with higher priority runs first and its output is the input to the next plugin.
+Plugins are called in **ascending priority order** per OVOS-TRANSFORM §4: a
+plugin with `priority = 1` runs first (default 50), and its output is the
+input to the next plugin — later plugins have the final say. An explicit
+`"order"` list in the config section wins over priorities; loaded plugins
+absent from the list do not run.
 
-Priority `1` is the **last** to run and has the final say on the output.
+The services are the canonical implementations from
+`ovos_plugin_manager.transformer_services` (re-exported by
+`ovos_audio.transformers`) and implement the OVOS-TRANSFORM §8.1
+cancellation contract. Full contract →
+[`ovos-plugin-manager/docs/transformers.md`](../../ovos-plugin-manager/docs/transformers.md).
+
+**Split deployments:** ovos-tts-server can run these same dialog/tts chains
+server-side — the tool for setting a tone/persona globally across every
+device using that server. Enable each plugin in exactly one place or the
+effect is applied twice.
 
 ### Blacklisted Skills
 
