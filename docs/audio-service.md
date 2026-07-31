@@ -140,3 +140,6 @@ ready = audio_service.wait_for_load(timeout=180)
 ```
 
 Blocks until all backend plugins have been loaded. Returns `True` if loading completed within the timeout.
+
+---
+[← tts.md](tts.md) · [Home](index.md) · [transformers.md →](transformers.md)

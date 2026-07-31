@@ -32,10 +32,13 @@ PlaybackService(
 
 | Parameter | Description |
 |---|---|
-| `bus` | `MessageBusClient` instance; created automatically if `None` |
-| `disable_ocp` | Disable OCP inside `AudioService`; reads `disable_ocp` from config if `None` |
+| `bus` | `MessageBusClient` instance. Created automatically if `None` |
+| `disable_ocp` | Disable OCP inside `AudioService`. Reads `disable_ocp` from config if `None` |
 | `validate_source` | If `True`, only handle audio from sessions with `session_id == "default"` (local mic only) |
-| `tts` | Pre-created `TTS` instance; if provided, auto-reload on config change is disabled |
+
+| Parameter | Description |
+|---|---|
+| `tts` | Pre-created `TTS` instance. If provided, auto-reload on config change is disabled |
 | `disable_fallback` | If `True`, never load or use the fallback TTS plugin |
 
 `ProcessStatus` lifecycle hook parameters (`ready_hook`, etc.) follow the standard OVOS process status pattern.
@@ -92,8 +95,8 @@ Calls `tts.execute()` with the utterance. On failure, falls back to `execute_fal
 ### `handle_queue_audio(message)`
 
 Queues a sound file or binary audio blob for playback in the TTS thread (serialised with speech). Accepts:
-- `uri` — file path or resource URI
-- `binary_data` — hex-encoded byte string with optional `audio_ext`
+- `uri`: file path or resource URI
+- `binary_data`: hex-encoded byte string with optional `audio_ext`
 
 ### `handle_instant_play(message)`
 
@@ -124,6 +127,9 @@ A decorator defined in `ovos_audio.utils` that guards bus handlers: if `validate
 | `started` | Constructor finished |
 | `alive` | `run()` called |
 | `ready` | TTS is loaded |
+
+| State | When |
+|---|---|
 | `error` | TTS failed to load |
 | `stopping` | `shutdown()` called |
 
@@ -137,15 +143,21 @@ A decorator defined in `ovos_audio.utils` that guards bus handlers: if `validate
 | `ovos.utterance.speak` | `handle_speak` | Spec-named NL response topic (OVOS-PIPELINE-1 §9.6) |
 | `speak:b64_audio` | `handle_b64_audio` | Synthesize and return as base64 |
 | `mycroft.stop` | `handle_stop` | Stop current TTS playback (legacy topic) |
+
+| Event | Handler | Description |
+|---|---|---|
 | `ovos.stop` | `handle_stop` | Universal stop broadcast (OVOS-STOP-1 §5.3) |
 | `mycroft.audio.speech.stop` | `handle_stop` | Stop current TTS playback |
 | `mycroft.audio.speak.status` | `handle_speak_status` | Reply with `{"speaking": bool}` |
 | `mycroft.audio.queue` | `handle_queue_audio` | Queue sound file in TTS thread |
+
+| Event | Handler | Description |
+|---|---|---|
 | `mycroft.audio.play_sound` | `handle_instant_play` | Play sound immediately |
 | `ovos.languages.tts` | `handle_get_languages_tts` | Reply with supported TTS languages |
 | `opm.tts.query` | `handle_opm_tts_query` | Reply with TTS plugin metadata |
 | `opm.g2p.query` | `handle_opm_g2p_query` | Reply with G2P plugin metadata |
-| `opm.audio.query` | `handle_opm_audio_query` | Deprecated; returns empty response |
+| `opm.audio.query` | `handle_opm_audio_query` | Deprecated. Returns empty response |
 
 ## Bus Events Emitted
 
@@ -167,4 +179,7 @@ the two co-exist during the transition:
 `ovos.utterance.speak` is the spec name for the natural-language response topic. `ovos.stop`
 is the universal stop broadcast: per OVOS-STOP-1 §5.3 a non-skill component with
 user-visible activity MUST cease on it. The legacy `AudioService` (media backends) mirrors
-the same `ovos.stop` subscription — see [audio-service.md](audio-service.md).
+the same `ovos.stop` subscription. See [audio-service.md](audio-service.md).
+
+---
+[Home](index.md) · [tts.md →](tts.md)

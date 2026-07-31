@@ -1,24 +1,22 @@
 # ovos-audio
 
-The "mouth" of the OVOS assistant!
-
-Handles TTS generation and sounds playback
-
+`ovos-audio` is the audio daemon for OpenVoiceOS. It handles text-to-speech (TTS) synthesis and sound playback, and it runs as a background service that connects to the OVOS MessageBus.
 
 _________
 
 ## Install
 
-`pip install ovos-audio[extras]` to install this package and the default plugins.
+```bash
+pip install ovos-audio[extras]
+```
 
-Without `extras`, you will also need to manually install, and possibly configure TTS modules as described below.
-
+The `extras` group installs this package with the default plugins. Without it, you must install and configure TTS modules yourself, as described below.
 
 _________
 
-# Configuration
+## Configuration
 
-under mycroft.conf
+`ovos-audio` reads its settings from `mycroft.conf`.
 
 ```javascript
 {
@@ -52,23 +50,22 @@ under mycroft.conf
 ```
 _________
 
-## 🤖 Persona Support  
+## Persona Support
 
-This project supports **dialog-transformer plugins** to customize the style or tone of the generated speech.  
+`ovos-audio` supports dialog-transformer plugins that rewrite generated speech to match a tone or persona.
 
-By using [OpenAI Persona Plugin](https://github.com/OpenVoiceOS/ovos-solver-plugin-openai-persona), you can rewrite text dynamically based on specific personas, such as simplifying explanations or mimicking a specific tone.  
+For example, [ovos-solver-plugin-openai-persona](https://github.com/OpenVoiceOS/ovos-solver-plugin-openai-persona) rewrites text before synthesis, based on a persona string. Sample personas:
 
-#### Example Usage:
-- **Persona:** `"rewrite the text as if you were explaining it to a 5-year-old"`  
-- **Input:** `"Quantum mechanics is a branch of physics that describes the behavior of particles at the smallest scales."`  
-- **Output:** `"Quantum mechanics is like a special kind of science that helps us understand really tiny things."`  
+- `"rewrite the text as if you were explaining it to a 5-year-old"`
+- `"rewrite the text as if it was an angry old man speaking"`
+- `"Add more 'dude'ness to it"`
 
-Examples of `persona` Values:
-- `"rewrite the text as if it was an angry old man speaking"`  
-- `"Add more 'dude'ness to it"`  
-- `"Explain it like you're teaching a child"`  
+Example input and output with the "explain to a 5-year-old" persona:
 
-To enable the OpenAI Persona Plugin, add the following to your `mycroft.conf`:  
+- **Input:** `"Quantum mechanics is a branch of physics that describes the behavior of particles at the smallest scales."`
+- **Output:** `"Quantum mechanics is like a special kind of science that helps us understand really tiny things."`
+
+To enable the plugin, add this to `mycroft.conf`:
 
 ```json
 "dialog_transformers": {
@@ -82,11 +79,11 @@ _____
 
 ## Using Legacy AudioService
 
-The legacy audio service supports audio playback via the old mycroft api ([@mycroft](https://github.com/MycroftAI/mycroft-core/blob/dev/mycroft/skills/audioservice.py#L43) [@ovos](https://github.com/OpenVoiceOS/ovos-bus-client/blob/dev/ovos_bus_client/apis/ocp.py#L51))
+The legacy audio service handles audio playback through the old Mycroft API. See the implementation in [mycroft-core](https://github.com/MycroftAI/mycroft-core/blob/dev/mycroft/skills/audioservice.py) and [ovos-bus-client](https://github.com/OpenVoiceOS/ovos-bus-client/blob/dev/ovos_bus_client/apis/ocp.py).
 
-by default OCP delegates to the legacy audio service when necessary and no action is needed, but if you want to disable ocp this api can be used as the sole media playback provider
+By default, OCP delegates to the legacy audio service when needed, so no action is required. If you disable OCP, this API becomes the sole media playback provider.
 
-> **NOTE:** once ovos-media is released OCP and this api will be disabled by default and deprecated!
+> **Note:** once `ovos-media` is released, OCP and this API will be disabled by default and deprecated.
 
 ```javascript
 {
@@ -109,17 +106,34 @@ by default OCP delegates to the legacy audio service when necessary and no actio
 }
 ```
 
-legacy plugins:
-- [vlc](https://github.com/OpenVoiceOS/ovos-vlc-plugin)
-- [simple](https://github.com/OpenVoiceOS/ovos-audio-plugin-simple) (no https support)
-- [mpv](https://github.com/OpenVoiceOS/ovos-audio-plugin-mpv) <- recommended default
-- [chromecast](https://github.com/OpenVoiceOS/ovos-media-plugin-chromecast)
-- [spotify](https://github.com/OpenVoiceOS/ovos-media-plugin-spotify)
+Legacy backend plugins:
+- [ovos-vlc-plugin](https://github.com/OpenVoiceOS/ovos-vlc-plugin)
+- [ovos-audio-plugin-simple](https://github.com/OpenVoiceOS/ovos-audio-plugin-simple) (no HTTPS support)
+- [ovos-audio-plugin-mpv](https://github.com/OpenVoiceOS/ovos-audio-plugin-mpv) (recommended default)
+- [ovos-media-plugin-chromecast](https://github.com/OpenVoiceOS/ovos-media-plugin-chromecast)
+- [ovos-media-plugin-spotify](https://github.com/OpenVoiceOS/ovos-media-plugin-spotify)
 
-**OCP technical details:**
+**About OCP:**
 
-- OCP was developed for mycroft-core under the legacy audio service system
-- OCP is **always** the default audio plugin, unless you set `"disable_ocp": true` in config
-- OCP uses the legacy api internally, to delegate playback when GUI is not available (or when configured to do so)
-- does **NOT** bring support for old Mycroft CommonPlay skills, that is achieved by using the `"ocp_legacy"` pipeline with ovos-core
-- [ovos-media](https://github.com/OpenVoiceOS/ovos-media) will fully replace OCP in **ovos-audio 1.0.0**
+- OCP was developed for `mycroft-core` under the legacy audio service system.
+- OCP is always the default audio plugin, unless `"disable_ocp": true` is set in the config.
+- OCP uses the legacy API internally to delegate playback when the GUI is unavailable, or when configured to do so.
+- OCP does not support old Mycroft CommonPlay skills. The `"ocp_legacy"` pipeline in `ovos-core` handles that instead.
+- [ovos-media](https://github.com/OpenVoiceOS/ovos-media) will fully replace OCP in `ovos-audio` 1.0.0.
+
+_________
+
+## Related Projects
+
+- [ovos-media](https://github.com/OpenVoiceOS/ovos-media), the replacement for OCP and the legacy audio service
+- [ovos-core](https://github.com/OpenVoiceOS/ovos-core), the assistant core that starts and manages `ovos-audio`
+- [ovos-plugin-manager](https://github.com/OpenVoiceOS/ovos-plugin-manager), plugin discovery for TTS, G2P, and audio backends
+- [ovos-bus-client](https://github.com/OpenVoiceOS/ovos-bus-client), the MessageBus client used to communicate with `ovos-audio`
+
+See [docs/index.md](docs/index.md) for a full architecture overview.
+
+_________
+
+## License
+
+`ovos-audio` is licensed under the [Apache License 2.0](LICENSE).
