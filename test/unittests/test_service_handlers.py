@@ -701,21 +701,19 @@ class TestHandleOpmTtsQuery(unittest.TestCase):
 # ---------------------------------------------------------------------------
 
 def _wire_audio1_handlers(svc):
-    """Subscribe the 6 AUDIO-1 dual-namespace handlers on svc.bus.
+    """Wire the AUDIO-1 dual-namespace handlers on svc.bus by driving the
+    service through the real ``init_messagebus`` (spec-only subscriptions),
+    relying on the bus-client namespace bridge on ``svc.bus`` (a
+    bridge-enabled ``FakeBus``) to mirror legacy emits onto the spec topics.
 
-    Mirrors init_messagebus() for the AUDIO-1 surface without running the
-    heavy __init__. Returns the svc for chaining.
+    This exercises the actual bridge rather than hand-wiring legacy topics
+    directly, per CodeRabbit review on ovos-audio#179: a test helper that
+    registers legacy topics itself can pass even if the bridge is broken.
+    Returns the svc for chaining.
     """
-    svc.bus.on(SpecMessage.AUDIO_STOP, svc.handle_stop)
-    svc.bus.on('mycroft.audio.speech.stop', svc.handle_stop)
-    svc.bus.on(SpecMessage.AUDIO_IS_SPEAKING, svc.handle_speak_status)
-    svc.bus.on('mycroft.audio.speak.status', svc.handle_speak_status)
-    svc.bus.on(SpecMessage.AUDIO_QUEUE, svc.handle_queue_audio)
-    svc.bus.on('mycroft.audio.queue', svc.handle_queue_audio)
-    svc.bus.on(SpecMessage.AUDIO_PLAY_SOUND, svc.handle_instant_play)
-    svc.bus.on('mycroft.audio.play_sound', svc.handle_instant_play)
-    svc.bus.on(SpecMessage.SPEAK_B64, svc.handle_b64_audio)
-    svc.bus.on('speak:b64_audio', svc.handle_b64_audio)
+    from ovos_audio.service import PlaybackService
+    with patch("ovos_audio.service.Configuration"):
+        PlaybackService.init_messagebus(svc)
     return svc
 
 

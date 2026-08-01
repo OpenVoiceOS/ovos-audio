@@ -50,49 +50,46 @@ class TestLegacyTopicsStillReachSpecOnlyHandlers(unittest.TestCase):
             setattr(service_mod.PlaybackService, handler_name, orig)
         return seen
 
-    def test_legacy_mycroft_stop_reaches_spec_only_handler(self):
-        self.assertTrue(
-            self._fired_topics_for("mycroft.stop", "handle_stop"),
-            "legacy 'mycroft.stop' must still reach handle_stop via the bus "
-            "bridge now that the manual legacy subscription is gone",
+    def _assert_exactly_once_on_spec_topic(self, legacy_topic, handler_name,
+                                            spec_topic):
+        seen = self._fired_topics_for(legacy_topic, handler_name)
+        self.assertEqual(
+            len(seen), 1,
+            f"legacy '{legacy_topic}' must reach {handler_name} exactly "
+            f"once via the bus bridge (no duplicate delivery), got {seen}",
         )
+        self.assertEqual(
+            seen[0], spec_topic,
+            f"legacy '{legacy_topic}' must be delivered on the spec topic "
+            f"'{spec_topic}', got '{seen[0]}'",
+        )
+
+    def test_legacy_mycroft_stop_reaches_spec_only_handler(self):
+        self._assert_exactly_once_on_spec_topic(
+            "mycroft.stop", "handle_stop", "ovos.stop")
 
     def test_legacy_audio_speech_stop_reaches_spec_only_handler(self):
-        self.assertTrue(
-            self._fired_topics_for("mycroft.audio.speech.stop", "handle_stop"),
-            "legacy 'mycroft.audio.speech.stop' must still reach handle_stop "
-            "via the bus bridge",
-        )
+        self._assert_exactly_once_on_spec_topic(
+            "mycroft.audio.speech.stop", "handle_stop", "ovos.audio.stop")
 
     def test_legacy_speak_status_reaches_spec_only_handler(self):
-        self.assertTrue(
-            self._fired_topics_for("mycroft.audio.speak.status",
-                                   "handle_speak_status"),
-            "legacy 'mycroft.audio.speak.status' must still reach "
-            "handle_speak_status via the bus bridge",
-        )
+        self._assert_exactly_once_on_spec_topic(
+            "mycroft.audio.speak.status", "handle_speak_status",
+            "ovos.audio.is_speaking")
 
     def test_legacy_audio_queue_reaches_spec_only_handler(self):
-        self.assertTrue(
-            self._fired_topics_for("mycroft.audio.queue", "handle_queue_audio"),
-            "legacy 'mycroft.audio.queue' must still reach handle_queue_audio "
-            "via the bus bridge",
-        )
+        self._assert_exactly_once_on_spec_topic(
+            "mycroft.audio.queue", "handle_queue_audio", "ovos.audio.queue")
 
     def test_legacy_play_sound_reaches_spec_only_handler(self):
-        self.assertTrue(
-            self._fired_topics_for("mycroft.audio.play_sound",
-                                   "handle_instant_play"),
-            "legacy 'mycroft.audio.play_sound' must still reach "
-            "handle_instant_play via the bus bridge",
-        )
+        self._assert_exactly_once_on_spec_topic(
+            "mycroft.audio.play_sound", "handle_instant_play",
+            "ovos.audio.play_sound")
 
     def test_legacy_speak_b64_audio_reaches_spec_only_handler(self):
-        self.assertTrue(
-            self._fired_topics_for("speak:b64_audio", "handle_b64_audio"),
-            "legacy 'speak:b64_audio' must still reach handle_b64_audio via "
-            "the bus bridge",
-        )
+        self._assert_exactly_once_on_spec_topic(
+            "speak:b64_audio", "handle_b64_audio",
+            "ovos.utterance.speak.b64")
 
 
 if __name__ == "__main__":
