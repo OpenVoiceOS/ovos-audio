@@ -53,9 +53,8 @@ class TestSpeech(unittest.TestCase):
         self.assertTrue(tts_factory_mock.create.called)
         self.assertTrue(speech.tts.init.called)
 
-        bus.on.assert_any_call('mycroft.stop', speech.handle_stop)
-        bus.on.assert_any_call('mycroft.audio.speech.stop',
-                               speech.handle_stop)
+        bus.on.assert_any_call('ovos.stop', speech.handle_stop)
+        bus.on.assert_any_call(SpecMessage.AUDIO_STOP, speech.handle_stop)
         bus.on.assert_any_call(SpecMessage.SPEAK, speech.handle_speak)
 
         self.assertTrue(speech.status.state > ProcessState.STOPPING)

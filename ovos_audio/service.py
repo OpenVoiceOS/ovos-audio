@@ -602,7 +602,16 @@ class PlaybackService(Thread):
             if muted:
                 self.bus.emit(Message("mycroft.volume.mute"))
 
+        # OVOS-AUDIO-1 §4.2: reply on the incoming topic's own '.response'
+        # suffix. The generic '<topic>.response' derivation is NOT one of the
+        # ovos-spec-tools MIGRATION_MAP pairs (only base request topics are
+        # mapped, not their derived replies), so the namespace bridge does not
+        # mirror it: a caller that reached this handler via the legacy
+        # 'mycroft.audio.play_sound' request would otherwise never see a
+        # response. Emit both spellings explicitly, matching
+        # handle_speak_status's hand-mirrored reply.
         self.bus.emit(message.response({}))
+        self.bus.emit(message.reply("mycroft.audio.play_sound.response", {}))
 
     def handle_get_languages_tts(self, message):
         """
