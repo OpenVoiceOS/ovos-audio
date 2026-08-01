@@ -720,8 +720,10 @@ def _wire_audio1_handlers(svc):
 
 
 class TestAudio1DualNamespaceRegistration(unittest.TestCase):
-    """init_messagebus subscribes BOTH the legacy and spec topic for each of
-    the 6 AUDIO-1 adoptions."""
+    """init_messagebus subscribes the spec topic ONLY for each of the 6
+    AUDIO-1 adoptions; the legacy counterpart is not subscribed directly
+    because the bus-client namespace bridge (ovos-spec-tools MIGRATION_MAP)
+    already mirrors a legacy emit onto the spec topic for local listeners."""
 
     def _registered_topics(self):
         from ovos_audio.service import PlaybackService
@@ -732,29 +734,30 @@ class TestAudio1DualNamespaceRegistration(unittest.TestCase):
             PlaybackService.init_messagebus(svc)
         return [c.args[0] for c in svc.bus.on.call_args_list]
 
-    def test_speak_b64_both_namespaces(self):
+    def test_speak_b64_spec_only(self):
         topics = self._registered_topics()
-        self.assertIn("speak:b64_audio", topics)
+        self.assertNotIn("speak:b64_audio", topics)
         self.assertIn(SpecMessage.SPEAK_B64, topics)
 
-    def test_queue_both_namespaces(self):
+    def test_queue_spec_only(self):
         topics = self._registered_topics()
-        self.assertIn("mycroft.audio.queue", topics)
+        self.assertNotIn("mycroft.audio.queue", topics)
         self.assertIn(SpecMessage.AUDIO_QUEUE, topics)
 
-    def test_play_sound_both_namespaces(self):
+    def test_play_sound_spec_only(self):
         topics = self._registered_topics()
-        self.assertIn("mycroft.audio.play_sound", topics)
+        self.assertNotIn("mycroft.audio.play_sound", topics)
         self.assertIn(SpecMessage.AUDIO_PLAY_SOUND, topics)
 
-    def test_is_speaking_both_namespaces(self):
+    def test_is_speaking_spec_only(self):
         topics = self._registered_topics()
-        self.assertIn("mycroft.audio.speak.status", topics)
+        self.assertNotIn("mycroft.audio.speak.status", topics)
         self.assertIn(SpecMessage.AUDIO_IS_SPEAKING, topics)
 
-    def test_stop_both_namespaces(self):
+    def test_stop_spec_only(self):
         topics = self._registered_topics()
-        self.assertIn("mycroft.audio.speech.stop", topics)
+        self.assertNotIn("mycroft.audio.speech.stop", topics)
+        self.assertNotIn("mycroft.stop", topics)
         self.assertIn(SpecMessage.AUDIO_STOP, topics)
         # §6: the universal ovos.stop broadcast stays wired too
         self.assertIn("ovos.stop", topics)
