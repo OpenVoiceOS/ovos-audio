@@ -22,6 +22,7 @@ from threading import Lock
 from unittest.mock import MagicMock, patch, call
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 from ovos_utils.fakebus import FakeBus
 
 
@@ -44,7 +45,7 @@ class TestPlayEmptyException(unittest.TestCase):
         """Raise queue.Empty from inside _play's try block — hits line 156."""
         from queue import Empty
         t = _make_thread(bus=MagicMock())
-        msg = Message("speak", {"utterance": "hi"}, context={})
+        msg = Message(SpecMessage.SPEAK, {"utterance": "hi"}, context={})
         t._now_playing = ("/tmp/x.wav", None, False, "tts", msg)
         t.on_start = MagicMock()
         t.on_end = MagicMock()
@@ -69,7 +70,7 @@ class TestRunDequeue(unittest.TestCase):
 
         t._play = fake_play
 
-        msg = Message("speak", {"utterance": "hello"}, context={})
+        msg = Message(SpecMessage.SPEAK, {"utterance": "hello"}, context={})
         q.put(("/tmp/a.wav", None, False, "tts", msg))
         t.run()  # will dequeue, call _play, then terminate
         self.assertEqual(len(called), 1)
