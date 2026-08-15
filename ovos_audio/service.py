@@ -23,6 +23,7 @@ from ovos_utils.file_utils import resolve_resource_file
 from ovos_utils.log import LOG, deprecated
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
+from ovos_utils.skill_installer import ServiceInstaller
 from ovos_utils.sound import play_audio
 
 from ovos_audio.audio import AudioService
@@ -87,6 +88,10 @@ class PlaybackService(Thread):
         self.bus = bus
         self.status.bind(self.bus)
         self.init_messagebus()
+        # Install/uninstall plugins into THIS service's environment when asked
+        # over the bus (ovos.pip.install / ovos.pip.install.ovos-audio). Gated
+        # by the 'skills.installer.allow_pip' config, off by default.
+        self.installer = ServiceInstaller(self.bus, service_name="ovos_audio")
         self.dialog_transform = DialogTransformersService(self.bus)
         if TTS.queue is None:
             TTS.queue = Queue()
@@ -629,6 +634,8 @@ class PlaybackService(Thread):
         Stop any playing audio and make sure threads are joined correctly.
         """
         self.status.set_stopping()
+        if getattr(self, "installer", None):
+            self.installer.shutdown()
         if self.playback_thread:
             self.playback_thread.shutdown()
             self.playback_thread.join()

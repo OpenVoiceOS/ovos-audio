@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.0a1) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.1.1a2...2.2.0a1)
+
+**Merged pull requests:**
+
+- feat: run ServiceInstaller \(install plugins into the audio env over the bus\) [\#181](https://github.com/OpenVoiceOS/ovos-audio/pull/181) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.1.1a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.1.1a2) (2026-07-17)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.1.1a1...2.1.1a2)
