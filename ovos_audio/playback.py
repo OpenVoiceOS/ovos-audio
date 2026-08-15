@@ -6,6 +6,7 @@ from typing import Optional
 from ovos_audio.transformers import TTSTransformersService
 from ovos_bus_client.message import Message
 from ovos_bus_client.util import get_message_lang
+from ovos_spec_tools import SpecMessage
 from ovos_config import Configuration
 from ovos_plugin_manager.g2p import OVOSG2PFactory
 from ovos_plugin_manager.templates.g2p import OutOfVocabulary, Grapheme2PhonemePlugin
@@ -74,8 +75,8 @@ class PlaybackThread(Thread):
                     self.bus.emit(Message("ovos.common_play.cork"))
                 elif cfg.get("ocp_duck", False):
                     self.bus.emit(Message("ovos.common_play.duck"))
-            message = message or Message("speak")
-            self.bus.emit(message.forward("recognizer_loop:audio_output_start"))
+            message = message or Message(SpecMessage.SPEAK)
+            self.bus.emit(message.forward(SpecMessage.AUDIO_OUTPUT_STARTED))
         else:
             LOG.warning("Speech started before bus was attached.")
 
@@ -94,10 +95,10 @@ class PlaybackThread(Thread):
                 elif cfg.get("ocp_duck", False):
                     self.bus.emit(Message("ovos.common_play.unduck"))
             # Send end of speech signals to the system
-            message = message or Message("speak")
-            self.bus.emit(message.forward("recognizer_loop:audio_output_end"))
+            message = message or Message(SpecMessage.SPEAK)
+            self.bus.emit(message.forward(SpecMessage.AUDIO_OUTPUT_ENDED))
             if listen:
-                self.bus.emit(message.forward('mycroft.mic.listen'))
+                self.bus.emit(message.forward(SpecMessage.MIC_LISTEN))
         else:
             LOG.warning("Speech started before bus was attached.")
 
