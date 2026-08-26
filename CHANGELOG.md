@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.1a1) (2026-08-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.0a2...2.2.1a1)
+
+**Closed issues:**
+
+- Changing tts.module does not reload the engine unless the new plugin has a config block [\#186](https://github.com/OpenVoiceOS/ovos-audio/issues/186)
+
+**Merged pull requests:**
+
+- fix: reload the TTS engine when the plugin changes [\#187](https://github.com/OpenVoiceOS/ovos-audio/pull/187) ([JarbasAl](https://github.com/JarbasAl))
+- docs: rewrite README in Simplified Technical English [\#178](https://github.com/OpenVoiceOS/ovos-audio/pull/178) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.2.0a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.0a2) (2026-08-15)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.0a1...2.2.0a2)
