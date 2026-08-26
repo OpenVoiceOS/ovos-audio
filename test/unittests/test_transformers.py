@@ -51,7 +51,7 @@ class TestDialogTransformersServiceInit(unittest.TestCase):
         svc = self._make()
         dialog, ctx = svc.transform("test")
         self.assertEqual(dialog, "test")
-        self.assertIsNone(ctx)
+        self.assertEqual(ctx, {})
 
     def test_shutdown_no_plugins(self):
         svc = self._make()
@@ -177,7 +177,7 @@ class TestTTSTransformersService(unittest.TestCase):
         svc = self._make()
         result, ctx = svc.transform("/tmp/test.wav")
         self.assertEqual(result, "/tmp/test.wav")
-        self.assertIsNone(ctx)
+        self.assertEqual(ctx, {})
 
     def test_set_bus_propagates_to_plugins(self):
         svc = self._make()
