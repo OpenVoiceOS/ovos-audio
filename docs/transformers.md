@@ -150,3 +150,6 @@ Both services share the same pattern:
 | Priority | Higher number → runs first |
 | Error handling | Exceptions in individual plugins are logged and skipped |
 | Shutdown | `shutdown()` calls `module.shutdown()` on each loaded plugin |
+
+---
+[← audio-service.md](audio-service.md) · [Home](index.md)
