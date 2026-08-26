@@ -270,10 +270,9 @@ class TestMaybeReloadTts(unittest.TestCase):
     def test_disable_fallback_skips_fallback_reload(self):
         svc = _make_svc()
         svc.disable_fallback = True
-        svc._tts_hash = "same"
-        cfg = {"module": "dummy", "dummy": {}}
-        import json
-        svc._tts_hash = hash(json.dumps({}, sort_keys=True))
+        from ovos_audio.service import tts_config_hash
+        # the hash the service will compute, so nothing needs reloading
+        svc._tts_hash = tts_config_hash({"module": "dummy"}, "dummy")
         with patch("ovos_audio.service.Configuration",
                    return_value={"tts": {"module": "dummy"}}), \
              patch("ovos_audio.service.TTSFactory") as mock_factory:
@@ -284,8 +283,9 @@ class TestMaybeReloadTts(unittest.TestCase):
 
     def test_preload_fallback_false_skips(self):
         svc = _make_svc()
-        svc._tts_hash = hash(json.dumps({}, sort_keys=True))
+        from ovos_audio.service import tts_config_hash
         cfg = {"module": "main", "fallback_module": "fallback", "preload_fallback": False}
+        svc._tts_hash = tts_config_hash(cfg, "main")
         with patch("ovos_audio.service.Configuration", return_value={"tts": cfg}), \
              patch("ovos_audio.service.TTSFactory") as mock_factory:
             svc._maybe_reload_tts()
@@ -293,8 +293,9 @@ class TestMaybeReloadTts(unittest.TestCase):
 
     def test_same_module_skips_fallback(self):
         svc = _make_svc()
-        svc._tts_hash = hash(json.dumps({}, sort_keys=True))
+        from ovos_audio.service import tts_config_hash
         cfg = {"module": "same", "fallback_module": "same"}
+        svc._tts_hash = tts_config_hash(cfg, "same")
         with patch("ovos_audio.service.Configuration", return_value={"tts": cfg}), \
              patch("ovos_audio.service.TTSFactory") as mock_factory:
             svc._maybe_reload_tts()

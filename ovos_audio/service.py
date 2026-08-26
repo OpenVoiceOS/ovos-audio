@@ -53,6 +53,19 @@ def on_stopping():
     LOG.info('TTS service is shutting down...')
 
 
+def tts_config_hash(tts_config: dict, module: str) -> int:
+    """Hash what decides whether a TTS engine has to be rebuilt.
+
+    The plugin name takes part in the hash, not only its settings block. Two
+    plugins that carry no settings of their own both hash to an empty block, so
+    without the name a swap between them looks like no change and the old engine
+    keeps speaking until the service restarts.
+    """
+    return hash(json.dumps({"module": module,
+                            "config": tts_config.get(module, {})},
+                           sort_keys=True))
+
+
 class PlaybackService(Thread):
     def __init__(self, ready_hook=on_ready, error_hook=on_error,
                  stopping_hook=on_stopping, alive_hook=on_alive,
@@ -384,10 +397,8 @@ class PlaybackService(Thread):
         config = Configuration().get("tts", {})
         tts_m = config.get("module", "")
         ftts_m = config.get("fallback_module", "")
-        _tts_hash = hash(json.dumps(config.get(tts_m, {}),
-                                    sort_keys=True))
-        _ftts_hash = hash(json.dumps(config.get(ftts_m, {}),
-                                     sort_keys=True))
+        _tts_hash = tts_config_hash(config, tts_m)
+        _ftts_hash = tts_config_hash(config, ftts_m)
 
         # update TTS object if configuration has changed
         if not self._tts_hash or self._tts_hash != _tts_hash:
@@ -418,6 +429,11 @@ class PlaybackService(Thread):
             with self.lock:
                 if self.fallback_tts:
                     self.fallback_tts.shutdown()
+                    # _get_tts_fallback only builds an engine when there is
+                    # none, and shutdown does not clear the attribute, so the
+                    # old one has to go or the reload hands back the engine it
+                    # just shut down.
+                    self.fallback_tts = None
                 # Create new tts instance
                 LOG.info("(re)loading fallback TTS engine")
                 self._get_tts_fallback()

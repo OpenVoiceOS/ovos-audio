@@ -348,3 +348,103 @@ class TestReportTiming(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# ===========================================================================
+# service.py — _maybe_reload_tts: the module name must take part in the hash
+# ===========================================================================
+
+class TestReloadOnModuleChange(unittest.TestCase):
+    """Swapping tts.module must reload the engine.
+
+    The reload hash covered only the selected module's own settings block. Two
+    plugins with no settings of their own therefore hashed identically, so the
+    swap looked like no change and the old engine kept speaking until the
+    service restarted.
+    """
+
+    @staticmethod
+    def _cfg(module):
+        return {"tts": {"module": module, "fallback_module": "", "preload_fallback": False}}
+
+    def _reload_with(self, svc, module, new_tts):
+        with patch("ovos_audio.service.Configuration", return_value=self._cfg(module)), \
+             patch("ovos_audio.service.TTSFactory.create", return_value=new_tts), \
+             patch.object(svc, "_get_tts_fallback"):
+            svc._maybe_reload_tts()
+
+    def test_changing_the_module_reloads_even_without_a_settings_block(self):
+        old = MagicMock()
+        svc = _make_svc(tts=old, disable_fallback=True)
+        self._reload_with(svc, "ovos-tts-plugin-mimic3", MagicMock())
+        first_hash = svc._tts_hash
+
+        new = MagicMock()
+        self._reload_with(svc, "ovos-tts-plugin-piper", new)
+
+        self.assertNotEqual(first_hash, svc._tts_hash,
+                            "the module name is not part of the reload hash")
+        self.assertIs(svc.tts, new, "the engine was not swapped")
+
+    def test_saving_the_same_module_again_does_not_reload(self):
+        svc = _make_svc(tts=MagicMock(), disable_fallback=True)
+        self._reload_with(svc, "ovos-tts-plugin-piper", MagicMock())
+        settled = svc.tts
+
+        self._reload_with(svc, "ovos-tts-plugin-piper", MagicMock())
+        self.assertIs(svc.tts, settled, "an unchanged configuration reloaded anyway")
+
+    def test_changing_the_fallback_module_reloads_the_fallback(self):
+        svc = _make_svc(tts=MagicMock(), fallback_tts=MagicMock())
+        cfg = {"tts": {"module": "main", "fallback_module": "fb-one",
+                       "preload_fallback": True}}
+        with patch("ovos_audio.service.Configuration", return_value=cfg), \
+             patch("ovos_audio.service.TTSFactory.create", return_value=MagicMock()), \
+             patch.object(svc, "_get_tts_fallback"):
+            svc._maybe_reload_tts()
+        first = svc._fallback_tts_hash
+
+        cfg["tts"]["fallback_module"] = "fb-two"
+        with patch("ovos_audio.service.Configuration", return_value=cfg), \
+             patch("ovos_audio.service.TTSFactory.create", return_value=MagicMock()), \
+             patch.object(svc, "_get_tts_fallback"):
+            svc._maybe_reload_tts()
+
+        self.assertNotEqual(first, svc._fallback_tts_hash,
+                            "the fallback module name is not part of its hash")
+
+
+class TestFallbackReloadReplacesTheEngine(unittest.TestCase):
+    """Reloading the fallback must produce the NEW plugin, not the old one.
+
+    `_get_tts_fallback` is lazy: it builds an engine only `if not
+    self.fallback_tts`. Shutting the old one down does not clear the attribute,
+    so the reload branch shut the engine down and then handed the same dead
+    object straight back. The tests around this mocked `_get_tts_fallback`,
+    which is exactly why it went unseen.
+    """
+
+    def test_changing_the_fallback_module_builds_the_new_one(self):
+        old_fallback = MagicMock()
+        svc = _make_svc(tts=MagicMock(), fallback_tts=old_fallback)
+        svc._tts_hash = None
+        svc._fallback_tts_hash = "stale"
+
+        cfg = {"tts": {"module": "main", "fallback_module": "fb-two",
+                       "preload_fallback": True}}
+        created = []
+
+        def _create(config):
+            engine = MagicMock()
+            created.append(config.get("tts", {}).get("module"))
+            return engine
+
+        # _get_tts_fallback is deliberately NOT mocked: it is what was broken.
+        with patch("ovos_audio.service.Configuration", return_value=cfg), \
+             patch("ovos_audio.service.TTSFactory.create", side_effect=_create):
+            svc._maybe_reload_tts()
+
+        old_fallback.shutdown.assert_called_once()
+        self.assertIsNot(svc.fallback_tts, old_fallback,
+                         "the shut-down fallback engine is still in use")
+        self.assertIn("fb-two", created,
+                      f"the replacement fallback was never built: {created}")
