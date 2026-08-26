@@ -8,13 +8,14 @@ dynamic = ["version"]
 description = "ovos-core audio daemon client"
 readme = "README.md"
 license = "Apache-2.0"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 dependencies = [
-    "ovos-utils>=0.8.0,<1.0.0",
-    "ovos_bus_client>=1.3.0,<2.0.0",
+    "ovos-utils>=0.8.5,<1.0.0",
+    "ovos_bus_client>=2.8.3a1,<3.0.0",
     "ovos-config>=0.0.12,<3.0.0",
-    "ovos-plugin-manager>=2.0.0,<3.0.0",
+    "ovos-plugin-manager>=2.10.0a1,<3.0.0",
+    "ovos-spec-tools>=0.17.3a1",
 ]
 
 [project.urls]
@@ -23,22 +24,33 @@ Repository = "https://github.com/OpenVoiceOS/ovos-audio"
 
 [project.optional-dependencies]
 test = [
-    "ovoscope>0.10.0",
+    # ovoscope >=1.0.2a1 carries the MockTTS.__del__ fix: a GC'd mock from an
+    # earlier harness used to terminate a later harness's shared playback
+    # thread, flaking the test/end2end/ suite. The 1.0.x line is also the first
+    # whose transitive ovos-core no longer caps ovos-bus-client<2.0.0; the
+    # AUDIO-1 dual-namespace e2e needs the bus-client 2.5.x spec<->legacy mirror.
+    # Floor-pinned (>=) so pip resolves the prerelease with no --pre.
+    # See test/end2end/test_b64_dual_namespace_e2e.py
+    "ovoscope>=1.0.2a1",
     "pytest>=5.2.4",
     "pytest-cov>=2.8.1",
     "cov-core>=1.15.0",
-    "ovos_audio_plugin_simple>=0.1.0, <1.0.0",
+    "ovos-media-plugin-simple>=0.1.0a1, <1.0.0",
 ]
 extras = [
-    "ovos-dialog-normalizer-plugin>=0.0.1, <1.0.0",
-    "ovos-tts-plugin-server>=0.0.2, <1.0.0",
-    "ovos-tts-plugin-piper>=0.2.4, <1.0.0",
+    "ovos-dialog-normalizer-plugin>=0.0.3a1, <1.0.0",
+    "ovos-tts-plugin-server>=0.0.6a1, <1.0.0",
     "phoonnx>=0.5.4, <1.0.0",
-    "ovos_audio_plugin_simple>=0.1.0, <1.0.0",
-    "ovos-audio-plugin-mpv>=0.2.0, <1.0.0",
-    "ovos-media-plugin-spotify>=0.2.3, <1.0.0",
-    "ovos-media-plugin-chromecast>=0.1.0, <1.0.0",
-    "ovos_plugin_common_play[extractors]>=1.1.4, <2.0.0",
+    # media plugins supersede the deprecated ovos-audio-plugin-* backends and
+    # expose compatible endpoints: simple + mpv replace the old simple/mpv local
+    # playback. ovos-media-plugin-vlc is intentionally NOT a default — its libvlc
+    # binding is (L)GPL, outside the permissive-by-default policy; users opt in
+    # explicitly (pip install ovos-media-plugin-vlc).
+    "ovos-media-plugin-simple>=0.1.0a1, <1.0.0",
+    "ovos-media-plugin-mpv>=1.0.0a2, <2.0.0",
+    "ovos-media-plugin-spotify>=0.2.8a5, <1.0.0",
+    "ovos-media-plugin-chromecast>=0.1.4a8, <1.0.0",
+    "ovos_plugin_common_play[extractors]>=1.3.3a1, <2.0.0",
 ]
 
 [project.scripts]
