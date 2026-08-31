@@ -577,8 +577,14 @@ class PlaybackService(Thread):
                 audio_file = self._path_from_hexdata(hex_audio, audio_ext)
 
             if not audio_file:
-                raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
-            audio_file = self._resolve_sound_uri(audio_file)
+                LOG.warning(f"{SpecMessage.AUDIO_QUEUE} message.data needs to provide "
+                            f"'uri' or 'binary_data': {message.data}")
+                return
+            try:
+                audio_file = self._resolve_sound_uri(audio_file)
+            except FileNotFoundError as e:
+                LOG.warning(f"{SpecMessage.AUDIO_QUEUE} could not resolve sound uri: {e}")
+                return
 
             listen = message.data.get("listen", False)
 
@@ -595,9 +601,15 @@ class PlaybackService(Thread):
         if hex_audio:
             audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
-            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
+            LOG.warning(f"{SpecMessage.AUDIO_PLAY_SOUND} message.data needs to provide "
+                        f"'uri' or 'binary_data': {message.data}")
+            return
 
-        audio_file = self._resolve_sound_uri(audio_file)
+        try:
+            audio_file = self._resolve_sound_uri(audio_file)
+        except FileNotFoundError as e:
+            LOG.warning(f"{SpecMessage.AUDIO_PLAY_SOUND} could not resolve sound uri: {e}")
+            return
 
         # volume handling and audio service ducking
         ensure_volume = message.data.get("force_unmute", False)
