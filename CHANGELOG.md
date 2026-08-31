@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.2a1) (2026-08-31)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.1a2...2.2.2a1)
+
+**Merged pull requests:**
+
+- fix: include requested uri in \_resolve\_sound\_uri error message [\#191](https://github.com/OpenVoiceOS/ovos-audio/pull/191) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.1a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.1a2) (2026-08-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.1a1...2.2.1a2)
+
 ## [2.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.1a1) (2026-08-26)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.0a2...2.2.1a1)
