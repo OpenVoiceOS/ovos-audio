@@ -542,7 +542,7 @@ class PlaybackService(Thread):
                 return local_uri
         audio_file = resolve_resource_file(uri)
         if audio_file is None or not exists(audio_file):
-            raise FileNotFoundError(f"{audio_file} does not exist")
+            raise FileNotFoundError(f"could not resolve sound uri: {uri}")
         return audio_file
 
     @staticmethod

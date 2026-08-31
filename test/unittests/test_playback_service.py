@@ -118,6 +118,13 @@ class TestResolveSoundUri(unittest.TestCase):
         with self.assertRaises((FileNotFoundError, Exception)):
             PlaybackService._resolve_sound_uri("/does/not/exist.wav")
 
+    def test_nonexistent_file_error_names_requested_uri(self):
+        from ovos_audio.service import PlaybackService
+        uri = "no/such/sound-file-xyz.wav"
+        with self.assertRaises(FileNotFoundError) as excinfo:
+            PlaybackService._resolve_sound_uri(uri)
+        self.assertIn(uri, str(excinfo.exception))
+
     def test_none_returns_none(self):
         from ovos_audio.service import PlaybackService
         result = PlaybackService._resolve_sound_uri(None)
