@@ -37,11 +37,11 @@ A daemon `Thread` that consumes entries from `TTS.queue` (a `Queue`) and plays t
 (audio_path: str, visemes: list, listen: bool, tts_id: str, message: Message)
 ```
 
-- `audio_path` — path to the synthesized WAV/MP3 file
-- `visemes` — list of `(phoneme, timestamp)` pairs for mouth animation; `None` if unavailable
-- `listen` — `True` if the microphone should be activated after playback
-- `tts_id` — identifier of the TTS plugin that produced the audio; `"sounds"` for queued sound files
-- `message` — originating `speak` message for context forwarding
+- `audio_path`: path to the synthesized WAV/MP3 file
+- `visemes`: list of `(phoneme, timestamp)` pairs for mouth animation. `None` if unavailable
+- `listen`: `True` if the microphone should be activated after playback
+- `tts_id`: identifier of the TTS plugin that produced the audio. `"sounds"` for queued sound files
+- `message`: originating `speak` message for context forwarding
 
 ### Lifecycle
 
@@ -67,7 +67,7 @@ When `tts.ocp_cork` or `tts.ocp_duck` is set in config, `begin_audio()` and `end
 | `ocp_cork: true` | `ovos.common_play.cork` | `ovos.common_play.uncork` |
 | `ocp_duck: true` | `ovos.common_play.duck` | `ovos.common_play.unduck` |
 
-If `pulse_duck: true`, no bus events are emitted — ducking is handled at the OS PulseAudio level.
+If `pulse_duck: true`, no bus events are emitted. Ducking is handled at the OS PulseAudio level.
 
 ### G2P Integration
 
@@ -89,6 +89,9 @@ If a G2P (Grapheme-to-Phoneme) plugin is configured (`g2p.module` in `mycroft.co
 | `clear_queue()` | Drain the queue and terminate any playing subprocess |
 | `clear()` | Alias for `clear_queue()` |
 | `pause()` | Stop current playback and block the queue |
+
+| Method | Description |
+|---|---|
 | `resume()` | Resume a paused playback |
 | `stop()` | Terminate thread and clear queue |
 | `shutdown()` | Alias for `stop()` |
@@ -111,7 +114,13 @@ If a G2P (Grapheme-to-Phoneme) plugin is configured (`g2p.module` in `mycroft.co
 | `recognizer_loop:audio_output_end` | Playback of a batch of queued audio ends |
 | `recognizer_loop:utterance_start` | Each individual utterance starts playing |
 | `mycroft.mic.listen` | After speech ends when `listen=True` |
+
+| Event | When |
+|---|---|
 | `ovos.common_play.cork` | Before speech if `ocp_cork=True` |
 | `ovos.common_play.uncork` | After speech if `ocp_cork=True` |
 | `ovos.common_play.duck` | Before speech if `ocp_duck=True` |
 | `ovos.common_play.unduck` | After speech if `ocp_duck=True` |
+
+---
+[← playback-service.md](playback-service.md) · [Home](index.md) · [audio-service.md →](audio-service.md)
