@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.3a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.3a1) (2026-08-31)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.2a1...2.2.3a1)
+
+**Closed issues:**
+
+- handle\_instant\_play: FileNotFoundError names the resolved path \(None\), not the requested URI [\#190](https://github.com/OpenVoiceOS/ovos-audio/issues/190)
+
+**Merged pull requests:**
+
+- fix: contain crash-shaped exceptions in playback bus handlers [\#193](https://github.com/OpenVoiceOS/ovos-audio/pull/193) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.2.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.2a1) (2026-08-31)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.1a2...2.2.2a1)
