@@ -228,11 +228,12 @@ class TestMaybeReloadFallbackShutdown(unittest.TestCase):
 
 class TestHandleInstantPlayNoUri(unittest.TestCase):
 
-    def test_raises_value_error_when_no_uri_or_binary_data(self):
+    def test_logs_and_returns_when_no_uri_or_binary_data(self):
         svc = _make_svc()
         msg = Message("mycroft.audio.play_sound", {})  # no uri, no binary_data
-        with self.assertRaises(ValueError):
+        with patch("ovos_audio.service.LOG") as mock_log:
             svc.handle_instant_play(msg)
+        mock_log.warning.assert_called()
 
 
 # ===========================================================================

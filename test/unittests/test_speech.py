@@ -161,13 +161,15 @@ class TestSpeech(unittest.TestCase):
         bus = mock.Mock()
         speech = PlaybackService(bus=bus)
 
-        with self.assertRaises(ValueError):
+        with mock.patch("ovos_audio.service.LOG") as mock_log:
             msg = Message("", {})
             speech.handle_queue_audio(msg)
+        mock_log.warning.assert_called()
 
-        with self.assertRaises(FileNotFoundError):
+        with mock.patch("ovos_audio.service.LOG") as mock_log:
             msg = Message("", {"filename": "no_exist.mp3"})
             speech.handle_queue_audio(msg)
+        mock_log.warning.assert_called()
 
         # TODO - fix res path and reenable
         #f = f"{MYCROFT_ROOT_PATH}/mycroft/res/snd/start_listening.wav"
