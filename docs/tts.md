@@ -49,13 +49,13 @@ A daemon `Thread` that consumes entries from `TTS.queue` (a `Queue`) and plays t
 PlaybackThread.run()
   └── loop:
         dequeue entry → _play()
-            ├── on_start()         → begin_audio()  → emit recognizer_loop:audio_output_start
+            ├── on_start()         → begin_audio()  → emit ovos.audio.output.started
             ├── TTSTransformersService.transform()   (post-process wav)
             ├── emit recognizer_loop:utterance_start
             ├── play_audio(path)   (subprocess via ovos_utils.sound)
             ├── show_visemes()     (if enclosure set)
-            └── on_end(listen)     → end_audio()    → emit recognizer_loop:audio_output_end
-                                                     → emit mycroft.mic.listen  (if listen=True)
+            └── on_end(listen)     → end_audio()    → emit ovos.audio.output.ended
+                                                     → emit ovos.mic.listen  (if listen=True)
 ```
 
 ### OCP Integration
@@ -110,10 +110,10 @@ If a G2P (Grapheme-to-Phoneme) plugin is configured (`g2p.module` in `mycroft.co
 
 | Event | When |
 |---|---|
-| `recognizer_loop:audio_output_start` | Playback of a batch of queued audio begins |
-| `recognizer_loop:audio_output_end` | Playback of a batch of queued audio ends |
+| `ovos.audio.output.started` | Playback of a batch of queued audio begins |
+| `ovos.audio.output.ended` | Playback of a batch of queued audio ends |
 | `recognizer_loop:utterance_start` | Each individual utterance starts playing |
-| `mycroft.mic.listen` | After speech ends when `listen=True` |
+| `ovos.mic.listen` | After speech ends when `listen=True` |
 
 | Event | When |
 |---|---|

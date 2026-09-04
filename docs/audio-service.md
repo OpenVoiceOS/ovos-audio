@@ -69,8 +69,8 @@ Track format:
 
 | Bus Event | Action |
 |---|---|
-| `recognizer_loop:audio_output_start` | Lower volume (TTS speaking) |
-| `recognizer_loop:audio_output_end` | Restore volume |
+| `ovos.audio.output.started` | Lower volume (TTS speaking) |
+| `ovos.audio.output.ended` | Restore volume |
 | `recognizer_loop:record_begin` | Lower volume (mic active) |
 | `recognizer_loop:record_end` | Restore volume (with 8 s speech-detection grace period) |
 | `ovos.utterance.handled` | Restore volume if not currently speaking |
