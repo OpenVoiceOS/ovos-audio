@@ -52,7 +52,7 @@ _________
 
 ## Persona Support
 
-`ovos-audio` supports dialog-transformer plugins that rewrite generated speech to match a tone or persona. See the [technical manual's dialog transformers page](https://tigregotico.github.io/ovos-technical-manual/dialog-transformers/) for the full transformer chain and priority rules.
+`ovos-audio` supports dialog-transformer plugins that rewrite generated speech to match a tone or persona. See the [technical manual's dialog transformers page](https://openvoiceos.github.io/beta-technical-manual/dialog-transformers/) for the full transformer chain and priority rules.
 
 For example, [ovos-solver-plugin-openai-persona](https://github.com/OpenVoiceOS/ovos-solver-plugin-openai-persona) rewrites text before synthesis, based on a persona string. Sample personas:
 
@@ -85,7 +85,7 @@ By default, OCP delegates to the legacy audio service when needed, so no action 
 
 > **Note:** once `ovos-media` is released, OCP and this API will be disabled by default and deprecated.
 
-See [docs/audio-service.md](docs/audio-service.md) for the module reference, and the [technical manual's OCP audio plugin page](https://tigregotico.github.io/ovos-technical-manual/ocp-audio-plugin/) for how OCP relates to this subsystem.
+See [docs/audio-service.md](docs/audio-service.md) for the module reference, and the [technical manual's OCP audio plugin page](https://openvoiceos.github.io/beta-technical-manual/ocp-audio-plugin/) for how OCP relates to this subsystem.
 
 ```javascript
 {
