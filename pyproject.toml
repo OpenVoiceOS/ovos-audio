@@ -35,7 +35,7 @@ test = [
     "pytest>=5.2.4",
     "pytest-cov>=2.8.1",
     "cov-core>=1.15.0",
-    "ovos-media-plugin-simple>=0.1.0a1, <1.0.0",
+    "ovos-audio-plugin-simple>=0.1.4a3, <1.0.0",
 ]
 extras = [
     "ovos-dialog-normalizer-plugin>=0.0.3a1, <1.0.0",
