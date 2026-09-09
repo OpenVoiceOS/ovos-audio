@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.4a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.4a1) (2026-09-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.3a2...2.2.4a1)
+
+**Merged pull requests:**
+
+- fix: drive TestLegacy with the purpose-built legacy plugin [\#202](https://github.com/OpenVoiceOS/ovos-audio/pull/202) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.2.3a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.3a2) (2026-08-31)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.3a1...2.2.3a2)
