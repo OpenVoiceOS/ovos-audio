@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.6a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.6a2) (2026-09-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.6a1...2.2.6a2)
+
+**Merged pull requests:**
+
+- build: allow ovos-config 3.x [\#199](https://github.com/OpenVoiceOS/ovos-audio/pull/199) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.2.6a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.6a1) (2026-09-10)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.5a1...2.2.6a1)
