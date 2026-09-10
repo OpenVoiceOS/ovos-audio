@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.6a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.6a1) (2026-09-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.5a1...2.2.6a1)
+
+**Merged pull requests:**
+
+- fix: drop deprecated no-op setup\_locale call [\#206](https://github.com/OpenVoiceOS/ovos-audio/pull/206) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.5a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.5a1) (2026-09-09)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.4a1...2.2.5a1)
