@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.7a3](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a3) (2026-09-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a2...2.2.7a3)
+
+**Merged pull requests:**
+
+- docs: point manual links at OpenVoiceOS/beta-technical-manual [\#198](https://github.com/OpenVoiceOS/ovos-audio/pull/198) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.2.7a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a2) (2026-09-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a1...2.2.7a2)
