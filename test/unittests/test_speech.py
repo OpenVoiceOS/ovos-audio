@@ -20,6 +20,7 @@ from ovos_config import Configuration
 from ovos_utils.messagebus import Message, FakeBus
 from ovos_utils.process_utils import ProcessState
 from ovos_bus_client.session import SessionManager, Session
+from ovos_spec_tools import SpecMessage
 """Tests for speech dispatch service."""
 
 tts_mock = mock.Mock()
@@ -52,10 +53,9 @@ class TestSpeech(unittest.TestCase):
         self.assertTrue(tts_factory_mock.create.called)
         self.assertTrue(speech.tts.init.called)
 
-        bus.on.assert_any_call('mycroft.stop', speech.handle_stop)
-        bus.on.assert_any_call('mycroft.audio.speech.stop',
-                               speech.handle_stop)
-        bus.on.assert_any_call('speak', speech.handle_speak)
+        bus.on.assert_any_call('ovos.stop', speech.handle_stop)
+        bus.on.assert_any_call(SpecMessage.AUDIO_STOP, speech.handle_stop)
+        bus.on.assert_any_call(SpecMessage.SPEAK, speech.handle_speak)
 
         self.assertTrue(speech.status.state > ProcessState.STOPPING)
         speech.shutdown()
@@ -161,13 +161,15 @@ class TestSpeech(unittest.TestCase):
         bus = mock.Mock()
         speech = PlaybackService(bus=bus)
 
-        with self.assertRaises(ValueError):
+        with mock.patch("ovos_audio.service.LOG") as mock_log:
             msg = Message("", {})
             speech.handle_queue_audio(msg)
+        mock_log.warning.assert_called()
 
-        with self.assertRaises(FileNotFoundError):
+        with mock.patch("ovos_audio.service.LOG") as mock_log:
             msg = Message("", {"filename": "no_exist.mp3"})
             speech.handle_queue_audio(msg)
+        mock_log.warning.assert_called()
 
         # TODO - fix res path and reenable
         #f = f"{MYCROFT_ROOT_PATH}/mycroft/res/snd/start_listening.wav"
@@ -185,7 +187,7 @@ class TestSpeech(unittest.TestCase):
         speech = PlaybackService(bus=bus)
         speech.execute_tts = mock.Mock()
 
-        msg = Message("speak", {"utterance": "hello world"})
+        msg = Message(SpecMessage.SPEAK, {"utterance": "hello world"})
 
         # test message.context.destination
         msg.context["session"] = Session().serialize() # not default

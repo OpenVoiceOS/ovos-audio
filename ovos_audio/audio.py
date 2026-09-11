@@ -22,6 +22,7 @@ from ovos_plugin_manager.audio import find_audio_service_plugins, \
     setup_audio_service
 from ovos_plugin_manager.ocp import load_stream_extractors
 from ovos_plugin_manager.templates.audio import RemoteAudioBackend
+from ovos_spec_tools import SpecMessage
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import MonotonicEvent
 
@@ -168,6 +169,9 @@ class AudioService:
         self.bus.on('mycroft.audio.service.pause', self._pause)
         self.bus.on('mycroft.audio.service.resume', self._resume)
         self.bus.on('mycroft.audio.service.stop', self._stop)
+        # OVOS-STOP-1 §5.3: media playback is user-visible activity — cease on
+        # the universal stop broadcast (alongside the legacy stop topic).
+        self.bus.on('ovos.stop', self._stop)
         self.bus.on('mycroft.audio.service.next', self._next)
         self.bus.on('mycroft.audio.service.prev', self._prev)
         self.bus.on('mycroft.audio.service.track_info', self._track_info)
@@ -179,8 +183,8 @@ class AudioService:
         self.bus.on('mycroft.audio.service.seek_backward', self._seek_backward)
 
         # audio ducking events
-        self.bus.on('recognizer_loop:audio_output_start', self._lower_volume_on_speak)
-        self.bus.on('recognizer_loop:audio_output_end', self._restore_volume_on_speak)
+        self.bus.on(SpecMessage.AUDIO_OUTPUT_STARTED, self._lower_volume_on_speak)
+        self.bus.on(SpecMessage.AUDIO_OUTPUT_ENDED, self._restore_volume_on_speak)
         self.bus.on('recognizer_loop:record_begin', self._lower_volume_on_record)
         self.bus.on('recognizer_loop:record_end', self._restore_volume_after_record)
         self.bus.on('ovos.utterance.handled', self._restore_volume_on_handled)
@@ -372,7 +376,7 @@ class AudioService:
         if self.current:
             self.bus.on('recognizer_loop:speech.recognition.unknown',
                         restore_volume)
-            speak_msg_detected = self.bus.wait_for_message('speak',
+            speak_msg_detected = self.bus.wait_for_message(SpecMessage.SPEAK,
                                                            timeout=8.0)
             if not speak_msg_detected:
                 restore_volume()
@@ -600,8 +604,8 @@ class AudioService:
         self.bus.remove('mycroft.audio.service.get_track_length', self._get_track_length)
         self.bus.remove('mycroft.audio.service.seek_forward', self._seek_forward)
         self.bus.remove('mycroft.audio.service.seek_backward', self._seek_backward)
-        self.bus.remove('recognizer_loop:audio_output_start', self._lower_volume_on_speak)
+        self.bus.remove(SpecMessage.AUDIO_OUTPUT_STARTED, self._lower_volume_on_speak)
         self.bus.remove('recognizer_loop:record_begin', self._lower_volume_on_record)
-        self.bus.remove('recognizer_loop:audio_output_end', self._restore_volume_on_speak)
+        self.bus.remove(SpecMessage.AUDIO_OUTPUT_ENDED, self._restore_volume_on_speak)
         self.bus.remove('recognizer_loop:record_end', self._restore_volume_after_record)
         self.bus.remove('ovos.utterance.handled', self._restore_volume_on_handled)

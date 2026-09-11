@@ -23,6 +23,7 @@ import time
 import unittest
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 from ovos_bus_client.session import Session
 
 from ovoscope.audio import AudioCaptureSession, AudioServiceHarness
@@ -132,10 +133,10 @@ class TestAudioDuckingLowersVolume(unittest.TestCase):
     """Speech start event triggers volume ducking on active backend."""
 
     def test_audio_ducking_lowers_volume(self) -> None:
-        """recognizer_loop:audio_output_start must call lower_volume."""
+        """ovos.audio.output.started must call lower_volume."""
         with AudioServiceHarness() as h:
             h.play(["http://example.com/track.mp3"])
-            h.bus.emit(Message("recognizer_loop:audio_output_start"))
+            h.bus.emit(Message(SpecMessage.AUDIO_OUTPUT_STARTED))
             time.sleep(0.05)
             h.assert_volume_lowered()
             self.assertTrue(h.service.volume_is_speaking)
@@ -145,12 +146,12 @@ class TestAudioDuckingRestoresVolume(unittest.TestCase):
     """Speech end event restores volume after ducking."""
 
     def test_audio_ducking_restores_volume(self) -> None:
-        """recognizer_loop:audio_output_end must call restore_volume."""
+        """ovos.audio.output.ended must call restore_volume."""
         with AudioServiceHarness() as h:
             h.play(["http://example.com/track.mp3"])
-            h.bus.emit(Message("recognizer_loop:audio_output_start"))
+            h.bus.emit(Message(SpecMessage.AUDIO_OUTPUT_STARTED))
             time.sleep(0.05)
-            h.bus.emit(Message("recognizer_loop:audio_output_end"))
+            h.bus.emit(Message(SpecMessage.AUDIO_OUTPUT_ENDED))
             time.sleep(0.05)
             h.assert_volume_restored()
             self.assertFalse(h.service.volume_is_speaking)
@@ -181,10 +182,10 @@ class TestOcpFlagIntegration(unittest.TestCase):
         with AudioServiceHarness(disable_ocp=True) as h:
             h.play(["http://example.com/track.mp3"])
             self.assertFalse(h.service.volume_is_speaking)
-            h.bus.emit(Message("recognizer_loop:audio_output_start"))
+            h.bus.emit(Message(SpecMessage.AUDIO_OUTPUT_STARTED))
             time.sleep(0.05)
             self.assertTrue(h.service.volume_is_speaking)
-            h.bus.emit(Message("recognizer_loop:audio_output_end"))
+            h.bus.emit(Message(SpecMessage.AUDIO_OUTPUT_ENDED))
             time.sleep(0.05)
             self.assertFalse(h.service.volume_is_speaking)
 

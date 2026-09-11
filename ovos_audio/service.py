@@ -18,10 +18,12 @@ from ovos_config.config import Configuration
 from ovos_plugin_manager.g2p import get_g2p_lang_configs, get_g2p_supported_langs, get_g2p_module_configs
 from ovos_plugin_manager.tts import TTS
 from ovos_plugin_manager.tts import get_tts_supported_langs, get_tts_lang_configs, get_tts_module_configs
+from ovos_spec_tools import SpecMessage
 from ovos_utils.file_utils import resolve_resource_file
 from ovos_utils.log import LOG, deprecated
 from ovos_utils.metrics import Stopwatch
 from ovos_utils.process_utils import ProcessStatus, StatusCallbackMap
+from ovos_utils.skill_installer import ServiceInstaller
 from ovos_utils.sound import play_audio
 
 from ovos_audio.audio import AudioService
@@ -49,6 +51,19 @@ def on_error(e='Unknown'):
 
 def on_stopping():
     LOG.info('TTS service is shutting down...')
+
+
+def tts_config_hash(tts_config: dict, module: str) -> int:
+    """Hash what decides whether a TTS engine has to be rebuilt.
+
+    The plugin name takes part in the hash, not only its settings block. Two
+    plugins that carry no settings of their own both hash to an empty block, so
+    without the name a swap between them looks like no change and the old engine
+    keeps speaking until the service restarts.
+    """
+    return hash(json.dumps({"module": module,
+                            "config": tts_config.get(module, {})},
+                           sort_keys=True))
 
 
 class PlaybackService(Thread):
@@ -86,6 +101,10 @@ class PlaybackService(Thread):
         self.bus = bus
         self.status.bind(self.bus)
         self.init_messagebus()
+        # Install/uninstall plugins into THIS service's environment when asked
+        # over the bus (ovos.pip.install / ovos.pip.install.ovos-audio). Gated
+        # by the 'skills.installer.allow_pip' config, off by default.
+        self.installer = ServiceInstaller(self.bus, service_name="ovos_audio")
         self.dialog_transform = DialogTransformersService(self.bus)
         if TTS.queue is None:
             TTS.queue = Queue()
@@ -282,6 +301,14 @@ class PlaybackService(Thread):
         """synthesizes speech, but instead of queuing for playback
         returns it b64 encoded in the bus
         allows 3rd party integrations to use OVOS as a TTS service
+
+        OVOS-AUDIO-1 §3.4: this is the remote-client rendering mode. It is
+        reached via the spec topic 'ovos.utterance.speak.b64'
+        (SpecMessage.SPEAK_B64) and the legacy 'speak:b64_audio'. The
+        synthesised audio is emitted as 'ovos.audio.speech'
+        (SpecMessage.AUDIO_SPEECH, §4.3) instead of being enqueued for local
+        playback. When the originating Message carries listen=True, the
+        service emits 'ovos.mic.listen' after 'ovos.audio.speech'.
         """
         sess = SessionManager.get(message)
         stopwatch = Stopwatch()
@@ -296,10 +323,18 @@ class PlaybackService(Thread):
             audio = f.read()
 
         b64_audio = base64.b64encode(audio).decode("utf-8")
-        self.bus.emit(message.response({"audio": b64_audio,
-                                        "listen": listen,
-                                        'tts_id': self.tts.plugin_id,
-                                        "utterance": utterance}))
+        payload = {"audio": b64_audio,
+                   "listen": listen,
+                   'tts_id': self.tts.plugin_id,
+                   "utterance": utterance}
+        # OVOS-AUDIO-1 §3.4/§4.3: emit the spec topic only. The bus client's
+        # emit_legacy flag mirrors it onto the legacy speak:b64_audio.response
+        # (ovos-spec-tools MIGRATION_MAP), so hand-emitting the legacy reply
+        # here too would put it on the wire twice.
+        self.bus.emit(message.forward(SpecMessage.AUDIO_SPEECH, payload))
+        # OVOS-AUDIO-1 §3.4: re-open the remote client's input channel
+        if listen:
+            self.bus.emit(message.forward(SpecMessage.MIC_LISTEN))
 
         stopwatch.stop()
         report_timing(sess.session_id, stopwatch,
@@ -328,7 +363,7 @@ class PlaybackService(Thread):
             stopwatch = Stopwatch()
             stopwatch.start()
 
-            utterance = message.data['utterance']
+            utterance = message.data.get('utterance')
 
             # allow dialog transformers to rewrite speech
             skill_id = message.data.get("meta", {}).get("skill") or message.context.get("skill_id")
@@ -362,10 +397,8 @@ class PlaybackService(Thread):
         config = Configuration().get("tts", {})
         tts_m = config.get("module", "")
         ftts_m = config.get("fallback_module", "")
-        _tts_hash = hash(json.dumps(config.get(tts_m, {}),
-                                    sort_keys=True))
-        _ftts_hash = hash(json.dumps(config.get(ftts_m, {}),
-                                     sort_keys=True))
+        _tts_hash = tts_config_hash(config, tts_m)
+        _ftts_hash = tts_config_hash(config, ftts_m)
 
         # update TTS object if configuration has changed
         if not self._tts_hash or self._tts_hash != _tts_hash:
@@ -396,6 +429,11 @@ class PlaybackService(Thread):
             with self.lock:
                 if self.fallback_tts:
                     self.fallback_tts.shutdown()
+                    # _get_tts_fallback only builds an engine when there is
+                    # none, and shutdown does not clear the attribute, so the
+                    # old one has to go or the reload hands back the engine it
+                    # just shut down.
+                    self.fallback_tts = None
                 # Create new tts instance
                 LOG.info("(re)loading fallback TTS engine")
                 self._get_tts_fallback()
@@ -461,8 +499,26 @@ class PlaybackService(Thread):
             self.tts.playback._now_playing is not None
 
     def handle_speak_status(self, message: Message):
+        """OVOS-AUDIO-1 §5.3: answer a speaking-status query.
+
+        Reachable via the spec query topic 'ovos.audio.is_speaking'
+        (SpecMessage.AUDIO_IS_SPEAKING) and the legacy
+        'mycroft.audio.speak.status'. The reply carries {"speaking": bool}
+        on the spec topic; the legacy topic name is kept for back-compat.
+        """
+        # The spec query topic and the spec reply topic share the name
+        # 'ovos.audio.is_speaking' (§5.3). Since this handler also subscribes
+        # to that topic, ignore messages that already carry the answer so the
+        # service never replies to its own reply.
+        if "speaking" in message.data:
+            return
+        speaking = self.is_speaking
+        # spec reply (OVOS-AUDIO-1 §5.3)
+        self.bus.emit(message.reply(SpecMessage.AUDIO_IS_SPEAKING,
+                                    {"speaking": speaking}))
+        # legacy reply name for back-compat
         self.bus.emit(message.reply("mycroft.audio.is_speaking",
-                                    {"speaking": self.is_speaking}))
+                                    {"speaking": speaking}))
 
     def handle_stop(self, message: Message):
         """Handle stop message.
@@ -486,7 +542,7 @@ class PlaybackService(Thread):
                 return local_uri
         audio_file = resolve_resource_file(uri)
         if audio_file is None or not exists(audio_file):
-            raise FileNotFoundError(f"{audio_file} does not exist")
+            raise FileNotFoundError(f"could not resolve sound uri: {uri}")
         return audio_file
 
     @staticmethod
@@ -521,8 +577,14 @@ class PlaybackService(Thread):
                 audio_file = self._path_from_hexdata(hex_audio, audio_ext)
 
             if not audio_file:
-                raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
-            audio_file = self._resolve_sound_uri(audio_file)
+                LOG.warning(f"{SpecMessage.AUDIO_QUEUE} message.data needs to provide "
+                            f"'uri' or 'binary_data': {message.data}")
+                return
+            try:
+                audio_file = self._resolve_sound_uri(audio_file)
+            except FileNotFoundError as e:
+                LOG.warning(f"{SpecMessage.AUDIO_QUEUE} could not resolve sound uri: {e}")
+                return
 
             listen = message.data.get("listen", False)
 
@@ -539,9 +601,15 @@ class PlaybackService(Thread):
         if hex_audio:
             audio_file = self._path_from_hexdata(hex_audio, audio_ext)
         if not audio_file:
-            raise ValueError(f"message.data needs to provide 'uri' or 'binary_data': {message.data}")
+            LOG.warning(f"{SpecMessage.AUDIO_PLAY_SOUND} message.data needs to provide "
+                        f"'uri' or 'binary_data': {message.data}")
+            return
 
-        audio_file = self._resolve_sound_uri(audio_file)
+        try:
+            audio_file = self._resolve_sound_uri(audio_file)
+        except FileNotFoundError as e:
+            LOG.warning(f"{SpecMessage.AUDIO_PLAY_SOUND} could not resolve sound uri: {e}")
+            return
 
         # volume handling and audio service ducking
         ensure_volume = message.data.get("force_unmute", False)
@@ -567,7 +635,16 @@ class PlaybackService(Thread):
             if muted:
                 self.bus.emit(Message("mycroft.volume.mute"))
 
+        # OVOS-AUDIO-1 §4.2: reply on the incoming topic's own '.response'
+        # suffix. The generic '<topic>.response' derivation is NOT one of the
+        # ovos-spec-tools MIGRATION_MAP pairs (only base request topics are
+        # mapped, not their derived replies), so the namespace bridge does not
+        # mirror it: a caller that reached this handler via the legacy
+        # 'mycroft.audio.play_sound' request would otherwise never see a
+        # response. Emit both spellings explicitly, matching
+        # handle_speak_status's hand-mirrored reply.
         self.bus.emit(message.response({}))
+        self.bus.emit(message.reply("mycroft.audio.play_sound.response", {}))
 
     def handle_get_languages_tts(self, message):
         """
@@ -585,6 +662,8 @@ class PlaybackService(Thread):
         Stop any playing audio and make sure threads are joined correctly.
         """
         self.status.set_stopping()
+        if getattr(self, "installer", None):
+            self.installer.shutdown()
         if self.playback_thread:
             self.playback_thread.shutdown()
             self.playback_thread.join()
@@ -596,13 +675,39 @@ class PlaybackService(Thread):
         Start speech related handlers.
         """
         Configuration.set_config_update_handlers(self.bus)
-        self.bus.on('mycroft.stop', self.handle_stop)
-        self.bus.on('mycroft.audio.speech.stop', self.handle_stop)
-        self.bus.on('mycroft.audio.speak.status', self.handle_speak_status)
-        self.bus.on('mycroft.audio.queue', self.handle_queue_audio)
-        self.bus.on('mycroft.audio.play_sound', self.handle_instant_play)
-        self.bus.on('speak', self.handle_speak)
-        self.bus.on('speak:b64_audio', self.handle_b64_audio)
+        # OVOS-STOP-1 §5.3: a non-skill component with user-visible activity MUST
+        # cease on the universal stop broadcast. The legacy 'mycroft.stop' topic
+        # is mirrored onto 'ovos.stop' by the bus-client compat boundary
+        # (ovos-bus-client's namespace bridge, client.py), so a single
+        # spec-namespace subscription suffices here.
+        self.bus.on('ovos.stop', self.handle_stop)
+        # OVOS-AUDIO-1 §6: 'ovos.audio.stop' is the spec stop-audio topic. The
+        # legacy 'mycroft.audio.speech.stop' is mirrored onto it by the
+        # bus-client compat boundary; no separate legacy subscription needed.
+        self.bus.on(SpecMessage.AUDIO_STOP, self.handle_stop)
+        # OVOS-AUDIO-1 §5.3: 'ovos.audio.is_speaking' is the spec speaking-status
+        # query topic. The legacy 'mycroft.audio.speak.status' is mirrored onto
+        # it by the bus-client compat boundary; no separate legacy subscription
+        # needed.
+        self.bus.on(SpecMessage.AUDIO_IS_SPEAKING, self.handle_speak_status)
+        # OVOS-AUDIO-1 §4.1: 'ovos.audio.queue' is the spec queued-sound topic.
+        # The legacy 'mycroft.audio.queue' is mirrored onto it by the bus-client
+        # compat boundary; no separate legacy subscription needed.
+        self.bus.on(SpecMessage.AUDIO_QUEUE, self.handle_queue_audio)
+        # OVOS-AUDIO-1 §4.2: 'ovos.audio.play_sound' is the spec instant-sound
+        # topic. The legacy 'mycroft.audio.play_sound' is mirrored onto it by
+        # the bus-client compat boundary; no separate legacy subscription
+        # needed.
+        self.bus.on(SpecMessage.AUDIO_PLAY_SOUND, self.handle_instant_play)
+        # OVOS-PIPELINE-1 §9.6: consume the spec-named natural-language response
+        # topic. The bus client's modernize flag routes legacy 'speak' emitters
+        # to this listener, so a single spec-namespace subscription suffices.
+        self.bus.on(SpecMessage.SPEAK, self.handle_speak)
+        # OVOS-AUDIO-1 §3.4: 'ovos.utterance.speak.b64' is the spec remote-client
+        # rendering topic. The legacy 'speak:b64_audio' is mirrored onto it by
+        # the bus-client compat boundary; no separate legacy subscription
+        # needed.
+        self.bus.on(SpecMessage.SPEAK_B64, self.handle_b64_audio)
         self.bus.on('ovos.languages.tts', self.handle_get_languages_tts)
         self.bus.on("opm.tts.query", self.handle_opm_tts_query)
         self.bus.on("opm.audio.query", self.handle_opm_audio_query)

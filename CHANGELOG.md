@@ -1,21 +1,202 @@
 # Changelog
 
-## [1.2.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.0a1) (2026-03-11)
+## [2.2.7a3](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a3) (2026-09-11)
 
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.2a1...1.2.0a1)
-
-**Merged pull requests:**
-
-- feat: migrate to pyproject.toml and extend test coverage to 98% [\#147](https://github.com/OpenVoiceOS/ovos-audio/pull/147) ([JarbasAl](https://github.com/JarbasAl))
-
-## [1.1.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.2a1) (2026-01-23)
-
-[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.1...1.1.2a1)
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a2...2.2.7a3)
 
 **Merged pull requests:**
 
-- chore\(deps\): update actions/setup-python action to v6 [\#142](https://github.com/OpenVoiceOS/ovos-audio/pull/142) ([renovate[bot]](https://github.com/apps/renovate))
-- chore\(deps\): update actions/checkout action to v6 [\#141](https://github.com/OpenVoiceOS/ovos-audio/pull/141) ([renovate[bot]](https://github.com/apps/renovate))
+- docs: point manual links at OpenVoiceOS/beta-technical-manual [\#198](https://github.com/OpenVoiceOS/ovos-audio/pull/198) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.7a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a2) (2026-09-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a1...2.2.7a2)
+
+**Merged pull requests:**
+
+- docs: fix stale recognizer\_loop:audio\_output\_\*/mycroft.mic.listen topic names [\#197](https://github.com/OpenVoiceOS/ovos-audio/pull/197) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.7a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a1) (2026-09-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.6a2...2.2.7a1)
+
+**Merged pull requests:**
+
+- fix: point the extras at the renamed media plugin package [\#205](https://github.com/OpenVoiceOS/ovos-audio/pull/205) ([JarbasAl](https://github.com/JarbasAl))
+- Add duration to utterance\_start message [\#146](https://github.com/OpenVoiceOS/ovos-audio/pull/146) ([femelo](https://github.com/femelo))
+
+## [2.2.6a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.6a2) (2026-09-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.6a1...2.2.6a2)
+
+**Merged pull requests:**
+
+- build: allow ovos-config 3.x [\#199](https://github.com/OpenVoiceOS/ovos-audio/pull/199) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.6a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.6a1) (2026-09-10)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.5a1...2.2.6a1)
+
+**Merged pull requests:**
+
+- fix: drop deprecated no-op setup\_locale call [\#206](https://github.com/OpenVoiceOS/ovos-audio/pull/206) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
+## [2.2.5a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.5a1) (2026-09-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.4a1...2.2.5a1)
+
+**Merged pull requests:**
+
+- fix: read each transformer stage's own config section [\#201](https://github.com/OpenVoiceOS/ovos-audio/pull/201) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.4a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.4a1) (2026-09-09)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.3a2...2.2.4a1)
+
+**Merged pull requests:**
+
+- fix: drive TestLegacy with the purpose-built legacy plugin [\#202](https://github.com/OpenVoiceOS/ovos-audio/pull/202) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.3a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.3a2) (2026-08-31)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.3a1...2.2.3a2)
+
+**Merged pull requests:**
+
+- docs: cross-link the technical manual [\#180](https://github.com/OpenVoiceOS/ovos-audio/pull/180) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.3a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.3a1) (2026-08-31)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.2a1...2.2.3a1)
+
+**Closed issues:**
+
+- handle\_instant\_play: FileNotFoundError names the resolved path \(None\), not the requested URI [\#190](https://github.com/OpenVoiceOS/ovos-audio/issues/190)
+
+**Merged pull requests:**
+
+- fix: contain crash-shaped exceptions in playback bus handlers [\#193](https://github.com/OpenVoiceOS/ovos-audio/pull/193) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.2a1) (2026-08-31)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.1a2...2.2.2a1)
+
+**Merged pull requests:**
+
+- fix: include requested uri in \_resolve\_sound\_uri error message [\#191](https://github.com/OpenVoiceOS/ovos-audio/pull/191) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.1a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.1a2) (2026-08-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.1a1...2.2.1a2)
+
+## [2.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.1a1) (2026-08-26)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.0a2...2.2.1a1)
+
+**Closed issues:**
+
+- Changing tts.module does not reload the engine unless the new plugin has a config block [\#186](https://github.com/OpenVoiceOS/ovos-audio/issues/186)
+
+**Merged pull requests:**
+
+- fix: reload the TTS engine when the plugin changes [\#187](https://github.com/OpenVoiceOS/ovos-audio/pull/187) ([JarbasAl](https://github.com/JarbasAl))
+- docs: rewrite README in Simplified Technical English [\#178](https://github.com/OpenVoiceOS/ovos-audio/pull/178) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.0a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.0a2) (2026-08-15)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.0a1...2.2.0a2)
+
+**Merged pull requests:**
+
+- refactor: drop redundant legacy dual bus subscriptions [\#179](https://github.com/OpenVoiceOS/ovos-audio/pull/179) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.2.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.0a1) (2026-08-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.1.1a2...2.2.0a1)
+
+**Merged pull requests:**
+
+- feat: run ServiceInstaller \(install plugins into the audio env over the bus\) [\#181](https://github.com/OpenVoiceOS/ovos-audio/pull/181) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.1.1a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.1.1a2) (2026-07-17)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.1.1a1...2.1.1a2)
+
+**Merged pull requests:**
+
+- refactor: consume transformer runner services from ovos-plugin-manager [\#175](https://github.com/OpenVoiceOS/ovos-audio/pull/175) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.1.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.1.1a1) (2026-06-28)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.1.0a1...2.1.1a1)
+
+**Merged pull requests:**
+
+- fix: lift ovos-spec-tools upper bound \(spec-tools 1.x\) [\#173](https://github.com/OpenVoiceOS/ovos-audio/pull/173) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.1.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.1.0a1) (2026-06-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.2a1...2.1.0a1)
+
+**Merged pull requests:**
+
+- feat: adopt AUDIO-1 spec output topics \(dual-namespace\) [\#171](https://github.com/OpenVoiceOS/ovos-audio/pull/171) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.0.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.2a1) (2026-06-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.1a1...2.0.2a1)
+
+**Merged pull requests:**
+
+- fix: floor media-plugin chromecast/spotify to bus-client-2.x prereleases [\#169](https://github.com/OpenVoiceOS/ovos-audio/pull/169) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.1a1) (2026-06-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.0.0a1...2.0.1a1)
+
+**Merged pull requests:**
+
+- fix: media-plugin backends replace deprecated audio-plugin-\*; single-source pyproject [\#167](https://github.com/OpenVoiceOS/ovos-audio/pull/167) ([JarbasAl](https://github.com/JarbasAl))
+
+## [2.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.0.0a1) (2026-06-25)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.3.0a1...2.0.0a1)
+
+**Breaking changes:**
+
+- feat!: migrate audio output to OVOS spec bus namespace [\#165](https://github.com/OpenVoiceOS/ovos-audio/pull/165) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.3.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.3.0a1) (2026-06-24)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.3a1...1.3.0a1)
+
+**Merged pull requests:**
+
+- feat: consume both bus namespaces for speak and stop \(PIPELINE-1 §9.6, STOP-1 §5.3\) [\#158](https://github.com/OpenVoiceOS/ovos-audio/pull/158) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.2.3a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.3a1) (2026-06-20)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.2a1...1.2.3a1)
+
+**Merged pull requests:**
+
+- fix: allow ovos-bus-client 2.x [\#161](https://github.com/OpenVoiceOS/ovos-audio/pull/161) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.2.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.2a1) (2026-06-06)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.1a1...1.2.2a1)
+
+**Merged pull requests:**
+
+- fix\(deps\): allow ovos-bus-client 2.x \(widen cap to \<3.0.0\) [\#159](https://github.com/OpenVoiceOS/ovos-audio/pull/159) ([JarbasAl](https://github.com/JarbasAl))
+
+## [1.2.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.2.1a1) (2026-03-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.2.0...1.2.1a1)
+
+**Merged pull requests:**
+
+- Update phoonnx requirement from \<1.0.0,\>=0.5.4 to \>=0.5.4,\<2.0.0 in /requirements [\#151](https://github.com/OpenVoiceOS/ovos-audio/pull/151) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 
 
