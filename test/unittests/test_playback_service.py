@@ -34,19 +34,9 @@ class TestPlaybackServiceConfigDefaults(unittest.TestCase):
         self.assertIn('"enable_old_audioservice", True', src,
                       "audio_enabled default must be True (TODO: flip to False)")
 
-    def test_disable_ocp_default_is_false(self):
-        src = self._read_defaults_from_source()
-        # The line: disable_ocp = self.config.get("disable_ocp", False)
-        self.assertIn('"disable_ocp", False', src,
-                      "disable_ocp default must be False (TODO: flip to True)")
-
     def test_audio_enabled_config_key_name(self):
         src = self._read_defaults_from_source()
         self.assertIn("enable_old_audioservice", src)
-
-    def test_disable_ocp_config_key_name(self):
-        src = self._read_defaults_from_source()
-        self.assertIn("disable_ocp", src)
 
 
 # ---------------------------------------------------------------------------

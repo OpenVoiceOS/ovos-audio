@@ -25,13 +25,12 @@ from unittest.mock import MagicMock, patch, call
 from ovos_utils.fakebus import FakeBus
 
 
-def _make_service(disable_ocp=True, validate_source=False, config=None):
+def _make_service(validate_source=False, config=None):
     from ovos_audio.audio import AudioService
     bus = FakeBus()
     cfg = config or {}
     with patch("ovos_audio.audio.Configuration", return_value={"Audio": cfg}):
         svc = AudioService(bus, autoload=False,
-                           disable_ocp=disable_ocp,
                            validate_source=validate_source)
     return svc
 
@@ -615,7 +614,7 @@ class TestLoadServicesRemote(unittest.TestCase):
         remote_backend = MagicMock(spec=RemoteAudioBackend)
 
         with patch("ovos_audio.audio.Configuration", return_value={"Audio": {}}):
-            svc = AudioService(bus, autoload=False, disable_ocp=True, validate_source=False)
+            svc = AudioService(bus, autoload=False, validate_source=False)
 
         local_plugin = MagicMock()
         remote_plugin = MagicMock()
@@ -630,7 +629,6 @@ class TestLoadServicesRemote(unittest.TestCase):
              patch("ovos_audio.audio.setup_audio_service", side_effect=fake_setup), \
              patch("ovos_audio.audio.isinstance",
                    side_effect=lambda obj, cls: cls == RemoteAudioBackend and obj is remote_backend), \
-             patch.object(svc, "find_ocp"), \
              patch.object(svc, "find_default"):
             svc.load_services()
         # set_track_start_callback should be called for each loaded service
@@ -640,7 +638,7 @@ class TestLoadServicesRemote(unittest.TestCase):
         from ovos_audio.audio import AudioService
         bus = FakeBus()
         with patch("ovos_audio.audio.Configuration", return_value={"Audio": {}}):
-            svc = AudioService(bus, autoload=False, disable_ocp=True, validate_source=False)
+            svc = AudioService(bus, autoload=False, validate_source=False)
 
         b1 = MagicMock()
         b2 = MagicMock()
@@ -649,7 +647,6 @@ class TestLoadServicesRemote(unittest.TestCase):
                    return_value={"p1": MagicMock(), "p2": MagicMock()}), \
              patch("ovos_audio.audio.setup_audio_service",
                    side_effect=[[b1], [b2]]), \
-             patch.object(svc, "find_ocp"), \
              patch.object(svc, "find_default"):
             svc.load_services()
 

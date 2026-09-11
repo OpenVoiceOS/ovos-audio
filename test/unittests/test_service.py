@@ -244,7 +244,7 @@ class TestService(unittest.TestCase):
                          service_names)
         service.shutdown()
 
-        service = AudioService(self.emitter, disable_ocp=True)
+        service = AudioService(self.emitter)
         service_names = [s.name for s in service.service]
         self.assertEqual(service_names, {"ovos_vlc", "ovos_simple"},
                          service_names)
