@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.7a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a2) (2026-09-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a1...2.2.7a2)
+
+**Merged pull requests:**
+
+- docs: fix stale recognizer\_loop:audio\_output\_\*/mycroft.mic.listen topic names [\#197](https://github.com/OpenVoiceOS/ovos-audio/pull/197) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [2.2.7a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a1) (2026-09-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.6a2...2.2.7a1)
