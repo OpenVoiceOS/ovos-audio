@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.2.7a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a1) (2026-09-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.6a2...2.2.7a1)
+
+**Merged pull requests:**
+
+- fix: point the extras at the renamed media plugin package [\#205](https://github.com/OpenVoiceOS/ovos-audio/pull/205) ([JarbasAl](https://github.com/JarbasAl))
+- Add duration to utterance\_start message [\#146](https://github.com/OpenVoiceOS/ovos-audio/pull/146) ([femelo](https://github.com/femelo))
+
 ## [2.2.6a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.6a2) (2026-09-10)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.6a1...2.2.6a2)
