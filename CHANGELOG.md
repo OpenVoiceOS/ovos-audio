@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.8a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.8a1) (2026-09-18)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a3...2.2.8a1)
+
+**Merged pull requests:**
+
+- Update dependency phoonnx to v1 [\#149](https://github.com/OpenVoiceOS/ovos-audio/pull/149) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [2.2.7a3](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.7a3) (2026-09-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a2...2.2.7a3)
