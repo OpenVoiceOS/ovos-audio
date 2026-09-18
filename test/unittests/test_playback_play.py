@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import MagicMock, patch, call, ANY
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 
 
 def _make_thread(bus=None, q=None):
@@ -89,7 +90,7 @@ class TestPlayMethod(unittest.TestCase):
         """Return a thread ready for _play() with _now_playing set."""
         bus = bus or MagicMock()
         t = _make_thread(bus=bus)
-        msg = Message("speak", {"utterance": "hello world"}, context={})
+        msg = Message(SpecMessage.SPEAK, {"utterance": "hello world"}, context={})
         t._now_playing = ("/tmp/test.wav", visemes, listen, "test-tts", msg)
         t.on_start = MagicMock()
         t.on_end = MagicMock()

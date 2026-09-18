@@ -26,12 +26,12 @@ from ovos_bus_client.session import SessionManager, Session
 def _simple_plugin_available() -> bool:
     try:
         from ovos_plugin_manager.audio import find_audio_service_plugins
-        return "ovos_simple" in find_audio_service_plugins()
+        return "ovos_audio_simple" in find_audio_service_plugins()
     except Exception:
         return False
 
 
-@unittest.skipUnless(_simple_plugin_available(), "ovos_simple audio plugin not installed")
+@unittest.skipUnless(_simple_plugin_available(), "ovos_audio_simple plugin not installed")
 class TestLegacy(unittest.TestCase):
     def setUp(self):
         self.core = AudioService(FakeBus(), disable_ocp=True,
@@ -39,7 +39,7 @@ class TestLegacy(unittest.TestCase):
                                  validate_source=True)
         self.core.config['default-backend'] = "simple"
         self.core.config['backends'] = {"simple": {
-            "type": "ovos_simple",
+            "type": "ovos_audio_simple",
             "active": True
         }}
         self.core.load_services()

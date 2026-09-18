@@ -34,6 +34,7 @@ import time
 import unittest
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 from ovos_bus_client.session import Session
 
 from ovoscope.audio import AudioCaptureSession, PlaybackServiceHarness, SILENT_WAV
@@ -161,7 +162,7 @@ class TestSpeakNonDefaultSessionRejected(unittest.TestCase):
         with PlaybackServiceHarness(validate_source=True) as h:
             custom = Session("non-default-xyz")
             msg = Message(
-                "speak",
+                SpecMessage.SPEAK,
                 {"utterance": "should be rejected"},
                 {"session": custom.serialize()},
             )
@@ -178,7 +179,7 @@ class TestSpeakWithIdentContext(unittest.TestCase):
     def test_speak_with_ident(self) -> None:
         with PlaybackServiceHarness() as h:
             msg = Message(
-                "speak",
+                SpecMessage.SPEAK,
                 {"utterance": "legacy ident test"},
                 {"ident": "abc-123"},
             )
@@ -196,8 +197,8 @@ class TestAudioCaptureSequence(unittest.TestCase):
                 h.speak("capture me")
 
         cap.assert_sequence(
-            "recognizer_loop:audio_output_start",
-            "recognizer_loop:audio_output_end",
+            SpecMessage.AUDIO_OUTPUT_STARTED,
+            SpecMessage.AUDIO_OUTPUT_ENDED,
         )
 
 
@@ -212,9 +213,9 @@ class TestMultipleSpeaksCaptureAllEvents(unittest.TestCase):
                     h.speak(s)
 
         starts = [t for t in cap.message_types
-                  if t == "recognizer_loop:audio_output_start"]
+                  if t == SpecMessage.AUDIO_OUTPUT_STARTED]
         ends = [t for t in cap.message_types
-                if t == "recognizer_loop:audio_output_end"]
+                if t == SpecMessage.AUDIO_OUTPUT_ENDED]
         self.assertGreaterEqual(len(starts), 1,
                                 "At least one audio_output_start must be emitted")
         self.assertGreaterEqual(len(ends), 1,
@@ -237,8 +238,8 @@ class TestQueueSoundWithBinaryData(unittest.TestCase):
                 h._audio_output_end.wait(timeout=5.0)
 
         cap.assert_sequence(
-            "recognizer_loop:audio_output_start",
-            "recognizer_loop:audio_output_end",
+            SpecMessage.AUDIO_OUTPUT_STARTED,
+            SpecMessage.AUDIO_OUTPUT_ENDED,
         )
 
 
@@ -293,8 +294,8 @@ class TestSpeakAfterStop(unittest.TestCase):
                 h._audio_output_end.wait(timeout=5.0)
 
         cap.assert_sequence(
-            "recognizer_loop:audio_output_start",
-            "recognizer_loop:audio_output_end",
+            SpecMessage.AUDIO_OUTPUT_STARTED,
+            SpecMessage.AUDIO_OUTPUT_ENDED,
         )
 
 

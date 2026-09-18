@@ -20,6 +20,7 @@ import time
 import unittest
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 
 from ovoscope.audio import AudioCaptureSession, PlaybackServiceHarness
 
@@ -33,17 +34,17 @@ class TestSpeakBasic(unittest.TestCase):
             with AudioCaptureSession(bus=h.bus) as cap:
                 h.speak("hello")
             cap.assert_sequence(
-                "recognizer_loop:audio_output_start",
-                "recognizer_loop:audio_output_end",
+                SpecMessage.AUDIO_OUTPUT_STARTED,
+                SpecMessage.AUDIO_OUTPUT_ENDED,
             )
             h.assert_spoke("hello")
 
 
 class TestSpeakExpectResponse(unittest.TestCase):
-    """speak with expect_response=True must trigger mycroft.mic.listen."""
+    """speak with expect_response=True must trigger ovos.mic.listen."""
 
     def test_speak_expect_response(self) -> None:
-        """speak(expect_response=True) must emit mycroft.mic.listen after speech."""
+        """speak(expect_response=True) must emit ovos.mic.listen after speech."""
         with PlaybackServiceHarness() as h:
             h.speak("are you there?", expect_response=True)
             h.assert_audio_output_ended()
@@ -83,8 +84,8 @@ class TestQueueSound(unittest.TestCase):
                     # Wait for playback to complete
                     h._audio_output_end.wait(timeout=5.0)
                 cap.assert_sequence(
-                    "recognizer_loop:audio_output_start",
-                    "recognizer_loop:audio_output_end",
+                    SpecMessage.AUDIO_OUTPUT_STARTED,
+                    SpecMessage.AUDIO_OUTPUT_ENDED,
                 )
         finally:
             os.unlink(wav_path)
