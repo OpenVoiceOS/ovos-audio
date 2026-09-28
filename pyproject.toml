@@ -63,5 +63,13 @@ include-package-data = true
 [tool.setuptools.packages.find]
 include = ["ovos_audio*"]
 
+# res/snd holds the notification sounds, which service.py resolves at
+# os.path.join(os.path.dirname(__file__), "res", uri). They are data, not code,
+# so include-package-data alone does not reach them and an installed copy has
+# no sound to play.
+[tool.setuptools.package-data]
+ovos_audio = [
+    "res/snd/*",
+]
 [tool.setuptools.dynamic]
 version = {attr = "ovos_audio.version.__version__"}
