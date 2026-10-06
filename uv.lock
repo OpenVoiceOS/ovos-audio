@@ -887,7 +887,7 @@ requires-dist = [
     { name = "ovos-tts-plugin-server", marker = "extra == 'extras'", specifier = ">=0.0.6a1,<1.0.0" },
     { name = "ovos-utils", specifier = ">=0.8.5,<1.0.0" },
     { name = "ovoscope", marker = "extra == 'test'", specifier = ">=1.0.2a1" },
-    { name = "phoonnx", marker = "extra == 'extras'", specifier = ">=1.3.3,<1.4.0" },
+    { name = "phoonnx", marker = "extra == 'extras'", specifier = ">=1.3.3,<2.0.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=5.2.4" },
     { name = "pytest-cov", marker = "extra == 'test'", specifier = ">=2.8.1" },
 ]
