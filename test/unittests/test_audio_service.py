@@ -16,14 +16,13 @@ from ovos_utils.ocp import MediaState
 # helpers
 # ---------------------------------------------------------------------------
 
-def _make_service(disable_ocp=True, validate_source=False, config=None):
+def _make_service(validate_source=False, config=None):
     """Instantiate AudioService with autoload=False so no real plugins load."""
     from ovos_audio.audio import AudioService
     bus = FakeBus()
     cfg = config or {}
     with patch("ovos_audio.audio.Configuration", return_value={"Audio": cfg}):
         svc = AudioService(bus, autoload=False,
-                           disable_ocp=disable_ocp,
                            validate_source=validate_source)
     return svc
 
@@ -50,7 +49,6 @@ class TestLoadServicesOcpExclusion(unittest.TestCase):
                    return_value=found_plugins), \
              patch("ovos_audio.audio.setup_audio_service",
                    return_value=[]) as mock_setup, \
-             patch.object(svc, "find_ocp"), \
              patch.object(svc, "find_default"):
             svc.load_services()
         return mock_setup
@@ -73,60 +71,9 @@ class TestLoadServicesOcpExclusion(unittest.TestCase):
     def test_no_plugins_gives_empty_service_list(self):
         svc = _make_service()
         with patch("ovos_audio.audio.find_audio_service_plugins", return_value={}), \
-             patch.object(svc, "find_ocp"), \
              patch.object(svc, "find_default"):
             svc.load_services()
         self.assertEqual(svc.service, [])
-
-    def test_find_ocp_called_when_not_disabled(self):
-        svc = _make_service(disable_ocp=False)
-        with patch("ovos_audio.audio.find_audio_service_plugins", return_value={}), \
-             patch("ovos_audio.audio.setup_audio_service", return_value=[]), \
-             patch.object(svc, "find_ocp") as mock_ocp, \
-             patch.object(svc, "find_default"):
-            svc.load_services()
-        mock_ocp.assert_called_once()
-
-    def test_find_ocp_called_even_when_disabled(self):
-        """find_ocp is always called; disable_ocp is checked inside it."""
-        svc = _make_service(disable_ocp=True)
-        with patch("ovos_audio.audio.find_audio_service_plugins", return_value={}), \
-             patch("ovos_audio.audio.setup_audio_service", return_value=[]), \
-             patch.object(svc, "find_ocp") as mock_ocp, \
-             patch.object(svc, "find_default"):
-            svc.load_services()
-        mock_ocp.assert_called_once()
-
-
-# ---------------------------------------------------------------------------
-# find_ocp
-# ---------------------------------------------------------------------------
-
-class TestFindOcp(unittest.TestCase):
-
-    def test_disable_ocp_skips_import(self):
-        svc = _make_service(disable_ocp=True)
-        svc.find_ocp()
-        self.assertIsNone(svc.ocp)
-
-    def test_ocp_not_installed_returns_false(self):
-        svc = _make_service(disable_ocp=False)
-        with patch("ovos_audio.audio.Configuration", return_value={"Audio": {}}), \
-             patch.dict("sys.modules", {"ovos_plugin_common_play": None}):
-            result = svc.find_ocp()
-        self.assertFalse(result)
-
-    def test_ocp_installed_instantiates(self):
-        svc = _make_service(disable_ocp=False)
-        mock_backend_cls = MagicMock()
-        mock_ocp_module = MagicMock()
-        mock_ocp_module.OCPAudioBackend = mock_backend_cls
-        with patch("ovos_audio.audio.Configuration", return_value={"Audio": {
-                "backends": {"OCP": {}}}}), \
-             patch.dict("sys.modules", {"ovos_plugin_common_play": mock_ocp_module}):
-            svc.find_ocp()
-        mock_backend_cls.assert_called_once()
-        self.assertIsNotNone(svc.ocp)
 
 
 # ---------------------------------------------------------------------------
