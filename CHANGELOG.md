@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.2.8a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.8a2) (2026-10-11)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.8a1...2.2.8a2)
+
+**Merged pull requests:**
+
+- fix: allow phoonnx 1.93 in the extras [\#217](https://github.com/OpenVoiceOS/ovos-audio/pull/217) ([goldyfruit](https://github.com/goldyfruit))
+- chore\(packaging\): retire test/requirements.txt in favor of the test extra [\#215](https://github.com/OpenVoiceOS/ovos-audio/pull/215) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.8a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.8a1) (2026-09-18)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.7a3...2.2.8a1)
