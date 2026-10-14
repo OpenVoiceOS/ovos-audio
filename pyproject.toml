@@ -63,5 +63,11 @@ include-package-data = true
 [tool.setuptools.packages.find]
 include = ["ovos_audio*"]
 
+# The default sounds mycroft.conf names (snd/start_listening.wav and the others).
+# include-package-data only ships what MANIFEST.in lists, and that file went with
+# setup.py in the move to pyproject.toml, so no wheel since 1.2.0a1 had them.
+[tool.setuptools.package-data]
+ovos_audio = ["res/snd/*"]
+
 [tool.setuptools.dynamic]
 version = {attr = "ovos_audio.version.__version__"}
