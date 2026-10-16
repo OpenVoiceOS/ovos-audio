@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.8a3](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.8a3) (2026-10-16)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.8a2...2.2.8a3)
+
+**Merged pull requests:**
+
+- fix: ship the default sounds in the wheel again [\#219](https://github.com/OpenVoiceOS/ovos-audio/pull/219) ([goldyfruit](https://github.com/goldyfruit))
+
 ## [2.2.8a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.8a2) (2026-10-11)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.8a1...2.2.8a2)
