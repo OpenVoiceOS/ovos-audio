@@ -118,6 +118,13 @@ class TestResolveSoundUri(unittest.TestCase):
         with self.assertRaises((FileNotFoundError, Exception)):
             PlaybackService._resolve_sound_uri("/does/not/exist.wav")
 
+    def test_nonexistent_file_error_names_requested_uri(self):
+        from ovos_audio.service import PlaybackService
+        uri = "no/such/sound-file-xyz.wav"
+        with self.assertRaises(FileNotFoundError) as excinfo:
+            PlaybackService._resolve_sound_uri(uri)
+        self.assertIn(uri, str(excinfo.exception))
+
     def test_none_returns_none(self):
         from ovos_audio.service import PlaybackService
         result = PlaybackService._resolve_sound_uri(None)
@@ -179,6 +186,53 @@ class TestPathFromHexdata(unittest.TestCase):
         path1 = PlaybackService._path_from_hexdata(hex_str, "wav")
         path2 = PlaybackService._path_from_hexdata(hex_str, "wav")
         self.assertEqual(path1, path2)
+
+
+class TestPlaybackHandlersDontCrashOnBadSound(unittest.TestCase):
+    """A missing sound file or malformed message must be logged and
+    swallowed by the bus handlers, never raised into pyee's emit."""
+
+    def _make_minimal_service(self):
+        from ovos_audio.service import PlaybackService
+        from threading import Lock
+        svc = PlaybackService.__new__(PlaybackService)
+        svc.bus = MagicMock()
+        svc.playback_lock = Lock()
+        svc.tts = None
+        svc.validate_source = False
+        return svc
+
+    def test_handle_instant_play_unresolvable_uri_logs_and_returns(self):
+        svc = self._make_minimal_service()
+        msg = MagicMock()
+        msg.data = {"uri": "no/such/sound-file-xyz.wav"}
+        with patch("ovos_audio.service.LOG") as mock_log:
+            svc.handle_instant_play(msg)
+        mock_log.warning.assert_called()
+
+    def test_handle_instant_play_no_uri_or_binary_data_logs_and_returns(self):
+        svc = self._make_minimal_service()
+        msg = MagicMock()
+        msg.data = {}
+        with patch("ovos_audio.service.LOG") as mock_log:
+            svc.handle_instant_play(msg)
+        mock_log.warning.assert_called()
+
+    def test_handle_queue_audio_unresolvable_uri_logs_and_returns(self):
+        svc = self._make_minimal_service()
+        msg = MagicMock()
+        msg.data = {"uri": "no/such/sound-file-xyz.wav"}
+        with patch("ovos_audio.service.LOG") as mock_log:
+            svc.handle_queue_audio(msg)
+        mock_log.warning.assert_called()
+
+    def test_handle_queue_audio_no_uri_or_binary_data_logs_and_returns(self):
+        svc = self._make_minimal_service()
+        msg = MagicMock()
+        msg.data = {}
+        with patch("ovos_audio.service.LOG") as mock_log:
+            svc.handle_queue_audio(msg)
+        mock_log.warning.assert_called()
 
 
 if __name__ == "__main__":

@@ -51,7 +51,7 @@ class TestDialogTransformersServiceInit(unittest.TestCase):
         svc = self._make()
         dialog, ctx = svc.transform("test")
         self.assertEqual(dialog, "test")
-        self.assertIsNone(ctx)
+        self.assertEqual(ctx, {})
 
     def test_shutdown_no_plugins(self):
         svc = self._make()
@@ -177,7 +177,7 @@ class TestTTSTransformersService(unittest.TestCase):
         svc = self._make()
         result, ctx = svc.transform("/tmp/test.wav")
         self.assertEqual(result, "/tmp/test.wav")
-        self.assertIsNone(ctx)
+        self.assertEqual(ctx, {})
 
     def test_set_bus_propagates_to_plugins(self):
         svc = self._make()
@@ -242,3 +242,67 @@ class TestTTSTransformersService(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStageConfigResolution(unittest.TestCase):
+    """A stage reads its own config section.
+
+    Neither ``dialog_transformers`` nor ``tts_transformers`` ships in the
+    default configuration, and the plugin manager cannot tell a whole core
+    configuration lacking the section from the section itself: every
+    top-level key then reads as an enabled plugin and the loader warns once
+    per key. That made an ordinary boot log dozens of false lines.
+    """
+
+    FULL_CONFIG = {
+        "lang": "en-US",
+        "listener": {"sample_rate": 16000},
+        "websocket": {"host": "127.0.0.1"},
+        "tts": {"module": "ovos-tts-plugin-server"},
+        "date_format": "DMY",
+        "system_unit": "metric",
+    }
+
+    def _services(self):
+        from ovos_audio.transformers import (DialogTransformersService,
+                                             TTSTransformersService)
+        return (("ovos_audio.transformers.find_dialog_transformer_plugins",
+                 DialogTransformersService),
+                ("ovos_audio.transformers.find_tts_transformer_plugins",
+                 TTSTransformersService))
+
+    def _warnings(self, finder, cls, config=None, full=None):
+        with patch(finder, return_value={}), \
+             patch("ovos_audio.transformers.Configuration",
+                   return_value=dict(full if full is not None
+                                     else self.FULL_CONFIG)), \
+             patch("ovos_plugin_manager.transformer_services.LOG.warning") as w:
+            svc = cls(bus=MagicMock(), config=config)
+        return svc, [c.args[0] for c in w.call_args_list]
+
+    def test_a_boot_warns_about_nothing(self):
+        for finder, cls in self._services():
+            with self.subTest(service=cls.__name__):
+                _, warnings = self._warnings(finder, cls)
+                self.assertEqual(
+                    warnings, [],
+                    f"{cls.__name__} read top-level config keys as plugins: "
+                    f"{warnings}")
+
+    def test_a_configured_but_missing_plugin_is_still_reported(self):
+        """The guard that silencing the false lines kept the true one."""
+        finder, cls = self._services()[0]
+        full = dict(self.FULL_CONFIG)
+        full["dialog_transformers"] = {"some-dialog-plugin": {}}
+        _, warnings = self._warnings(finder, cls, full=full)
+        self.assertEqual(len(warnings), 1, warnings)
+        self.assertIn("some-dialog-plugin", warnings[0])
+
+    def test_an_explicit_config_is_passed_through_untouched(self):
+        """A caller that supplies a mapping has named what it wants used."""
+        finder, cls = self._services()[0]
+        section = {"some-dialog-plugin": {"active": True}}
+        svc, warnings = self._warnings(finder, cls, config=section)
+        self.assertEqual(svc.config, section)
+        self.assertEqual(len(warnings), 1, warnings)
+        self.assertIn("some-dialog-plugin", warnings[0])
