@@ -31,6 +31,7 @@ import time
 import unittest
 
 from ovos_bus_client.message import Message
+from ovos_spec_tools import SpecMessage
 from ovos_bus_client.session import Session
 
 from ovoscope.audio import AudioCaptureSession, AudioServiceHarness
@@ -106,7 +107,7 @@ class TestRestoreVolumeOnHandledWhileSpeaking(unittest.TestCase):
     def test_restore_on_handled_speaking(self) -> None:
         with AudioServiceHarness() as h:
             h.play(["http://example.com/track.mp3"])
-            h.bus.emit(Message("recognizer_loop:audio_output_start"))
+            h.bus.emit(Message(SpecMessage.AUDIO_OUTPUT_STARTED))
             time.sleep(0.05)
             h.assert_volume_lowered()
             self.assertTrue(h.service.volume_is_speaking)
