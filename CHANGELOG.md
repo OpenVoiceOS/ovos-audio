@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.9a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.9a1) (2026-10-22)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.8a3...2.2.9a1)
+
+**Merged pull requests:**
+
+- fix\(deps\): accept ovos-plugin-manager 3 [\#221](https://github.com/OpenVoiceOS/ovos-audio/pull/221) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.8a3](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.8a3) (2026-10-16)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.8a2...2.2.8a3)
