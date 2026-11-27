@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.11a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.11a2) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.11a1...2.2.11a2)
+
+**Merged pull requests:**
+
+- chore: allow ovos-media-plugin-spotify 1.x [\#247](https://github.com/OpenVoiceOS/ovos-audio/pull/247) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.11a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.11a1) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.10a2...2.2.11a1)
@@ -362,18 +370,9 @@
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.1...1.0.2a1)
 
-**Merged pull requests:**
-
-- Release 1.0.2a1 [\#129](https://github.com/OpenVoiceOS/ovos-audio/pull/129) ([github-actions[bot]](https://github.com/apps/github-actions))
-- Update ovos-config requirement from \<2.0.0,\>=0.0.12 to \>=0.0.12,\<3.0.0 in /requirements [\#128](https://github.com/OpenVoiceOS/ovos-audio/pull/128) ([dependabot[bot]](https://github.com/apps/dependabot))
-
 ## [1.0.1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.1) (2025-06-08)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.1a1...1.0.1)
-
-**Merged pull requests:**
-
-- Release 1.0.1a1 [\#127](https://github.com/OpenVoiceOS/ovos-audio/pull/127) ([github-actions[bot]](https://github.com/apps/github-actions))
 
 ## [1.0.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.1a1) (2025-06-08)
 
