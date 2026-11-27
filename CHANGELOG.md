@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.11a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.11a1) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.10a2...2.2.11a1)
+
+**Merged pull requests:**
+
+- fix: allow ovos-media-plugin-chromecast 1.x and drop the chromecast\#51 xfail [\#248](https://github.com/OpenVoiceOS/ovos-audio/pull/248) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.10a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.10a2) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.10a1...2.2.10a2)
@@ -371,17 +379,9 @@
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.0a1...1.0.1a1)
 
-**Merged pull requests:**
-
-- fix: opm 1.X.X compat [\#126](https://github.com/OpenVoiceOS/ovos-audio/pull/126) ([JarbasAl](https://github.com/JarbasAl))
-
 ## [1.0.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.0a1) (2025-03-06)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.1a1...1.0.0a1)
-
-**Merged pull requests:**
-
-- Release 1.0.0a1 [\#124](https://github.com/OpenVoiceOS/ovos-audio/pull/124) ([github-actions[bot]](https://github.com/apps/github-actions))
 
 ## [0.4.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.1a1) (2025-03-06)
 
