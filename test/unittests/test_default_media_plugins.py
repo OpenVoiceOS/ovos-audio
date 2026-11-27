@@ -74,6 +74,7 @@ class TestDefaultMediaPlugins(unittest.TestCase):
                                        "abstract methods '_stop', 'load_track'")))
 
     def test_spotify(self):
+        pytest.importorskip("ovos_media_plugin_spotify.spotify_client")
         # No credentials: the client must not reach the network.
         with patch("ovos_media_plugin_spotify.spotify_client.SpotifyClient.spotify", None):
             _check_backend(_load("ovos_spotify", {"identifier": "test"}, self.caplog))
@@ -82,6 +83,7 @@ class TestDefaultMediaPlugins(unittest.TestCase):
         "ovos-media-plugin-chromecast#51: under ovos-plugin-manager 3 "
         "ChromecastOCPAudioService does not implement the abstract method _stop"))
     def test_chromecast(self):
+        pytest.importorskip("ovos_media_plugin_chromecast.media")
         with patch("ovos_media_plugin_chromecast.media.CastListener.start_browser"):
             service = _load("ovos_chromecast", {"identifier": "test"}, self.caplog,
                             _abstract("ChromecastOCPAudioService", "abstract method '_stop'"))
