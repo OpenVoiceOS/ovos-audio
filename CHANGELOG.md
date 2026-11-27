@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.9a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.9a2) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.9a1...2.2.9a2)
+
+**Merged pull requests:**
+
+- ci: run build tests on every push to the integration branch [\#233](https://github.com/OpenVoiceOS/ovos-audio/pull/233) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.9a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.9a1) (2026-10-22)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.8a3...2.2.9a1)
