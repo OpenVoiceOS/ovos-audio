@@ -22,8 +22,10 @@ jobs:
     secrets: inherit
     with:
       system_deps: 'swig sox mpg123'
-      pre_install_pip: 'ovos-plugin-manager>=3.1.0a1 ovos-media-plugin-cli>=1.0.0a1 ovos-media-plugin-mpv>=2.0.0a1 ovos-media-plugin-spotify>=1.0.0a1 ovos-media-plugin-chromecast>=1.0.0a1'
-      install_extras: 'test'
+      pre_install_pip: 'ovos-plugin-manager~=3.1a1 ovos-media-plugin-cli~=1.0a1 ovos-media-plugin-mpv~=2.0a1 ovos-media-plugin-spotify~=1.0a1 ovos-media-plugin-chromecast~=1.0a1'
+      # ovoscope>=1.12 pulls ovos-core[plugins], whose translation plugins cap
+      # opm below 3; the constraint keeps opm 3 in the same resolve.
+      install_extras: '-c test/constraints/opm3.txt ovos-audio[test] --find-links dist'
       test_path: 'test/unittests/test_default_media_plugins.py test/unittests/test_end2end.py'
       pytest_args: '-rs'
       pre_test_command: >-
@@ -39,7 +41,7 @@ jobs:
     secrets: inherit
     with:
       system_deps: 'swig sox mpg123'
-      pre_install_pip: 'ovos-plugin-manager<3 ovos-audio-plugin-simple>=0.1.4a3'
+      pre_install_pip: 'ovos-plugin-manager~=2.12a1 ovos-audio-plugin-simple~=0.1.4a3'
       install_extras: 'test'
       test_path: 'test/unittests/test_end2end.py'
       pytest_args: '-rs'
