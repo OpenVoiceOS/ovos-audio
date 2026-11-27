@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.9a3](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.9a3) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.9a2...2.2.9a3)
+
+**Merged pull requests:**
+
+- test: legacy loader loads each default media plugin's AudioBackend shim [\#234](https://github.com/OpenVoiceOS/ovos-audio/pull/234) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.9a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.9a2) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.9a1...2.2.9a2)
