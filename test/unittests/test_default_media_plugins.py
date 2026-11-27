@@ -78,17 +78,17 @@ class TestDefaultMediaPlugins(unittest.TestCase):
         with patch("ovos_media_plugin_spotify.spotify_client.SpotifyClient.spotify", None):
             _check_backend(_load("ovos_spotify", {"identifier": "test"}, self.caplog))
 
-    @pytest.mark.xfail(strict=True, raises=KnownDefect, reason=(
-        "ovos-media-plugin-chromecast#51: play() with no device found raises "
-        "RuntimeError; under ovos-plugin-manager 3 ChromecastOCPAudioService "
-        "does not implement the abstract method _stop"))
+    @pytest.mark.xfail(OPM3, strict=True, raises=KnownDefect, reason=(
+        "ovos-media-plugin-chromecast#51: under ovos-plugin-manager 3 "
+        "ChromecastOCPAudioService does not implement the abstract method _stop"))
     def test_chromecast(self):
         with patch("ovos_media_plugin_chromecast.media.CastListener.start_browser"):
             service = _load("ovos_chromecast", {"identifier": "test"}, self.caplog,
                             _abstract("ChromecastOCPAudioService", "abstract method '_stop'"))
-            try:
-                _check_backend(service)
-            except RuntimeError as e:
-                if str(e) == "Unknown Chromecast device: test":
-                    raise KnownDefect(str(e)) from e
-                raise
+            assert isinstance(service, AudioBackend)
+            # The raise is the failure signal: the audio service catches it
+            # and reports a playback error.
+            with pytest.raises(RuntimeError, match="^Unknown Chromecast device: test$"):
+                service.play()
+            for method in NO_TRACK_CALLS[1:]:
+                getattr(service, method)()
