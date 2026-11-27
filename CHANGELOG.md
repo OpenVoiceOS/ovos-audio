@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.10a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.10a1) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.9a4...2.2.10a1)
+
+**Merged pull requests:**
+
+- fix: allow ovos-media-plugin-mpv 2.x and drop the mpv\#35 xfail [\#242](https://github.com/OpenVoiceOS/ovos-audio/pull/242) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.9a4](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.9a4) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.9a3...2.2.9a4)
@@ -363,10 +371,6 @@
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.1a1...1.0.0a1)
 
-**Breaking changes:**
-
-- refactor!:drop "native source" and use session\_id instead [\#121](https://github.com/OpenVoiceOS/ovos-audio/pull/121) ([JarbasAl](https://github.com/JarbasAl))
-
 **Merged pull requests:**
 
 - Release 1.0.0a1 [\#124](https://github.com/OpenVoiceOS/ovos-audio/pull/124) ([github-actions[bot]](https://github.com/apps/github-actions))
@@ -382,10 +386,6 @@
 ## [0.4.0](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.0) (2025-03-06)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.0a1...0.4.0)
-
-**Merged pull requests:**
-
-- Release 0.4.0a1 [\#120](https://github.com/OpenVoiceOS/ovos-audio/pull/120) ([github-actions[bot]](https://github.com/apps/github-actions))
 
 ## [0.4.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.0a1) (2025-02-27)
 
