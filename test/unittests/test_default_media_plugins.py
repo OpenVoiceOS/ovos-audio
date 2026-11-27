@@ -61,13 +61,8 @@ class TestDefaultMediaPlugins(unittest.TestCase):
     def test_cli(self):
         _check_backend(_load("ovos_cli", {}, self.caplog))
 
-    @pytest.mark.xfail(OPM3, strict=True, raises=KnownDefect, reason=(
-        "ovos-media-plugin-mpv#35: under ovos-plugin-manager 3 OVOSMPVService does not "
-        "implement the abstract methods _stop and load_track"))
     def test_mpv(self):
-        _check_backend(_load("ovos_mpv", {}, self.caplog,
-                             _abstract("OVOSMPVService",
-                                       "abstract methods '_stop', 'load_track'")))
+        _check_backend(_load("ovos_mpv", {}, self.caplog))
 
     def test_spotify(self):
         pytest.importorskip("ovos_media_plugin_spotify.spotify_client")
