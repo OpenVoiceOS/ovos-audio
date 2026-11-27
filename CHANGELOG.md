@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.3.1a1) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.3.0a1...2.3.1a1)
+
+**Merged pull requests:**
+
+- fix: b64 path handles SSML in utterance, drop utterance\_ssml [\#255](https://github.com/OpenVoiceOS/ovos-audio/pull/255) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.3.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.3.0a1) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.12a1...2.3.0a1)
@@ -356,17 +364,9 @@
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.0a2...1.1.0)
 
-**Merged pull requests:**
-
-- Release 1.1.0a2 [\#135](https://github.com/OpenVoiceOS/ovos-audio/pull/135) ([github-actions[bot]](https://github.com/apps/github-actions))
-
 ## [1.1.0a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.0a2) (2025-11-05)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.1.0a1...1.1.0a2)
-
-**Merged pull requests:**
-
-- Update requirements.txt [\#134](https://github.com/OpenVoiceOS/ovos-audio/pull/134) ([JarbasAl](https://github.com/JarbasAl))
 
 ## [1.1.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.0a1) (2025-10-07)
 
