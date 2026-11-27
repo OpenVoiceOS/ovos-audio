@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.10a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.10a2) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.10a1...2.2.10a2)
+
+**Merged pull requests:**
+
+- test: ovos-media-plugin-cli loads under ovos-plugin-manager 3 [\#244](https://github.com/OpenVoiceOS/ovos-audio/pull/244) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.10a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.10a1) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.9a4...2.2.10a1)
@@ -378,10 +386,6 @@
 ## [0.4.1a1](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.1a1) (2025-03-06)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/0.4.0...0.4.1a1)
-
-**Merged pull requests:**
-
-- fix:automations [\#122](https://github.com/OpenVoiceOS/ovos-audio/pull/122) ([JarbasAl](https://github.com/JarbasAl))
 
 ## [0.4.0](https://github.com/OpenVoiceOS/ovos-audio/tree/0.4.0) (2025-03-06)
 
