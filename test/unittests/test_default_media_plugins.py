@@ -58,12 +58,8 @@ class TestDefaultMediaPlugins(unittest.TestCase):
             self.caplog = caplog
             yield
 
-    @pytest.mark.xfail(OPM3, strict=True, raises=KnownDefect, reason=(
-        "ovos-media-plugin-cli#17: under ovos-plugin-manager 3 CLIOldAudioService "
-        "does not implement the abstract method _stop, so it cannot be instantiated"))
     def test_cli(self):
-        _check_backend(_load("ovos_cli", {}, self.caplog,
-                             _abstract("CLIOldAudioService", "abstract method '_stop'")))
+        _check_backend(_load("ovos_cli", {}, self.caplog))
 
     @pytest.mark.xfail(OPM3, strict=True, raises=KnownDefect, reason=(
         "ovos-media-plugin-mpv#35: under ovos-plugin-manager 3 OVOSMPVService does not "
