@@ -106,6 +106,8 @@ Plays a sound immediately, bypassing the TTS queue. Supports optional volume-res
 
 Synthesizes an utterance and returns the audio base64-encoded on the bus instead of playing it. Useful for remote TTS integrations.
 
+The message can carry `utterance_ssml` beside the required `utterance`. The TTS gets the SSML only when its `ssml_tags` include `speak` and the SSML is well-formed XML. In all other cases the TTS gets the plain `utterance`. The reply always carries the plain `utterance`.
+
 ### `handle_stop(message)`
 
 Clears the `PlaybackThread` queue on `mycroft.stop`.

@@ -12,6 +12,7 @@ from typing import Optional
 
 import binascii
 import time
+from xml.etree import ElementTree
 from ovos_bus_client import Message, MessageBusClient
 from ovos_bus_client.session import SessionManager
 from ovos_config.config import Configuration
@@ -297,6 +298,19 @@ class PlaybackService(Thread):
         else:
             self.status.set_error('No TTS loaded')
 
+    def _b64_sentence(self, utterance: str, ssml: Optional[str]) -> str:
+        """Pick the text to synthesise: the SSML when the TTS declares the
+        'speak' tag in ``ssml_tags`` and the SSML is well-formed XML, else the
+        plain utterance."""
+        if not ssml or "speak" not in self.tts.ssml_tags:
+            return utterance
+        try:
+            ElementTree.fromstring(self.tts.format_speak_tags(ssml))
+        except ElementTree.ParseError as e:
+            LOG.warning(f"malformed utterance_ssml, using plain utterance: {e}")
+            return utterance
+        return self.tts.validate_ssml(ssml)
+
     def handle_b64_audio(self, message):
         """synthesizes speech, but instead of queuing for playback
         returns it b64 encoded in the bus
@@ -315,9 +329,10 @@ class PlaybackService(Thread):
         stopwatch.start()
         utterance = message.data['utterance']
         listen = message.data.get("listen", False)
+        sentence = self._b64_sentence(utterance, message.data.get("utterance_ssml"))
 
         ctxt = self.tts._get_ctxt({"message": message})
-        wav, _ = self.tts.synth(utterance, ctxt)
+        wav, _ = self.tts.synth(sentence, ctxt)
         # cast to str() to get a path, as it is a AudioFile object from tts cache
         with open(str(wav), "rb") as f:
             audio = f.read()
