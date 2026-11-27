@@ -32,3 +32,19 @@ jobs:
         assert m.version('ovos-plugin-manager').startswith('3.'), m.version('ovos-plugin-manager');
         missing = {'ovos_cli', 'ovos_mpv', 'ovos_spotify', 'ovos_chromecast'} - set(f());
         assert not missing, missing"
+
+  # Users run the legacy OCP on opm 2 with ovos-audio-plugin-simple.
+  legacy_ocp_opm2:
+    uses: OpenVoiceOS/gh-automations/.github/workflows/build-tests.yml@dev
+    secrets: inherit
+    with:
+      system_deps: 'swig sox mpg123'
+      pre_install_pip: 'ovos-plugin-manager<3 ovos-audio-plugin-simple>=0.1.4a3'
+      install_extras: 'test'
+      test_path: 'test/unittests/test_end2end.py'
+      pytest_args: '-rs'
+      pre_test_command: >-
+        python -c "import importlib.metadata as m;
+        from ovos_plugin_manager.audio import find_audio_service_plugins as f;
+        assert m.version('ovos-plugin-manager').startswith('2.'), m.version('ovos-plugin-manager');
+        assert 'ovos_audio_simple' in f()"
