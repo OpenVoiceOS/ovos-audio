@@ -12,6 +12,8 @@
 #
 import time
 import unittest
+from importlib.metadata import PackageNotFoundError, version
+from unittest.mock import patch
 from time import sleep
 
 from ovos_bus_client.message import Message
@@ -23,15 +25,34 @@ from ovos_audio.service import AudioService
 from ovos_bus_client.session import SessionManager, Session
 
 
-def _simple_plugin_available() -> bool:
+def _legacy_backend():
+    """The legacy backend that is installed, and whether it is the simple one.
+
+    The expected messages follow the shim of ovos-media-plugin-cli 1.x
+    (opm 3) or ovos-audio-plugin-simple (opm 2).
+    """
     try:
-        from ovos_plugin_manager.audio import find_audio_service_plugins
-        return "ovos_simple" in find_audio_service_plugins()
-    except Exception:
-        return False
+        if int(version("ovos-media-plugin-cli").split(".")[0]) >= 1:
+            return "ovos_cli", False
+    except PackageNotFoundError:
+        pass
+    try:
+        version("ovos-audio-plugin-simple")
+        return "ovos_audio_simple", True
+    except PackageNotFoundError:
+        return None, False
 
 
-@unittest.skipUnless(_simple_plugin_available(), "ovos_simple audio plugin not installed")
+BACKEND, SIMPLE = _legacy_backend()
+# The simple plugin emits these from load_track and hands playback to the
+# bus; the cli shim does neither.
+LOAD = ["ovos.common_play.media.state",  # LOADING_MEDIA
+        "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
+        "ovos.common_play.simple.play"] if SIMPLE else []
+OFF = len(LOAD)
+
+
+@unittest.skipUnless(BACKEND, "no legacy audio backend installed")
 class TestLegacy(unittest.TestCase):
     def setUp(self):
         self.core = AudioService(FakeBus(), disable_ocp=True,
@@ -39,12 +60,17 @@ class TestLegacy(unittest.TestCase):
                                  validate_source=True)
         self.core.config['default-backend'] = "simple"
         self.core.config['backends'] = {"simple": {
-            "type": "ovos_simple",
+            "type": BACKEND,
             "active": True
         }}
         self.core.load_services()
-        # simple plugin
-        self.core.bus.remove_all_listeners('ovos.common_play.simple.play')
+        if SIMPLE:
+            self.core.bus.remove_all_listeners('ovos.common_play.simple.play')
+        else:
+            # keep the CLI engine from spawning a player for the fake URIs
+            patcher = patch("ovos_media_plugin_cli.CLIBaseService.play")
+            patcher.start()
+            self.addCleanup(patcher.stop)
 
     def test_http(self):
 
@@ -74,9 +100,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.play',
-            "ovos.common_play.media.state",  # LOADING_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
             "ovos.common_play.player.state",  # PLAYING
             "ovos.common_play.media.state",  # LOADED_MEDIA
             "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
@@ -88,15 +112,16 @@ class TestLegacy(unittest.TestCase):
         for idx, m in enumerate(messages):
             self.assertEqual(m.msg_type, expected_messages[idx])
 
-        state = messages[1]
-        self.assertEqual(state.data["state"], MediaState.LOADING_MEDIA)
-        state = messages[2]
-        self.assertEqual(state.data["state"], TrackState.QUEUED_AUDIOSERVICE)
-        state = messages[4]
+        if SIMPLE:
+            state = messages[1]
+            self.assertEqual(state.data["state"], MediaState.LOADING_MEDIA)
+            state = messages[2]
+            self.assertEqual(state.data["state"], TrackState.QUEUED_AUDIOSERVICE)
+        state = messages[1 + OFF]
         self.assertEqual(state.data["state"], PlayerState.PLAYING)
-        state = messages[5]
+        state = messages[2 + OFF]
         self.assertEqual(state.data["state"], MediaState.LOADED_MEDIA)
-        state = messages[6]
+        state = messages[3 + OFF]
         self.assertEqual(state.data["state"], TrackState.PLAYING_AUDIOSERVICE)
         # confirm stream has been loaded into plugin
         self.assertEqual(self.core.current._now_playing, "http://fake.mp3")
@@ -142,9 +167,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.play',
-            "ovos.common_play.media.state",  # LOADING_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
             "ovos.common_play.player.state",  # PLAYING
             "ovos.common_play.media.state",  # LOADED_MEDIA
             "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
@@ -232,9 +255,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.play',
-            "ovos.common_play.media.state",  # LOADED_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
             "ovos.common_play.player.state",  # PLAYING
             "ovos.common_play.media.state",  # LOADED_MEDIA
             "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
@@ -262,9 +283,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.next',
-            "ovos.common_play.media.state",  # LOADED_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
         ]
         wait_for_n_messages(len(expected_messages))
 
@@ -288,9 +307,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.next',
-            "ovos.common_play.media.state",  # LOADED_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
         ]
         wait_for_n_messages(len(expected_messages))
 
@@ -314,9 +331,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.prev',
-            "ovos.common_play.media.state",  # LOADED_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
         ]
         wait_for_n_messages(len(expected_messages))
 
@@ -385,9 +400,7 @@ class TestLegacy(unittest.TestCase):
         # confirm all expected messages are sent
         expected_messages = [
             'mycroft.audio.service.play',
-            "ovos.common_play.media.state",  # LOADING_MEDIA
-            "ovos.common_play.track.state",  # QUEUED_AUDIOSERVICE
-            "ovos.common_play.simple.play",  # call simple plugin
+            *LOAD,
             "ovos.common_play.player.state",  # PLAYING
             "ovos.common_play.media.state",  # LOADED_MEDIA
             "ovos.common_play.track.state",  # PLAYING_AUDIOSERVICE
@@ -399,11 +412,11 @@ class TestLegacy(unittest.TestCase):
         for idx, m in enumerate(messages):
             self.assertEqual(m.msg_type, expected_messages[idx])
 
-        state = messages[4]
+        state = messages[1 + OFF]
         self.assertEqual(state.data["state"], PlayerState.PLAYING)
-        state = messages[5]
+        state = messages[2 + OFF]
         self.assertEqual(state.data["state"], MediaState.LOADED_MEDIA)
-        state = messages[6]
+        state = messages[3 + OFF]
         self.assertEqual(state.data["state"], TrackState.PLAYING_AUDIOSERVICE)
 
         messages = []

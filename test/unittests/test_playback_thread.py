@@ -15,6 +15,8 @@ import queue
 import unittest
 from unittest.mock import MagicMock, patch, call
 
+from ovos_spec_tools import SpecMessage
+
 
 def _make_thread(bus=None, q=None):
     """Create a PlaybackThread without starting it."""
@@ -102,7 +104,7 @@ class TestBeginAudio(unittest.TestCase):
         msg = MagicMock()
         msg.forward.return_value = MagicMock()
         t.begin_audio(message=msg)
-        msg.forward.assert_any_call("recognizer_loop:audio_output_start")
+        msg.forward.assert_any_call(SpecMessage.AUDIO_OUTPUT_STARTED)
 
     def test_begin_audio_no_bus_logs_warning(self):
         t = _make_thread(bus=None)
@@ -141,7 +143,7 @@ class TestEndAudio(unittest.TestCase):
         msg = MagicMock()
         msg.forward.return_value = MagicMock()
         t.end_audio(listen=False, message=msg)
-        msg.forward.assert_any_call("recognizer_loop:audio_output_end")
+        msg.forward.assert_any_call(SpecMessage.AUDIO_OUTPUT_ENDED)
 
     def test_end_audio_emits_listen_when_requested(self):
         bus = MagicMock()
@@ -149,7 +151,7 @@ class TestEndAudio(unittest.TestCase):
         msg = MagicMock()
         msg.forward.return_value = MagicMock()
         t.end_audio(listen=True, message=msg)
-        msg.forward.assert_any_call("mycroft.mic.listen")
+        msg.forward.assert_any_call(SpecMessage.MIC_LISTEN)
 
     def test_end_audio_no_listen(self):
         bus = MagicMock()
@@ -158,7 +160,7 @@ class TestEndAudio(unittest.TestCase):
         msg.forward.return_value = MagicMock()
         t.end_audio(listen=False, message=msg)
         forwarded = [c[0][0] for c in msg.forward.call_args_list]
-        self.assertNotIn("mycroft.mic.listen", forwarded)
+        self.assertNotIn(SpecMessage.MIC_LISTEN, forwarded)
 
     def test_end_audio_no_bus_logs_warning(self):
         t = _make_thread(bus=None)
