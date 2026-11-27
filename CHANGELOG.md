@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.12a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.12a1) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.11a2...2.2.12a1)
+
+**Closed issues:**
+
+- Test extra pins ovos-audio-plugin-simple, which caps ovos-plugin-manager below 3 [\#245](https://github.com/OpenVoiceOS/ovos-audio/issues/245)
+
+**Merged pull requests:**
+
+- fix: test extra resolves on ovos-plugin-manager 3 [\#251](https://github.com/OpenVoiceOS/ovos-audio/pull/251) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.11a2](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.11a2) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.11a1...2.2.11a2)
@@ -360,11 +372,6 @@
 ## [1.0.2a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a2) (2025-07-07)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.2a1...1.0.2a2)
-
-**Merged pull requests:**
-
-- Release 1.0.2a2 [\#131](https://github.com/OpenVoiceOS/ovos-audio/pull/131) ([github-actions[bot]](https://github.com/apps/github-actions))
-- Update extras.txt [\#130](https://github.com/OpenVoiceOS/ovos-audio/pull/130) ([JarbasAl](https://github.com/JarbasAl))
 
 ## [1.0.2a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a1) (2025-06-16)
 
