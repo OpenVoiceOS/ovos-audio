@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.3.0a1) (2026-11-27)
+
+[Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.12a1...2.3.0a1)
+
+**Merged pull requests:**
+
+- feat: optional utterance\_ssml on ovos.utterance.speak.b64 [\#253](https://github.com/OpenVoiceOS/ovos-audio/pull/253) ([openvoiceos-bot](https://github.com/openvoiceos-bot))
+
 ## [2.2.12a1](https://github.com/OpenVoiceOS/ovos-audio/tree/2.2.12a1) (2026-11-27)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/2.2.11a2...2.2.12a1)
@@ -363,11 +371,6 @@
 ## [1.1.0a1](https://github.com/OpenVoiceOS/ovos-audio/tree/1.1.0a1) (2025-10-07)
 
 [Full Changelog](https://github.com/OpenVoiceOS/ovos-audio/compare/1.0.2a2...1.1.0a1)
-
-**Merged pull requests:**
-
-- Release 1.1.0a1 [\#133](https://github.com/OpenVoiceOS/ovos-audio/pull/133) ([github-actions[bot]](https://github.com/apps/github-actions))
-- feat: per utterance playback start event [\#132](https://github.com/OpenVoiceOS/ovos-audio/pull/132) ([JarbasAl](https://github.com/JarbasAl))
 
 ## [1.0.2a2](https://github.com/OpenVoiceOS/ovos-audio/tree/1.0.2a2) (2025-07-07)
 
